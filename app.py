@@ -24,3 +24,4 @@ app.config.from_object('config')
 @app.route('/home')
 def home():
     return render_template('index.html')
+    
