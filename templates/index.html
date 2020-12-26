@@ -1,55 +1,79 @@
 {% extends "base.html" %}
 
 {% block head %}
-  {{ super() }}
+{{ super() }}
 {% endblock %}
 
- {% block body %}
-  {{ super() }}
-  <div class="row">
+{% block body %}
+{{ super() }}
+<div class="row">
   {% if tag_results %}
-    <p>
-      {{ tag_results | safe }}
-    </p>
+  <p>
+    {{ tag_results | safe }}
+  </p>
   {% endif %}
-  </div>
+</div>
 
-    {% if not text %}
-    <form id="submitText" action="{{ url_for('tag') }}" method="post">
-      <div class="row mb-3">
-        <div class="col-md-12">
-          <div class="form-group green-border-focus">
-            <label for="inputText">Enter text below:</label>
-            <!-- todo: make largeTextArea responsive to screen size -->
-            <textarea form="submitText" class="form-control" id="inputText" name="inputText" rows="20">
+{% if not text %}
+<form id="submitText" action="{{ url_for('tag') }}" method="post">
+  <div class="row mb-3">
+    <div class="col-md-12">
+      <div class="form-group green-border-focus">
+        <label for="inputText">Enter text below:</label>
+        <!-- todo: make largeTextArea responsive to screen size -->
+        <textarea id="textArea" form="submitText" class="form-control" id="inputText" name="inputText" rows="20">
 
             </textarea>
-          </div>
-        </div>
-        </div>
-        <div class="row mb-3">
-          <div class="col-md-12">
-              <div class="float-right">
-                <button type="submit" id=tag-text class="btn btn-outline-success"></i> Tag text</button>
-              </div>
-            </div>
-          </div>
-    </form>
-
-    {% elif text %}
-    <div class="row mb-3">
-          <div class="col-md-12">
-              <div class="border"> {{text}} </div>
-           </div>
+      </div>
     </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-md-12">
+      <div class="float-right">
+        <button type="submit" id=tag-text class="btn btn-outline-success"></i> Tag text</button>
+      </div>
+    </div>
+  </div>
+</form>
 
-    {% endif %}
+{% elif text %}
+<div class="row mb-3">
+  <div class="col-md-12">
+
+    <div id="compressedText" class="border"> {{text}} </div>
+  </div>
+</div>
+<script type="text/javascript">
+  var results = {{ tag_results | safe}};
+  var textText = $("#compressedText").text(); //got the text here!
+  // console.log("textText is: " + textText);
+
+  replaceText(results);
+
+  $(".highlight").css({ backgroundColor: "#FFFF88" });
+
+  function replaceText(matches) {
+    $.each(matches, function (index, value) {
+      $("#compressedText").html(function () {
+        // return $(this).html().replace(value.span_text, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"); //test works!
+        //highlight
+        $(this).highlight(value.span_text);
+        console.log(value.span_text);
+        console.log(index);
+      });
+    });
+
+
+  }
+
+
+</script>
+{% endif %}
 
 
 
 {% endblock %}
 
 {% block footer %}
-  {{ super() }}
+{{ super() }}
 {% endblock %}
-
