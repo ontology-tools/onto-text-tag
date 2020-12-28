@@ -44,28 +44,51 @@
   </div>
 </div>
 <script type="text/javascript">
+
+//enable tooltips:
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+
   var results = {{ tag_results | safe}};
   var textText = $("#compressedText").text(); //got the text here!
   // console.log("textText is: " + textText);
 
   replaceText(results);
 
-  $(".highlight").css({ backgroundColor: "#FFFF88" });
+  // $(".highlight").css({ backgroundColor: "#FFFF88" });
+  // var randomColor = Math.floor(1/index*16777215).toString(16);
+  // var randomBackground = "#" + randomColor;
+  // $(".highlight").css({ backgroundColor: randomBackground });
 
   function replaceText(matches) {
     $.each(matches, function (index, value) {
       $("#compressedText").html(function () {
         // return $(this).html().replace(value.span_text, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"); //test works!
         //highlight
-        $(this).highlight(value.span_text);
+        // $(this).highlight(value.span_text);
+        var shortValue = value.span_text.toLowerCase().replace(/\s+/g, '');
+        $(this).highlight(value.span_text, { className: 'jQueryLink' + shortValue});
+        var randomColor = '#'+ Math.floor(Math.random()*16777215).toString(16);
+        // var randomBackground = "#" + randomColor;
+         $(".jQueryLink" + shortValue).css("backgroundColor", randomColor);
         console.log(value.span_text);
         console.log(index);
       });
     });
 
+    // function replaceText(matches) {
+    // $.each(matches, function (index, value) {
+    //   // $("#compressedText").html(function () {
 
+    //     $(".jQueryLink" + value.span_text).css("color", "red");
+    //     console.log(value.span_text);
+    //     console.log(index);
+    //   });
+    // // });
   }
 
+  
 
 </script>
 {% endif %}
