@@ -46,9 +46,9 @@
 <script type="text/javascript">
 
   //enable tooltips:
-  // $(function () {
-  //   $('[data-toggle="tooltip"]').tooltip()
-  // })
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+  })
 
   var results = {{ tag_results | safe}};
   var textText = $("#compressedText").text(); //got the text here!
@@ -61,7 +61,7 @@
   function replaceText(matches) {
     $.each(matches, function (index, value) {
       $("#compressedText").html(function () {
-        $('[data-toggle="tooltip"]').tooltip(); //enable tooltips
+        // $('[data-toggle="tooltip"]').tooltip(); //enable tooltips
         //highlight
         // $(this).highlight(value.span_text);
         var shortValue = value.span_text.toLowerCase().replace(/\s+/g, ''); //remove spaces for adding to className
@@ -69,6 +69,7 @@
         var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16); //generate random colour
         $(".jQueryLink" + shortValue).css("backgroundColor", randomColor); //different colours depending on className
         $(".jQueryLink" + shortValue).attr({title: value.ontol_id});
+        $(".jQueryLink" + shortValue).attr("data-toggle", "tooltip");
         // $(".jQueryLink" + shortValue).tooltip(); //shows tooltip a different way? Also shows twice..
         //todo: make text more visible by calculating and applying contrasting text colour? 
         console.log(value.span_text);
