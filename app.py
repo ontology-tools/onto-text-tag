@@ -49,9 +49,24 @@ def tag():
     # get ontology IDs identified
     for token in doc:
         if token._.is_ontol_term:
-            print(token._.ontol_id, token.text, token.idx)
+            #print(token._.ontol_id, token.text, token.idx)
+            term = onto_extractor.get_term(token._.ontol_id)
+            if term:
+                ontol_label = term.name
+                ontol_def = str(term.definition)
+                ontol_namespace = term.namespace
+                if ontol_namespace is None:
+                    ontol_namespace = term.id[0:term.id.index(":")]
+            else:
+                ontol_label = ""
+                ontol_def = ""
+                ontol_namespace = ""
             tag_results.append({"ontol_id":token._.ontol_id,
                                 "span_text":token.text,
+                                "ontol_label": ontol_label,
+                                "ontol_def": ontol_def,
+                                "ontol_namespace": ontol_namespace,
+                                "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
                                 "match_index":token.idx})
     print(f"Got tag results {tag_results}")
 

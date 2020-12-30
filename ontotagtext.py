@@ -15,19 +15,20 @@ class ExtractorComponent(object):
 
         # load ontology
         print("Loading ontology")
-        ontol = Ontology(ontologyfile)
+        self.ontol = Ontology(ontologyfile)
+        self.ontol_ids = [t.id for t in self.ontol.terms()]
 
         # init terms and patterns
         self.terms = {}
         patterns = []
 
         i = 0
-        nr_terms = len(ontol.terms())
+        nr_terms = len(self.ontol.terms())
         # init progress bar as loading terms takes long
         print("Importing terms")
 
         # iterate over terms in ontology
-        for term in ontol.terms():
+        for term in self.ontol.terms():
           # if term has a name
           if term.name is not None:
             self.terms[term.name.lower()] = {'id': term.id}
@@ -71,10 +72,16 @@ class ExtractorComponent(object):
                 doc._.ontols = list(doc._.ontols) + [span]
 
         return doc
-    # setter function for doc level
+
+    # getter function for doc level
     def has_ontols(self, tokens):
         return any([t._.get("is_ontol_term") for t in tokens])
 
+    def get_term(self, term_id):
+        if term_id in self.ontol_ids:
+            return self.ontol.get_term(term_id)
+        else:
+            return None
 
 
 # Testing
@@ -101,3 +108,5 @@ if __name__ == "__main__":
     for token in doc:
         if token._.is_ontol_term:
             print(token._.ontol_id, token.text, token.idx)
+
+
