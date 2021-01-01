@@ -43,16 +43,22 @@
     <div id="compressedText" class="border"> {{text}} </div>
   </div>
 </div>
+
+<style>
+  .popov-inner {
+    white-space: pre-wrap;
+  }
+</style>
+
 <script type="text/javascript">
 
-  //enable tooltips globally:
+  // enable popovers globally:
   $(function () {
-    $('[data-toggle="tooltip"]').tooltip()
+    $('[data-toggle="popover"]').popover({html: true});  
   })
 
   var results = {{ tag_results | safe}};
-  var textText = $("#compressedText").text(); //got the text here!
-  // console.log("textText is: " + textText);
+  // var textText = $("#compressedText").text(); //got the text here!
 
   replaceText(results);
 
@@ -68,11 +74,22 @@
         var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16); //generate random colour
         $(".jQueryLink" + shortValue).css("color", invertColor(randomColor, true)); //inverse colour for text
         $(".jQueryLink" + shortValue).css("backgroundColor", randomColor); //different colours depending on className
-        $(".jQueryLink" + shortValue).attr("data-toggle", "tooltip");
-        $(".jQueryLink" + shortValue).tooltip({title: value.ontol_id, delay: {show: 0, hide: 500}}); //added delay 
-        // $(".jQueryLink" + shortValue).tooltip('enable'); //or 'disable' if necessary
-        console.log(value.span_text);
-        console.log(index);
+        $(".jQueryLink" + shortValue).attr("data-toggle", "popover");
+        $(".jQueryLink" + shortValue).popover({ html: true, title: value.ontol_id + "<br><a href='" + value.ontol_link + "'target='_blank'>- Link to Addict Vocab reference -</a><br>", content: value.ontol_label + ": " + value.ontol_def, trigger: "manual", placement: "top"})
+          .on("mouseenter", function () {
+            var _this = this;
+            $(this).popover("show");
+            $(".popover").on("mouseleave", function () {
+              $(_this).popover('hide');
+            });
+          }).on("mouseleave", function () {
+            var _this = this;
+            setTimeout(function () {
+              if (!$(".popover:hover").length) {
+                $(_this).popover("hide");
+              }
+            }, 300);
+          });
       });
     });
 
@@ -81,23 +98,23 @@
   //invertColor function from https://stackoverflow.com/questions/35969656/how-can-i-generate-the-opposite-color-according-to-current-color
   function invertColor(hex, bw) {
     if (hex.indexOf('#') === 0) {
-        hex = hex.slice(1);
+      hex = hex.slice(1);
     }
     // convert 3-digit hex to 6-digits.
     if (hex.length === 3) {
-        hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+      hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
     }
     // if (hex.length !== 6) { //somehow this is wrong
     //     throw new Error('Invalid HEX color.');
     // }
     var r = parseInt(hex.slice(0, 2), 16),
-        g = parseInt(hex.slice(2, 4), 16),
-        b = parseInt(hex.slice(4, 6), 16);
+      g = parseInt(hex.slice(2, 4), 16),
+      b = parseInt(hex.slice(4, 6), 16);
     if (bw) {
-        // http://stackoverflow.com/a/3943023/112731
-        return (r * 0.299 + g * 0.587 + b * 0.114) > 186
-            ? '#000000'
-            : '#FFFFFF';
+      // http://stackoverflow.com/a/3943023/112731
+      return (r * 0.299 + g * 0.587 + b * 0.114) > 186
+        ? '#000000'
+        : '#FFFFFF';
     }
     // invert color components
     r = (255 - r).toString(16);
@@ -105,13 +122,13 @@
     b = (255 - b).toString(16);
     // pad each with zeros and return
     return "#" + padZero(r) + padZero(g) + padZero(b);
-}
+  }
 
-function padZero(str, len) {
+  function padZero(str, len) {
     len = len || 2;
     var zeros = new Array(len).join('0');
     return (zeros + str).slice(-len);
-}
+  }
 
 </script>
 {% endif %}
