@@ -15,6 +15,20 @@
 </div>
 
 {% if not text %}
+<div class="row mb-3">
+  <div class="col-md-12">
+    <div class="float-right">
+      <!-- <button type=submit id=enter-pubmed-id class="btn btn-outline-danger"></i> Enter PubMed ID</button> -->
+      <form action="pubmed" method="post">
+        <label for="pubmed_id">Enter PubMed ID: </label>
+        <input type="text" id="pubmed_id" name="pubmed_id"><br>
+        <input type="submit" value="SEND">
+      </form>
+
+    </div>
+  </div>
+</div>
+
 <form id="submitText" action="{{ url_for('tag') }}" method="post">
   <div class="row mb-3">
     <div class="col-md-12">
@@ -36,6 +50,38 @@
   </div>
 </form>
 
+
+<script type="text/javascript">
+/*
+  //prompt for PubMed ID
+  $("#enter-pubmed-id").click(function () {
+    bootbox.prompt('Enter your PubMed ID', function (result) {
+      var request = new XMLHttpRequest();
+      request.onreadystatechange = function () {
+        if (request.readyState === 4) {
+          if (!request.status) {
+            alert("Problem communicating with server");
+          }
+          else if (request.status === 200) {
+            console.log(request.status);
+          }
+          else {
+
+          }
+        }
+      }
+        request.open('POST', '/pubmed', true);
+        // request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        // request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        // request.send("hello");
+        request.send("pubmed_id" + result);
+        console.log("sent request? " + result);
+      
+    });
+  });
+  */
+</script>
+
 {% elif text %}
 <div class="row mb-3">
   <div class="col-md-12">
@@ -54,7 +100,7 @@
 
   // enable popovers globally:
   $(function () {
-    $('[data-toggle="popover"]').popover({html: true});  
+    $('[data-toggle="popover"]').popover({ html: true });
   })
 
   var results = {{ tag_results | safe}};
@@ -75,7 +121,7 @@
         $(".jQueryLink" + shortValue).css("color", invertColor(randomColor, true)); //inverse colour for text
         $(".jQueryLink" + shortValue).css("backgroundColor", randomColor); //different colours depending on className
         $(".jQueryLink" + shortValue).attr("data-toggle", "popover");
-        $(".jQueryLink" + shortValue).popover({ html: true, title: value.ontol_id + "<br><a href='" + value.ontol_link + "'target='_blank'>- Link to Addict Vocab reference -</a><br>", content: value.ontol_label + ": " + value.ontol_def, trigger: "manual", placement: "top"})
+        $(".jQueryLink" + shortValue).popover({ html: true, title: value.ontol_id + "<br><a href='" + value.ontol_link + "'target='_blank'>- Link to Addict Vocab reference -</a><br>", content: value.ontol_label + ": " + value.ontol_def, trigger: "manual", placement: "top" })
           .on("mouseenter", function () {
             var _this = this;
             $(this).popover("show");
@@ -129,6 +175,7 @@
     var zeros = new Array(len).join('0');
     return (zeros + str).slice(-len);
   }
+
 
 </script>
 {% endif %}
