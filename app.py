@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from flask import Flask, request
+from flask import Flask, request, redirect, url_for
 from flask.templating import render_template
 from ontotagtext import ExtractorComponent
 import spacy
+from Bio import Entrez
+import requests
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -24,12 +26,36 @@ app.config.from_object('config')
 # or: en_core_web_sm or en_core_web_lg
 nlp = spacy.load('en_core_web_md')
 
+
 onto_extractor = ExtractorComponent(
     nlp,
     name="ADDICTO",
     label="ADDICTO",
     ontologyfile="static/addicto.obo")
 nlp.add_pipe(onto_extractor, after="ner")
+
+
+# Interaction with PubMed: get detailed results for a list of IDs
+def fetch_details(id_list):
+    ids = ','.join(id_list)
+    Entrez.email = 'janna.hastings@ucl.ac.uk'
+    handle = Entrez.efetch(db='pubmed',
+                           retmode='xml',
+                           id=ids)
+    results = Entrez.read(handle)
+    return results
+
+# Parse the PubMed result to get the abstract text if it is there
+def get_abstract_text(result):
+    abstractText = None
+    for detail in result:
+        if 'MedlineCitation' in detail:
+            if 'Article' in detail['MedlineCitation']:
+                if 'Abstract' in detail['MedlineCitation']['Article']:
+                    if 'AbstractText' in detail['MedlineCitation']['Article']['Abstract']:
+                        abstractText = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText'])
+
+    return abstractText
 
 
 # Pages for the app
@@ -46,12 +72,17 @@ def pubmed():
     print(f"Pubmed id {id}")
     if id:
         print(f"Got it {id}")
-        return render_template('index.html')
-    else:
-        print(f"Got nothing")
-        return render_template('index.html')
-    #     text = id)
-    #    tag_results=tag_results)
+        results = fetch_details([id])
+        for result in results:
+            resultDetail = results[result]
+            abstractText = get_abstract_text(resultDetail)
+            print(f"Got abstract text {abstractText}")
+            if abstractText:
+                r = requests.post(url_for("tag", _external=True), data={"inputText":abstractText})
+                return r.text, r.status_code, r.headers.items()
+
+    print(f"Got nothing")
+    return render_template('index.html')
 
 
 # Text tagging app
