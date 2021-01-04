@@ -178,6 +178,74 @@
 
 
 </script>
+
+<!-- add more text -->
+<div class="row mb-3">
+  <div class="col-md-12">
+    <div class="float-right">
+      <!-- <button type=submit id=enter-pubmed-id class="btn btn-outline-danger"></i> Enter PubMed ID</button> -->
+      <form action="pubmed" method="post">
+        <label for="pubmed_id">Enter PubMed ID: </label>
+        <input type="text" id="pubmed_id" name="pubmed_id"><br>
+        <input type="submit" value="SEND">
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<form id="submitText" action="{{ url_for('tag') }}" method="post">
+  <div class="row mb-3">
+    <div class="col-md-12">
+      <div class="form-group green-border-focus">
+        <label for="inputText">Enter text below:</label>
+        <!-- todo: make largeTextArea responsive to screen size -->
+        <textarea id="textArea" form="submitText" class="form-control" id="inputText" name="inputText" rows="20">
+
+            </textarea>
+      </div>
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-md-12">
+      <div class="float-right">
+        <button type="submit" id=tag-text class="btn btn-outline-success"></i> Tag text</button>
+      </div>
+    </div>
+  </div>
+</form>
+
+
+<script type="text/javascript">
+/*
+  //prompt for PubMed ID
+  $("#enter-pubmed-id").click(function () {
+    bootbox.prompt('Enter your PubMed ID', function (result) {
+      var request = new XMLHttpRequest();
+      request.onreadystatechange = function () {
+        if (request.readyState === 4) {
+          if (!request.status) {
+            alert("Problem communicating with server");
+          }
+          else if (request.status === 200) {
+            console.log(request.status);
+          }
+          else {
+
+          }
+        }
+      }
+        request.open('POST', '/pubmed', true);
+        // request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        // request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        // request.send("hello");
+        request.send("pubmed_id" + result);
+        console.log("sent request? " + result);
+      
+    });
+  });
+  */
+</script>
 {% endif %}
 
 
