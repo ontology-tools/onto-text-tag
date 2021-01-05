@@ -65,7 +65,7 @@ def home():
     return render_template('index.html')
 
 
-@app.route('/pubmed', methods=['POST'])
+@app.route('/pubmed', methods=['POST', 'GET'])
 def pubmed():
     id = request.form.get('pubmed_id')
     # id = request.get_json()
