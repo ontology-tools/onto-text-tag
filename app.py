@@ -80,9 +80,8 @@ def pubmed():
             if abstractText:
                 r = requests.post(url_for("tag", _external=True), data={"inputText":abstractText})
                 return r.text, r.status_code, r.headers.items()
-
-    print(f"Got nothing")
-    return render_template('index.html')
+    return render_template('index.html', error_msg = f"No abstract found for PubMed ID {id}")            
+    # return render_template('index.html')
 
 
 # Text tagging app

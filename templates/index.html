@@ -14,15 +14,22 @@
   {% endif %} -->
 </div>
 
+{% if error_msg %}
+<div class="alert alert-danger" role="alert">
+  
+    {{error_msg}}
+ 
+  
+</div>
+<script type = "text/javascript">
+console.log("error message");
+</script>
+{% endif %}
+
 {% if not text %}
-<!-- bootbox form button: -->
 <div class="row mb-3">
   <div class="col-md-12">
     <div class="float-right">
-      <!-- todo: convert form to bootbox dialog -->
-      <!-- <button type=submit id=enter-pubmed-id class="btn btn-outline-danger"></i> Enter PubMed ID</button> -->
-      <!-- <button type=submit id=enter-pubmed-id class="btn btn-outline-danger" onclick="submit_pubmed()"></i> Enter PubMed ID</button> -->
-      <!-- todo: remove this form once bootbox dialog is set up -->
       <form action="pubmed" method="post" class="green-border-focus">
         <label for="pubmed_id">Enter PubMed ID: </label>
         <input type="text" id="pubmed_id" name="pubmed_id" class="form-control">
@@ -34,19 +41,7 @@
   </div>
 </div>
 
-<!-- message box for bootbox form -->
-<!-- <div class="row"> -->
-  <!-- The form that gets displayed on the confirmation box, otherwise is hidden -->
-  <!-- <div id="message-box" class="form-content" style="display:none;">
-      <form class="form" role="form">
-          <div class="form-group">
-              <label for="pubmed-msg">Pubmed ID</label>
-              <input type="text" class="form-control" id="pubmed-msg" name="pubmed-msg">
-          </div>
-      </form>
-  </div>
-</div> -->
-
+<!-- PubMed ID form input -->
 <form id="submitText" action="{{ url_for('tag') }}" method="post">
   <div class="row mb-3">
     <div class="col-md-12">
@@ -69,116 +64,6 @@
   </div>
 </form>
 
-
-<script type="text/javascript">
-
-/*
-var submit_pubmed = function () {
-        // $("#pubmed-msg").attr('value', 'Updating ' + spreadsheet);
-
-        // Get a confirmation from the user:
-        var modal = bootbox.dialog({
-            title: "Enter PubMed ID",
-            message: $("#message-box").html(),
-            buttons: {
-                confirm: {
-                    label: 'Submit',
-                    className: 'btn-danger',
-                    callback: function () {
-                        var aForm = modal.find(".form");
-                        var formData = aForm.serializeArray(),
-                            dataObj = {};
-                        $(formData).each(function (i, field) {
-                            dataObj[field.name] = field.value;
-                        });
-                        var commit_msg = dataObj["pubmed-msg"];
-                        var msgBody = dataObj["descr"];
-                        if (commit_msg !== null && commit_msg !== undefined) {
-                            if (!commit_msg || commit_msg.trim() === "") {
-                                bootbox.alert({
-                                    closeButton: false,
-                                    message: "PubMed ID cannot be empty. Please fill in PubMed"
-                                });
-                                return;
-                            }
-
-                            // Embed the code into a request.
-                            var request = new XMLHttpRequest();
-                            // Define a function to handle a state change of the request:
-                            request.onreadystatechange = function () {
-                                $("*").css("cursor", "default");
-                                if (request.readyState === 4) {
-                                    if (!request.status) {
-                                        alert("Problem communicating with server");
-                                    }
-                                    else if (request.status === 200) {
-                                        var response = JSON.parse(request.responseText);
-                                        var new_file_sha = response['file_sha'];
-                                        file_sha = new_file_sha;
-                                        // $('#saveAlert').removeClass('alert-danger');
-                                        // $('#saveAlert').addClass('alert-success');
-                                        $("#saveMessage").text('Changes were saved successfully to the repository. ');
-                                        // $("#saveAlert").dismissed = false;
-                                        // $("#saveAlert").show();
-                                
-                                    } else {
-                                        var response = JSON.parse(request.responseText);
-                                        var errInfo = response['Error'];
-                                        var mergeInfo = response['merge_diff'];
-                                        // $('#saveAlert').removeClass('alert-success');
-                                        // $('#saveAlert').addClass('alert-danger');
-                                        $("#saveMessage").text('There was a problem saving changes: ' + errInfo + "--->" + mergeInfo);
-                                        $(".alert").alert()
-                                        // $("#saveAlert").show();
-                                    }
-                                }
-                            }
-                            // Post the request to the server.
-                            request.open('POST', '/pubmed', true);
-                            request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                            request.send('pubmed_id=29059413');
-                            // $("*").css("cursor", "progress");
-                        }
-                    }
-                },
-                cancel: {
-                    label: 'Cancel',
-                    className: 'btn-primary'
-                }
-            }
-        });
-    };
-*/
-  //prompt for PubMed ID
-  //todo: dialog is sending and python receiving. Only problem: no redirect....???
-  /*
-  $("#enter-pubmed-id").click(function () {
-    bootbox.prompt('Enter your PubMed ID', function (result) {
-      var request = new XMLHttpRequest();
-      request.onreadystatechange = function () {
-        if (request.readyState === 4) {
-          if (!request.status) {
-            alert("Problem communicating with server");
-          }
-          else if (request.status === 200) {
-            console.log(request.status); //200 ok but no redirect???
-          }
-          else {
-
-          }
-        }
-      }
-        request.open('POST', '/pubmed', true);
-        request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        // request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        request.send("pubmed_id=29059413");
-        // request.send("pubmed_id=" + result);
-        console.log("sent request? " + result);
-      
-    });
-  });
- */
-</script>
 
 {% elif text %}
 <div class="row mb-3">
@@ -278,15 +163,10 @@ var submit_pubmed = function () {
 </script>
 
 <!-- add more text -->
-<!-- bootbox form button: -->
 <div class="row mb-3">
   <div class="col-md-12">
     <div class="float-right">
-      <!-- todo: convert form to bootbox dialog -->
-      <!-- <button type=submit id=enter-pubmed-id class="btn btn-outline-danger"></i> Enter PubMed ID</button> -->
-      <!-- <button type=submit id=enter-pubmed-id class="btn btn-outline-danger" onclick="submit_pubmed()"></i> Enter PubMed ID</button> -->
-      <!-- todo: remove this form once bootbox dialog is set up -->
-      <form action="pubmed" method="post" class="green-border-focus">
+        <form action="pubmed" method="post" class="green-border-focus">
         <label for="pubmed_id">Enter PubMed ID: </label>
         <input type="text" id="pubmed_id" name="pubmed_id" class="form-control">
         <br>
@@ -297,19 +177,7 @@ var submit_pubmed = function () {
   </div>
 </div>
 
-<!-- message box for bootbox form -->
-<!-- <div class="row"> -->
-  <!-- The form that gets displayed on the confirmation box, otherwise is hidden -->
-  <!-- <div id="message-box" class="form-content" style="display:none;">
-      <form class="form" role="form">
-          <div class="form-group">
-              <label for="pubmed-msg">Pubmed ID</label>
-              <input type="text" class="form-control" id="pubmed-msg" name="pubmed-msg">
-          </div>
-      </form>
-  </div>
-</div> -->
-
+<!-- PubMed ID form input -->
 <form id="submitText" action="{{ url_for('tag') }}" method="post">
   <div class="row mb-3">
     <div class="col-md-12">
@@ -332,38 +200,8 @@ var submit_pubmed = function () {
   </div>
 </form>
 
-
-<script type="text/javascript">
-/*
-  //prompt for PubMed ID
-  $("#enter-pubmed-id").click(function () {
-    bootbox.prompt('Enter your PubMed ID', function (result) {
-      var request = new XMLHttpRequest();
-      request.onreadystatechange = function () {
-        if (request.readyState === 4) {
-          if (!request.status) {
-            alert("Problem communicating with server");
-          }
-          else if (request.status === 200) {
-            console.log(request.status);
-          }
-          else {
-
-          }
-        }
-      }
-        request.open('POST', '/pubmed', true);
-        // request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        // request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        // request.send("hello");
-        request.send("pubmed_id" + result);
-        console.log("sent request? " + result);
-      
-    });
-  });
-  */
-</script>
 {% endif %}
+
 
 
 
