@@ -72,7 +72,7 @@ def pubmed():
     print(f"Pubmed id {id}")
     if id:
         print(f"Got it {id}")
-        results = fetch_details([id])
+        results = fetch_details([id]) #400 bad request handling needed!
         for result in results:
             resultDetail = results[result]
             abstractText = get_abstract_text(resultDetail)
