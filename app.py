@@ -72,16 +72,19 @@ def pubmed():
     print(f"Pubmed id {id}")
     if id:
         print(f"Got it {id}")
-        results = fetch_details([id]) #400 bad request handling needed!
-        for result in results:
-            resultDetail = results[result]
-            abstractText = get_abstract_text(resultDetail)
-            print(f"Got abstract text {abstractText}")
-            if abstractText:
-                r = requests.post(url_for("tag", _external=True), data={"inputText":abstractText})
-                return r.text, r.status_code, r.headers.items()
+        try:
+            results = fetch_details([id]) 
+            print(f"results are: {results}") 
+            for result in results:
+                resultDetail = results[result]
+                abstractText = get_abstract_text(resultDetail)
+                print(f"Got abstract text {abstractText}")
+                if abstractText:
+                    r = requests.post(url_for("tag", _external=True), data={"inputText":abstractText})
+                    return r.text, r.status_code, r.headers.items()
+        except Exception as err: #400 bad request handling, also if no internet connection
+            print(err)
     return render_template('index.html', error_msg = f"No abstract found for PubMed ID {id}")            
-    # return render_template('index.html')
 
 
 # Text tagging app
