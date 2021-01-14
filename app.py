@@ -19,6 +19,9 @@ import spacy
 from Bio import Entrez
 import requests
 
+import pprint
+pp = pprint.PrettyPrinter(depth=4)
+
 app = Flask(__name__)
 app.config.from_object('config')
 
@@ -43,7 +46,39 @@ def fetch_details(id_list):
                            retmode='xml',
                            id=ids)
     results = Entrez.read(handle)
+    # print(f"")
+    # print(f"results are: " + results)
+    # print(f"")
     return results
+    
+#parse the title, authors and date published 
+def get_article_details(result):
+    articleDetails = None
+    for detail in result:
+        if 'MedlineCitation' in detail:
+            # print(f"")
+            print(f"MedlineCitation is: ")
+            pp.pprint(detail['MedlineCitation']) #pretty print
+            # print(str(detail['MedlineCitation']))
+            if 'DateCompleted' in detail['MedlineCitation']: #this works
+                print(f"")
+                print(f"DateCompleted is: ")
+                print(str(detail['MedlineCitation']['DateCompleted']))
+            if 'AuthorList' in detail['MedlineCitation']['Article']: #this works, need to refine though
+                print(f"")
+                print(f"AuthorList is: ")
+                pp.pprint(detail['MedlineCitation']['Article']['AuthorList']) 
+            else:
+                print(f"AuthorList not found")
+            if 'ArticleTitle' in detail['MedlineCitation']['Article']: 
+                print(f"")
+                print(f"ArticleTitle is: ") #got title!
+                pp.pprint(detail['MedlineCitation']['Article']['ArticleTitle'])
+                # articleDetails = str(detail['MedlineCitation']['Article']['Abstract']['ArticleTitle'])
+            else:
+                print(f"ArticleTitle not found")
+
+    return articleDetails
 
 # Parse the PubMed result to get the abstract text if it is there
 def get_abstract_text(result):
@@ -74,11 +109,13 @@ def pubmed():
         print(f"Got it {id}")
         try:
             results = fetch_details([id]) 
-            print(f"results are: {results}") 
+            # print(f"results are: {results}") 
             for result in results:
                 resultDetail = results[result]
                 abstractText = get_abstract_text(resultDetail)
-                print(f"Got abstract text {abstractText}")
+                # print(f"Got abstract text {abstractText}")
+                articleDetails = get_article_details(resultDetail)
+                # print(f"Got abstract text {articleDetails}") #when we get the right details...
                 if abstractText:
                     r = requests.post(url_for("tag", _external=True), data={"inputText":abstractText})
                     return r.text, r.status_code, r.headers.items()
@@ -92,7 +129,7 @@ def pubmed():
 @ app.route('/tag', methods=['POST'])
 def tag():
     text=request.form['inputText']
-    print(f"Got input text {text}")
+    # print(f"Got input text {text}")
     # process the text
     doc=nlp(text)
     tag_results=[]
@@ -118,7 +155,7 @@ def tag():
                                 "ontol_namespace": ontol_namespace,
                                 "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
                                 "match_index": token.idx})
-    print(f"Got tag results {tag_results}")
+    # print(f"Got tag results {tag_results}")
 
     return render_template('index.html',
                            text = text,
