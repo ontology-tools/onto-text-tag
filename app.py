@@ -72,9 +72,9 @@ def get_article_details(result):
                 print(f"AuthorList not found")
             if 'ArticleTitle' in detail['MedlineCitation']['Article']: 
                 print(f"")
-                print(f"ArticleTitle is: ") #got title!
+                print(f"ArticleTitle is: ") #works, got title!
                 pp.pprint(detail['MedlineCitation']['Article']['ArticleTitle'])
-                # articleDetails = str(detail['MedlineCitation']['Article']['Abstract']['ArticleTitle'])
+                articleDetails = str(detail['MedlineCitation']['Article']['ArticleTitle'])
             else:
                 print(f"ArticleTitle not found")
 
@@ -115,9 +115,9 @@ def pubmed():
                 abstractText = get_abstract_text(resultDetail)
                 # print(f"Got abstract text {abstractText}")
                 articleDetails = get_article_details(resultDetail)
-                # print(f"Got abstract text {articleDetails}") #when we get the right details...
+                print(f"Got articleDetails {articleDetails}") #when we get the right details...
                 if abstractText:
-                    r = requests.post(url_for("tag", _external=True), data={"inputText":abstractText})
+                    r = requests.post(url_for("tag", _external=True), data={"inputDetails":articleDetails, "inputText":abstractText})
                     return r.text, r.status_code, r.headers.items()
         except Exception as err: #400 bad request handling, also if no internet connection
             print(err)
@@ -129,6 +129,7 @@ def pubmed():
 @ app.route('/tag', methods=['POST'])
 def tag():
     text=request.form['inputText']
+    details=request.form['inputDetails']
     # print(f"Got input text {text}")
     # process the text
     doc=nlp(text)
@@ -159,6 +160,7 @@ def tag():
 
     return render_template('index.html',
                            text = text,
+                           details = details,
                            tag_results = tag_results)
 
 
