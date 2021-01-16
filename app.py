@@ -52,18 +52,29 @@ def fetch_details(id_list):
     return results
     
 #parse the title, authors and date published 
+#try return separate values for year, day, month, AuthourList and ArticleTitle
 def get_article_details(result):
     articleDetails = None
+    dayCompleted = None
+    monthCompleted = None
+    yearCompleted = None
     for detail in result:
         if 'MedlineCitation' in detail:
             # print(f"")
             print(f"MedlineCitation is: ")
             pp.pprint(detail['MedlineCitation']) #pretty print
             # print(str(detail['MedlineCitation']))
-            if 'DateCompleted' in detail['MedlineCitation']: #this works
+            if 'DateCompleted' in detail['MedlineCitation']: #this works, needs formatting though..
                 print(f"")
                 print(f"DateCompleted is: ")
                 print(str(detail['MedlineCitation']['DateCompleted']))
+                dayCompleted = str(detail['MedlineCitation']['DateCompleted']['Day'])
+                monthCompleted = str(detail['MedlineCitation']['DateCompleted']['Month'])
+                yearCompleted = str(detail['MedlineCitation']['DateCompleted']['Year'])
+            else:
+                yearCompleted = ""
+                monthCompleted = ""
+                dayCompleted = "" #todo: we still end up with // here...
             if 'AuthorList' in detail['MedlineCitation']['Article']: #this works, need to refine though
                 print(f"")
                 print(f"AuthorList is: ")
@@ -74,7 +85,8 @@ def get_article_details(result):
                 print(f"")
                 print(f"ArticleTitle is: ") #works, got title!
                 pp.pprint(detail['MedlineCitation']['Article']['ArticleTitle'])
-                articleDetails = str(detail['MedlineCitation']['Article']['ArticleTitle'])
+                # articleDetails = yearCompleted + "\n" + str(detail['MedlineCitation']['Article']['ArticleTitle'])
+                articleDetails = dayCompleted + "/" + monthCompleted + "/" + yearCompleted + "\n" + str(detail['MedlineCitation']['Article']['ArticleTitle'])
             else:
                 print(f"ArticleTitle not found")
 
@@ -115,7 +127,7 @@ def pubmed():
                 abstractText = get_abstract_text(resultDetail)
                 # print(f"Got abstract text {abstractText}")
                 articleDetails = get_article_details(resultDetail)
-                print(f"Got articleDetails {articleDetails}") #when we get the right details...
+                print(f"Got articleDetails {articleDetails}") #when we get the right details... how to separate 
                 if abstractText:
                     r = requests.post(url_for("tag", _external=True), data={"inputDetails":articleDetails, "inputText":abstractText})
                     return r.text, r.status_code, r.headers.items()
