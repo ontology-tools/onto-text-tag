@@ -64,7 +64,7 @@ def get_article_details(result):
             print(f"MedlineCitation is: ")
             pp.pprint(detail['MedlineCitation']) #pretty print
             # print(str(detail['MedlineCitation']))
-            if 'DateCompleted' in detail['MedlineCitation']: #this works, needs formatting though..
+            if 'DateCompleted' in detail['MedlineCitation']: #this works.
                 print(f"")
                 print(f"DateCompleted is: ")
                 print(str(detail['MedlineCitation']['DateCompleted']))
@@ -74,21 +74,32 @@ def get_article_details(result):
             else:
                 yearCompleted = ""
                 monthCompleted = ""
-                dayCompleted = "" #todo: we still end up with // here...
-            if 'AuthorList' in detail['MedlineCitation']['Article']: #this works, need to refine though
-                print(f"")
-                print(f"AuthorList is: ")
-                pp.pprint(detail['MedlineCitation']['Article']['AuthorList']) 
-            else:
-                print(f"AuthorList not found")
+                dayCompleted = "" #todo: we still end up with // here if no data returned..
+            
             if 'ArticleTitle' in detail['MedlineCitation']['Article']: 
                 print(f"")
                 print(f"ArticleTitle is: ") #works, got title!
                 pp.pprint(detail['MedlineCitation']['Article']['ArticleTitle'])
-                # articleDetails = yearCompleted + "\n" + str(detail['MedlineCitation']['Article']['ArticleTitle'])
                 articleDetails = dayCompleted + "/" + monthCompleted + "/" + yearCompleted + "\n" + str(detail['MedlineCitation']['Article']['ArticleTitle'])
             else:
                 print(f"ArticleTitle not found")
+
+            if 'AuthorList' in detail['MedlineCitation']['Article']: #this works, need to refine though
+                print(f"")
+                print(f"AuthorList is: ")
+                pp.pprint(detail['MedlineCitation']['Article']['AuthorList'])
+
+                articleDetails += "Authors: "
+                #this one works! Just assign to string and we on!
+                for s in range(len(detail['MedlineCitation']['Article']['AuthorList'])):
+                    pp.pprint(detail['MedlineCitation']['Article']['AuthorList'][s]['LastName'])                    
+                    articleDetails += detail['MedlineCitation']['Article']['AuthorList'][s]['LastName']
+                    if(s == (len(detail['MedlineCitation']['Article']['AuthorList'])-1)):
+                        articleDetails += "."
+                    else:
+                        articleDetails += ", "
+            else:
+                print(f"AuthorList not found")
 
     return articleDetails
 
