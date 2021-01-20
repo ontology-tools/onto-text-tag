@@ -24,10 +24,11 @@ pp = pprint.PrettyPrinter(depth=4)
 
 app = Flask(__name__)
 app.config.from_object('config')
-
+idName = "ID"
 # python -m spacy download en_core_web_md
 # or: en_core_web_sm or en_core_web_lg
 nlp = spacy.load('en_core_web_md')
+
 
 
 onto_extractor = ExtractorComponent(
@@ -80,6 +81,7 @@ def get_article_details(result):
                 print(f"")
                 print(f"ArticleTitle is: ") #works, got title!
                 pp.pprint(detail['MedlineCitation']['Article']['ArticleTitle'])
+                # pp.pprint({id} + " " + "ID")
                 articleDetails = dayCompleted + "/" + monthCompleted + "/" + yearCompleted + "\n" + str(detail['MedlineCitation']['Article']['ArticleTitle'])
             else:
                 print(f"ArticleTitle not found")
@@ -126,6 +128,9 @@ def home():
 @app.route('/pubmed', methods=['POST', 'GET'])
 def pubmed():
     id = request.form.get('pubmed_id')
+    global idName
+    idName="Pubmed ID: " + id
+    # idName="HELLO"
     # id = request.get_json()
     print(f"Pubmed id {id}")
     if id:
@@ -153,6 +158,7 @@ def pubmed():
 def tag():
     text=request.form['inputText']
     details=request.form['inputDetails']
+    id=request.form.get('pubmed_id')
     # print(f"Got input text {text}")
     # process the text
     doc=nlp(text)
@@ -182,6 +188,7 @@ def tag():
     # print(f"Got tag results {tag_results}")
 
     return render_template('index.html',
+                           id = idName,
                            text = text,
                            details = details,
                            tag_results = tag_results)
