@@ -82,7 +82,7 @@ def get_article_details(result):
                 print(f"ArticleTitle is: ") #works, got title!
                 pp.pprint(detail['MedlineCitation']['Article']['ArticleTitle'])
                 # pp.pprint({id} + " " + "ID")
-                articleDetails = dayCompleted + "/" + monthCompleted + "/" + yearCompleted + "\n" + str(detail['MedlineCitation']['Article']['ArticleTitle'])
+                articleDetails = dayCompleted + "/" + monthCompleted + "/" + yearCompleted + ";" + str(detail['MedlineCitation']['Article']['ArticleTitle'])
             else:
                 print(f"ArticleTitle not found")
 
@@ -91,7 +91,7 @@ def get_article_details(result):
                 print(f"AuthorList is: ")
                 pp.pprint(detail['MedlineCitation']['Article']['AuthorList'])
 
-                articleDetails += "Authors: "
+                articleDetails += ";Authors: "
                 #this one works! Just assign to string and we on!
                 for s in range(len(detail['MedlineCitation']['Article']['AuthorList'])):
                     pp.pprint(detail['MedlineCitation']['Article']['AuthorList'][s]['LastName'])                    
@@ -129,12 +129,14 @@ def home():
 def pubmed():
     id = request.form.get('pubmed_id')
     global idName
-    idName="Pubmed ID: " + id
-    # idName="HELLO"
+    # idName=id
+    # idName="Pubmed ID: " + id #todo: fix this line - error, even though it worked before...
+    idName="PubmedID here.."
     # id = request.get_json()
     print(f"Pubmed id {id}")
     if id:
         print(f"Got it {id}")
+        # idName={id}
         try:
             results = fetch_details([id]) 
             # print(f"results are: {results}") 
@@ -144,8 +146,9 @@ def pubmed():
                 # print(f"Got abstract text {abstractText}")
                 articleDetails = get_article_details(resultDetail)
                 print(f"Got articleDetails {articleDetails}") #when we get the right details... how to separate 
+                dateA, titleA, authorsA = articleDetails.split(';')
                 if abstractText:
-                    r = requests.post(url_for("tag", _external=True), data={"inputDetails":articleDetails, "inputText":abstractText})
+                    r = requests.post(url_for("tag", _external=True), data={"inputDetails":articleDetails, "inputText":abstractText, "dateDetails":dateA, "titleDetails":titleA, "authorsDetails":authorsA})
                     return r.text, r.status_code, r.headers.items()
         except Exception as err: #400 bad request handling, also if no internet connection
             print(err)
@@ -158,7 +161,11 @@ def pubmed():
 def tag():
     text=request.form['inputText']
     details=request.form['inputDetails']
+    date=request.form['dateDetails']
+    title=request.form['titleDetails']
+    authors=request.form['authorsDetails']
     id=request.form.get('pubmed_id')
+    # print("/tag id is: " + id)
     # print(f"Got input text {text}")
     # process the text
     doc=nlp(text)
@@ -188,9 +195,12 @@ def tag():
     # print(f"Got tag results {tag_results}")
 
     return render_template('index.html',
-                           id = idName,
                            text = text,
                            details = details,
+                           date = date,
+                           title = title,
+                           authors = authors,
+                           id = idName,
                            tag_results = tag_results)
 
 
