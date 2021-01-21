@@ -136,7 +136,7 @@ def pubmed():
     print(f"Pubmed id {id}")
     if id:
         print(f"Got it {id}")
-        # idName={id}
+        idName=f"{id}"
         try:
             results = fetch_details([id]) 
             # print(f"results are: {results}") 
