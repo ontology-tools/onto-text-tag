@@ -114,7 +114,7 @@ def get_abstract_text(result):
                 if 'Abstract' in detail['MedlineCitation']['Article']:
                     if 'AbstractText' in detail['MedlineCitation']['Article']['Abstract']:
                         abstractText = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText'])
-                        abstractText = abstractText[2:-2] #remove brackets and quotation
+                        # abstractText = abstractText[2:-2] #remove brackets and quotation
 
     return abstractText
 
