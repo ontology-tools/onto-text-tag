@@ -139,17 +139,17 @@ def pubmed():
         print(f"Got it {id}")
         idName=f"{id}"
         try:
-		results = fetch_details([id])
-		for result in results:
-		    resultDetail = results[result]
-		    abstractText = get_abstract_text(resultDetail)
-		        # print(f"Got abstract text {abstractText}")
-		        articleDetails = get_article_details(resultDetail)
-		        print(f"Got articleDetails {articleDetails}") #when we get the right details... how to separate 
-		        dateA, titleA, authorsA = articleDetails.split(';')
-		    if abstractText:
-		            r = requests.post(url_for("tag", _external=True), data={"inputDetails":articleDetails, "inputText":abstractText, "dateDetails":dateA, "titleDetails":titleA, "authorsDetails":authorsA})
-		        return r.text, r.status_code, r.headers.items()
+            results = fetch_details([id])
+            for result in results:
+                resultDetail = results[result]
+                abstractText = get_abstract_text(resultDetail)
+                    # print(f"Got abstract text {abstractText}")
+                articleDetails = get_article_details(resultDetail)
+                print(f"Got articleDetails {articleDetails}") #when we get the right details... how to separate 
+                dateA, titleA, authorsA = articleDetails.split(';')
+                if abstractText:
+                    r = requests.post(url_for("tag", _external=True), data={"inputDetails":articleDetails, "inputText":abstractText, "dateDetails":dateA, "titleDetails":titleA, "authorsDetails":authorsA})
+                    return r.text, r.status_code, r.headers.items()
         except Exception as err: #400 bad request handling, also if no internet connection
             print(err)
     return render_template('index.html', error_msg = f"No abstract found for PubMed ID {id}")            
