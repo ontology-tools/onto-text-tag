@@ -19,6 +19,8 @@ import spacy
 from Bio import Entrez
 import requests
 
+from urllib.request import urlopen
+
 app = Flask(__name__)
 app.config.from_object('config')
 
@@ -26,12 +28,16 @@ app.config.from_object('config')
 # or: en_core_web_sm or en_core_web_lg
 nlp = spacy.load('en_core_web_md')
 
+location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
+print("Fetching release file from", location)
+data = urlopen(location).read()  # bytes
+ontofile = data.decode('utf-8')
 
 onto_extractor = ExtractorComponent(
     nlp,
     name="ADDICTO",
     label="ADDICTO",
-    ontologyfile="static/addicto.obo")
+    ontologyfile=ontofile)
 nlp.add_pipe(onto_extractor, after="ner")
 
 
