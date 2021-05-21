@@ -1,5 +1,7 @@
 
-from pronto import Ontology
+#from pronto import Ontology
+
+import pyhornedowl
 import spacy
 from spacy import displacy
 from spacy.tokens import Doc, Span, Token
@@ -7,6 +9,34 @@ from spacy.lang.en import English
 from spacy.matcher import PhraseMatcher
 from spacy.util import filter_spans
 import inflect
+
+RDFSLABEL = "http://www.w3.org/2000/01/rdf-schema#label"
+SYN = "http://purl.obolibrary.org/obo/IAO_0000118"
+PREFIXES = [ ["ADDICTO","http://addictovocab.org/ADDICTO_"],
+             ["BFO","http://purl.obolibrary.org/obo/BFO_"],
+             ["CHEBI","http://purl.obolibrary.org/obo/CHEBI_"],
+             ["UBERON","http://purl.obolibrary.org/obo/UBERON_"],
+             ["PATO","http://purl.obolibrary.org/obo/PATO_"],
+             ["BCIO","http://humanbehaviourchange.org/ontology/BCIO_"],
+             ["SEPIO","http://purl.obolibrary.org/obo/SEPIO_"],
+             ["OMRSE","http://purl.obolibrary.org/obo/OMRSE_"],
+             ["OBCS","http://purl.obolibrary.org/obo/OBCS_"],
+             ["OGMS","http://purl.obolibrary.org/obo/OGMS_"],
+             ["ENVO","http://purl.obolibrary.org/obo/ENVO_"],
+             ["OBI", "http://purl.obolibrary.org/obo/OBI_"],
+             ["MFOEM","http://purl.obolibrary.org/obo/MFOEM_"],
+             ["MF","http://purl.obolibrary.org/obo/MF_"],
+             ["CHMO","http://purl.obolibrary.org/obo/CHMO_"],
+             ["DOID","http://purl.obolibrary.org/obo/DOID_"],
+             ["IAO","http://purl.obolibrary.org/obo/IAO_"],
+             ["ERO","http://purl.obolibrary.org/obo/ERO_"],
+             ["PO","http://purl.obolibrary.org/obo/PO_"],
+             ["RO","http://purl.obolibrary.org/obo/RO_"],
+             ["APOLLO_SV","http://purl.obolibrary.org/obo/APOLLO_SV_"],
+             ["PDRO","http://purl.obolibrary.org/obo/PDRO_"],
+             ["GAZ","http://purl.obolibrary.org/obo/GAZ_"],
+             ["GSSO","http://purl.obolibrary.org/obo/GSSO_"]
+           ]
 
 class ExtractorComponent(object):
     def __init__(self, nlp, name, label, ontologyfile):
@@ -21,8 +51,11 @@ class ExtractorComponent(object):
 
         # load ontology
         print("Loading ontology")
-        self.ontol = Ontology(ontologyfile)
-        self.ontol_ids = [t.id for t in self.ontol.terms()]
+        self.ontol = pyhornedowl.open_ontology(ontologyfile)
+        for prefix in PREFIXES:
+            self.ontol.add_prefix_mapping(prefix[0], prefix[1])
+
+        self.ontol_ids = self.ontol.get_classes()
 
         # for making plural forms of labels for text matching
         engine = inflect.engine()
@@ -32,33 +65,31 @@ class ExtractorComponent(object):
         patterns = []
 
         i = 0
-        nr_terms = len(self.ontol.terms())
+        nr_terms = len(self.ontol.get_classes())
         print(f"Importing {nr_terms} terms")
 
         # iterate over terms in ontology
-        for term in self.ontol.terms():
-          # if term has a name
-          if term.name is not None and term.name.strip().lower() not in stopwords:
-            self.terms[term.name.strip().lower()] = {'id': term.id}
-            patterns.append(nlp.make_doc(term.name.strip()))
-            plural = engine.plural(term.name.strip())
-            self.terms[plural.lower()] = {'id': term.id}
-            patterns.append(nlp.make_doc(plural))
-          for s in term.synonyms:
-              if s.description.strip().lower() not in stopwords:
-                self.terms[s.description.strip().lower()] = {'id': term.id}
-                patterns.append(nlp.make_doc(s.description.strip()))
-                plural = engine.plural(s.description.strip())
-                self.terms[plural.lower()] = {'id': term.id}
-                patterns.append(nlp.make_doc(plural))
-          extra_synonyms = [ s.literal for s in term.annotations if s.property=="IAO:0000118"]
-          for s in extra_synonyms:
+        for termid in self.ontol.get_classes():
+          termshortid = self.ontol.get_id_for_iri(termid)
+          label = self.ontol.get_annotation(termid, RDFSLABEL)
+          if label is not None and label.strip().lower() not in stopwords:
+              self.terms[label.strip().lower()] = {'id': termid if termshortid is None else termshortid}
+              patterns.append(nlp.make_doc(label.strip()))
+              plural = engine.plural(label.strip())
+              self.terms[plural.lower()] = {'id': termid if termshortid is None else termshortid}
+              patterns.append(nlp.make_doc(plural))
+          synonyms = self.ontol.get_annotations(termid, SYN)
+          for s in synonyms:
               if s.strip().lower() not in stopwords:
-                self.terms[s.strip().lower()] = {'id': term.id}
-                patterns.append(nlp.make_doc(s.strip()))
-                plural = engine.plural(s.strip())
-                self.terms[plural.lower()] = {'id': term.id}
-                patterns.append(nlp.make_doc(plural))
+                  self.terms[s.strip().lower()] = {'id': termid if termshortid is None else termshortid}
+                  patterns.append(nlp.make_doc(s.strip()))
+                  try:
+                      plural = engine.plural(s.strip())
+                      self.terms[plural.lower()] = {'id': termid if termshortid is None else termshortid}
+                      patterns.append(nlp.make_doc(plural))
+                  except:
+                      print("Problem getting plural of ",s)
+                      continue
           i += 1
 
         # initialize matcher and add patterns
@@ -114,7 +145,7 @@ if __name__ == "__main__":
         nlp,
         name="ADDICTO",
         label="ADDICTO",
-        ontologyfile="/Users/hastingj/Work/Onto/addiction-ontology/addicto.obo")
+        ontologyfile="/Users/hastingj/Work/Onto/addiction-ontology/addicto-merged.owx")
     nlp.add_pipe(onto_extractor, after="parser")
 
     test = '''
