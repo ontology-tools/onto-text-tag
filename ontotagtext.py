@@ -48,6 +48,7 @@ class ExtractorComponent(object):
         stopwords = nlp.Defaults.stop_words
         stopwords.add("ands")
         stopwords.add("ends")
+        stopwords.add("ci")
 
         # load ontology
         print("Loading ontology")
