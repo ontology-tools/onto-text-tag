@@ -18,6 +18,7 @@ from ontotagtext import ExtractorComponent
 import spacy
 from Bio import Entrez
 import requests
+from urllib.request import urlopen
 
 import pprint
 pp = pprint.PrettyPrinter(depth=4)
@@ -29,13 +30,16 @@ idName = "ID"
 # or: en_core_web_sm or en_core_web_lg
 nlp = spacy.load('en_core_web_md')
 
-
+location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
+print("Fetching release file from", location)
+data = urlopen(location).read()  # bytes
+ontofile = data.decode('utf-8')
 
 onto_extractor = ExtractorComponent(
     nlp,
     name="ADDICTO",
     label="ADDICTO",
-    ontologyfile="static/addicto.obo")
+    ontologyfile=ontofile)
 nlp.add_pipe(onto_extractor, after="ner")
 
 
@@ -47,11 +51,8 @@ def fetch_details(id_list):
                            retmode='xml',
                            id=ids)
     results = Entrez.read(handle)
-    # print(f"")
-    # print(f"results are: " + results)
-    # print(f"")
     return results
-    
+
 #parse the title, authors and date published 
 #try return separate values for year, day, month, AuthourList and ArticleTitle
 def get_article_details(result):
@@ -114,7 +115,6 @@ def get_abstract_text(result):
                 if 'Abstract' in detail['MedlineCitation']['Article']:
                     if 'AbstractText' in detail['MedlineCitation']['Article']['Abstract']:
                         abstractText = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText'])
-                        # abstractText = abstractText[2:-2] #remove brackets and quotation
 
     return abstractText
 
@@ -139,21 +139,21 @@ def pubmed():
         print(f"Got it {id}")
         idName=f"{id}"
         try:
-            results = fetch_details([id]) 
-            # print(f"results are: {results}") 
-            for result in results:
-                resultDetail = results[result]
-                abstractText = get_abstract_text(resultDetail)
-                # print(f"Got abstract text {abstractText}")
-                articleDetails = get_article_details(resultDetail)
-                print(f"Got articleDetails {articleDetails}") #when we get the right details... how to separate 
-                dateA, titleA, authorsA = articleDetails.split(';')
-                if abstractText:
-                    r = requests.post(url_for("tag", _external=True), data={"inputDetails":articleDetails, "inputText":abstractText, "dateDetails":dateA, "titleDetails":titleA, "authorsDetails":authorsA})
-                    return r.text, r.status_code, r.headers.items()
+		results = fetch_details([id])
+		for result in results:
+		    resultDetail = results[result]
+		    abstractText = get_abstract_text(resultDetail)
+		        # print(f"Got abstract text {abstractText}")
+		        articleDetails = get_article_details(resultDetail)
+		        print(f"Got articleDetails {articleDetails}") #when we get the right details... how to separate 
+		        dateA, titleA, authorsA = articleDetails.split(';')
+		    if abstractText:
+		            r = requests.post(url_for("tag", _external=True), data={"inputDetails":articleDetails, "inputText":abstractText, "dateDetails":dateA, "titleDetails":titleA, "authorsDetails":authorsA})
+		        return r.text, r.status_code, r.headers.items()
         except Exception as err: #400 bad request handling, also if no internet connection
             print(err)
     return render_template('index.html', error_msg = f"No abstract found for PubMed ID {id}")            
+    # return render_template('index.html')
 
 
 # Text tagging app

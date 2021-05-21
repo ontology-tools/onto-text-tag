@@ -1,7 +1,7 @@
 format-version: 1.2
 ontology: http://addictovocab.org/addicto.owl
 owl-axioms: Prefix(owl:=<http://www.w3.org/2002/07/owl#>)\nPrefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)\nPrefix(xml:=<http://www.w3.org/XML/1998/namespace>)\nPrefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)\nPrefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)\n\n\nOntology(\nDeclaration(Class(<http://purl.obolibrary.org/obo/BFO_0000002>))\nDeclaration(Class(<http://purl.obolibrary.org/obo/CHEBI_50906>))\n############################\n#   Classes\n############################\n\n# Class: <http://purl.obolibrary.org/obo/BFO_0000002> (continuant)\n\nSubClassOf(<http://purl.obolibrary.org/obo/BFO_0000002> owl:Thing)\n\n# Class: <http://purl.obolibrary.org/obo/CHEBI_50906> (role)\n\nSubClassOf(<http://purl.obolibrary.org/obo/CHEBI_50906> owl:Thing)\n\n\n)
-synonymtypedef: INN "INN" RELATED 
+synonymtypedef: INN "INN" RELATED
 synonymtypedef: IUPAC_NAME "IUPAC_NAME" EXACT
 synonymtypedef: BRAND_NAME "BRAND_NAME" RELATED
 synonymtypedef: Spanish "Spanish" RELATED
@@ -495,7 +495,7 @@ property_value: IAO:0000118 "cigalike" xsd:string
 [Term]
 id: ADDICTO:0000200
 name: cigar
-def: "A combustible tobacco-containing product that is formed of chopped tobacco leaves encased in tobacco leaves. The user sets one end alight and ingests smoke by sucking on the other end. The cylinder becomes shorter as the tobacco burns to smoke and ash until either the user extinguishes the burning tobacco or all the tobacco is burnt." []
+def: "A combustible tobacco-containing product that is a cylinder formed of chopped tobacco leaf encased in tobacco leaf. The user sets one end alight and ingests smoke by sucking on the other end. The cylinder becomes shorter as the tobacco burns to smoke and ash until either the user extinguishes the burning tobacco or all the tobacco is burnt." []
 comment: This definition includes all forms of cigar, including large panatellas and small cigars and cigarillos. The larger cigars are typically made in a way that produces a large amount of smoke with high concentration of nicotine that allows a significant amount of nicotine to be absorbed through the lining of the mouth.
 is_a: ADDICTO:0000207 ! combustible tobacco-containing product
 relationship: BFO:0000051 ADDICTO:0000303 ! has part tobacco
@@ -503,7 +503,7 @@ relationship: BFO:0000051 ADDICTO:0000303 ! has part tobacco
 [Term]
 id: ADDICTO:0000201
 name: cigarette
-def: "A combustible tobacco-containing product that is a thin cylinder of finely cut tobacco rolled in cigarette paper. The user sets one end alight and ingests smoke by sucking on the other end. The cylinder becomes shorter as the tobacco burns to smoke and ash until either the user extinguishes the burning tobacco or all the tobacco is burnt." []
+def: "A combustible tobacco-containing product that is a thin cylinder of finely cut tobacco encased in cigarette paper. The user sets one end alight and ingests smoke by sucking on the other end. The cylinder becomes shorter as the tobacco burns to smoke and ash until either the user extinguishes the burning tobacco or all the tobacco is burnt." []
 comment: This definition includes hand-rolled cigarettes and manufactured cigarettes but not cigarillos, bidis or small cigars. Cigarettes are typically made for the smoke to be inhaled into the lungs.
 is_a: ADDICTO:0000207 ! combustible tobacco-containing product
 relationship: BFO:0000051 ADDICTO:0000303 ! has part tobacco
@@ -545,7 +545,7 @@ is_a: ADDICTO:0000273 ! pharmaceutical formulation
 [Term]
 id: ADDICTO:0000207
 name: combustible tobacco-containing product
-def: "A tobacco-containing product of which the tobacco is processed to make it suitable for burning for the user to ingest the smoke." []
+def: "A tobacco-containing product in which the tobacco is processed to make it suitable for burning for the user to ingest the smoke." []
 is_a: ADDICTO:0000311 ! tobacco-containing product
 property_value: IAO:0000118 " smoked tobacco" xsd:string
 property_value: IAO:0000118 " smoked tobacco product" xsd:string
@@ -582,6 +582,7 @@ property_value: IAO:0000118 " electronic nicotine vaping device" xsd:string
 property_value: IAO:0000118 " electronic vaping device" xsd:string
 property_value: IAO:0000118 " ENDS" xsd:string
 property_value: IAO:0000118 " nicotine vaping device" xsd:string
+property_value: IAO:0000118 " nicotine vaping product, NVP" xsd:string
 property_value: IAO:0000118 "vape" xsd:string
 
 [Term]
@@ -787,20 +788,22 @@ property_value: curator_notes "Note in comment that is the risk not what leads t
 id: ADDICTO:0000245
 name: heated tobacco-containing product
 def: "A tobacco-containing product that contains a tobacco stick that it heats to produce a vapour for inhalation by a person." []
-is_a: ADDICTO:0000311 ! tobacco-containing product
-relationship: RO:0001019 ADDICTO:0000246 ! contains tobacco stick
+is_a: ADDICTO:0000304 ! processed tobacco
+relationship: RO:0001019 ADDICTO:0000246 ! contains heated tobacco stick
 
 [Term]
 id: ADDICTO:0000246
-name: tobacco stick
+name: heated tobacco stick
 def: "A heated tobacco-containing product part that has been processed to make it suitable for use in a heated tobacco product." []
-is_a: ADDICTO:0000535 ! heated tobacco-containing product part
+is_a: ADDICTO:0000311 ! tobacco-containing product
+property_value: IAO:0000118 " heat not burn stick" xsd:string
+property_value: IAO:0000118 "Heet" xsd:string
 
 [Term]
 id: ADDICTO:0000247
 name: high nicotine concentration e-liquid
 def: "An e-liquid that has a high concentration of nicotine." []
-is_a: ADDICTO:0000232 ! e-liquid
+is_a: ADDICTO:0000826 ! nicotine containing e-liquid
 
 [Term]
 id: ADDICTO:0000248
@@ -888,7 +891,7 @@ property_value: curator_notes "I wonder if here we should add this includes toba
 id: ADDICTO:0000267
 name: oil based THC e-liquid
 def: "An e-liquid that is oil based and contains THC." []
-is_a: ADDICTO:0000232 ! e-liquid
+is_a: ADDICTO:0000301 ! THC containing e-liquid
 relationship: BFO:0000051 CHEBI:66964 ! has part THC
 
 [Term]
@@ -923,7 +926,7 @@ name: pharmaceutical formulation
 def: "Formulation of a drug-containing product, including the characteristics of its components, the chemical nature of the drug , drug solubility in water and organic solvents, particle size and surface area, type of dosage form  and the excipients and processes used in its manufacturing." []
 is_a: BFO:0000020 ! specifically dependent continuant
 property_value: curator_notes "Much of the NCIT definition as been used but not all because it does not quite capture what is needed." xsd:string
-property_value: IAO:0000119 https://www.ebi.ac.uk/ols/ontologies/ncit/terms?iri=http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FNCIT_C42638 xsd:string
+property_value: IAO:0000119 https://www.ebi.ac.uk/ols/ontologies/ncit/terms?iri=http://purl.obolibrary.org/obo/NCIT_C42638 xsd:string
 
 [Term]
 id: ADDICTO:0000278
@@ -1006,10 +1009,11 @@ is_a: ADDICTO:0000236 ! environmental tobacco smoke
 [Term]
 id: ADDICTO:0000292
 name: smokeless tobacco-containing product
-def: "A tobacco-containing product of which the tobacco is processed for use by placing in the mouth or ingesting into the nose." []
-comment: This class is intended to include all tobacco-containing products whose use does not include burning. It is not intended to include products that only contain nicotine. Those are in the class of nicotine-containing products.
+def: "A tobacco-containing product in which the tobacco is processed for use in a manner that does not involve combustion." []
+comment: This class is intended to include all tobacco-containing products whose use does not involve burning. It is not intended to include products that only contain nicotine. Those are in the class of nicotine-containing products. It includes chewing tobacco and snus.
 is_a: ADDICTO:0000311 ! tobacco-containing product
 property_value: IAO:0000118 " non-combustible tobacco product" xsd:string
+property_value: IAO:0000118 " smokeless tobacco" xsd:string
 property_value: IAO:0000118 "smokeless tobacco product" xsd:string
 
 [Term]
@@ -1048,7 +1052,7 @@ is_a: ADDICTO:0000212 ! e-cigarette
 
 [Term]
 id: ADDICTO:0000301
-name: THC e-liquid
+name: THC containing e-liquid
 def: "An e-liquid that contains THC." []
 is_a: ADDICTO:0000232 ! e-liquid
 relationship: BFO:0000051 CHEBI:66964 ! has part THC
@@ -1080,25 +1084,25 @@ name: tobacco plant
 def: "A plant of the species that belongs to the Nicotiana genus of herbaceous plants." []
 comment: Nicotiana species include many varieties. These are commonly referred to as tobacco plants, and are cultivated as ornamental garden plants. N. tabacum is grown worldwide for production tobacco-containing products.
 is_a: PO:0000003 ! whole plant
+property_value: curator_notes "Although there are definitions of tobacco plant in other ontologies, these were not quite suitable for the purposes of AddictO." xsd:string
 property_value: IAO:0000118 "Nicotiana" xsd:string
 
 [Term]
 id: ADDICTO:0000308
-name: CDC Tobacco product
-def: "A product derived from tobacco plants for ingestion of constituents of tobacco, not including products that have a medicinal licence." []
-comment: This class is required because the CDC has chosen to exclude currently licensed nicotine-containing products from the class, but to include e-cigarettes.
-is_a: ADDICTO:0000279 ! product
-relationship: RO:0001000 ADDICTO:0000303 ! derives from tobacco
-property_value: curator_notes "The CDC chose to define tobacco product in a way that allowed it to have jurisdiction over certain nicotine-containing products but not others. This makes the definition problematic from a scientific standpoint because entities are included or excluded for regulatory purposes rather than their attributes." xsd:string
+name: FDA defined tobacco product
+def: "A product that is designed in most cases for the purpose of ingestion of one or more constituents of tobacco, not including products that have a medicinal licence." []
+comment: This class is not coherent and is best avoided in scientific discourse. This is because, despite the label, it includes products that have no tobacco constituents in them  and excludes products that do have the tobacco constituent nicotine .
+is_a: ADDICTO:0000304 ! processed tobacco
+relationship: BFO:0000051 ADDICTO:0000303 ! has part tobacco
+property_value: curator_notes "This class is required because it is used by organisations such as the Food and Drug Administration and Centers for Disease Control in the US, even though it is confused and confusing." xsd:string
 property_value: IAO:0000118 "tobacco product" xsd:string
-property_value: IAO:0000119 "Centers for Disease Control in the US" xsd:string
 
 [Term]
 id: ADDICTO:0000311
 name: tobacco-containing product
 def: "Aproduct that contains tobacco and is used by people to ingest tobacco constituents." []
 comment: This class includes products that contain parts of the tobacco plant that have been subject to some form of processing. This class does not contain products that only contain nicotine. These are dealt with separately as 'nicotine-containing products'.
-is_a: ADDICTO:0000279 ! product
+is_a: ADDICTO:0000304 ! processed tobacco
 relationship: BFO:0000051 ADDICTO:0000303 ! has part tobacco
 property_value: IAO:0000118 " tobacco product." xsd:string
 property_value: IAO:0000118 "tobacco" xsd:string
@@ -1142,7 +1146,7 @@ relationship: BFO:0000051 ADDICTO:0000317 ! has part vaping device part
 id: ADDICTO:0000317
 name: vaping device part
 def: "A part of a vaping device." []
-is_a: ADDICTO:0000279 ! product
+is_a: ADDICTO:0000827 ! product part
 
 [Term]
 id: ADDICTO:0000319
@@ -1168,6 +1172,13 @@ name: alcohol-related mortality
 def: "Mortality in a population in which the deaths in question are at least partly caused by the consumption of alcohol by people in that population." []
 comment: Expressed in terms of number or proportion of deaths or population attributable fraction.
 is_a: ADDICTO:0000324 ! mortality
+
+[Term]
+id: ADDICTO:0000323
+name: HIV epidemic
+def: "Epidemic of HIV infection." []
+is_a: APOLLO_SV:00000298 ! epidemic
+property_value: curator_notes "No definition found in Ontobee" xsd:string
 
 [Term]
 id: ADDICTO:0000324
@@ -1341,12 +1352,12 @@ name: cannabis dependence
 def: "Addiction to use of cannabis or cannabis products." []
 is_a: ADDICTO:0000518 ! substance addiction
 property_value: IAO:0000118 "Cannabis addiction" xsd:string
-property_value: IAO:0000119 https://www.ebi.ac.uk/ols/ontologies/ncit/terms?iri=http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FNCIT_C34445 xsd:string
+property_value: IAO:0000119 https://www.ebi.ac.uk/ols/ontologies/ncit/terms?iri=http://purl.obolibrary.org/obo/NCIT_C34445 xsd:string
 
 [Term]
 id: ADDICTO:0000362
 name: cannabis user
-def: "A person who self-identifies as currently using cannabis." []
+def: "A psychoactive substance user who self-identifies as currently using cannabis." []
 is_a: ADDICTO:0000513 ! psychoactive substance user
 
 [Term]
@@ -1369,7 +1380,7 @@ is_a: ADDICTO:0000517 ! poisoning
 
 [Term]
 id: ADDICTO:0000366
-name: concurrent non daily user
+name: concurrent non daily dual user
 def: "A dual product user who is also an e-cigarette user participating in use that is less than daily frequency." []
 is_a: ADDICTO:0000374 ! dual product user of e-cigarettes and cigarettes
 property_value: IAO:0000118 "Dual user" xsd:string
@@ -1383,8 +1394,8 @@ is_a: ADDICTO:0000381 ! identity
 [Term]
 id: ADDICTO:0000368
 name: daily cigarette smoker
-def: "A tobacco smoker who smokes a cigarette every day." []
-is_a: ADDICTO:0000405 ! tobacco smoker
+def: "A daily tobacco smoker who smokes a cigarette every day." []
+is_a: ADDICTO:0000370 ! daily tobacco smoker
 property_value: IAO:0000118 "Daily smoker" xsd:string
 
 [Term]
@@ -1422,8 +1433,8 @@ property_value: IAO:0000118 "Dual user" xsd:string
 [Term]
 id: ADDICTO:0000375
 name: e-cigarette user
-def: "A psychoactive substance user who particpates in e-cigarette use" []
-is_a: ADDICTO:0000513 ! psychoactive substance user
+def: "A person user who participates in e-cigarette use" []
+is_a: MF:0000016 ! human being
 
 [Term]
 id: ADDICTO:0000381
@@ -1479,6 +1490,13 @@ id: ADDICTO:0000391
 name: policy maker
 def: "A person who participates in policy making." []
 is_a: MF:0000016 ! human being
+
+[Term]
+id: ADDICTO:0000392
+name: positive self-appraisal of tobacco smoker identity
+def: "Self-appraisal of tobacco smoker identity that construes it as good." []
+is_a: ADDICTO:0000398 ! self-appraisal of identity
+property_value: IAO:0000118 "Positive smoker identity" xsd:string
 
 [Term]
 id: ADDICTO:0000393
@@ -1635,6 +1653,12 @@ def: "An industry in which the product is cannabis." []
 is_a: ADDICTO:0000428 ! industry
 
 [Term]
+id: ADDICTO:0000416
+name: cannabis retail outlet
+def: "A cannabis retailer that has a physical outlet." []
+is_a: ADDICTO:0000417 ! cannabis retailer
+
+[Term]
 id: ADDICTO:0000417
 name: cannabis retailer
 def: "A cannabis company that predominantly sells cannabis products and related merchandise." []
@@ -1661,6 +1685,8 @@ def: "A e-cigarette company that predominantly sells e-cigarettes, e-cigarette c
 is_a: ADDICTO:0000419 ! e-cigarette company
 property_value: IAO:0000118 " E-cig Industry" xsd:string
 property_value: IAO:0000118 " E-Cig merchant" xsd:string
+property_value: IAO:0000118 " vape retailer" xsd:string
+property_value: IAO:0000118 " vape shop" xsd:string
 property_value: IAO:0000118 "E-Cig shop" xsd:string
 
 [Term]
@@ -2113,7 +2139,7 @@ is_a: ADDICTO:0000281 ! psychoactive drug
 id: ADDICTO:0000535
 name: heated tobacco-containing product part
 def: "A part of a heated tobacco-containing product." []
-is_a: ADDICTO:0000279 ! product
+is_a: ADDICTO:0000827 ! product part
 
 [Term]
 id: ADDICTO:0000536
@@ -2429,7 +2455,6 @@ id: ADDICTO:0000717
 name: non-smoker identity
 def: "An identity whereby the person perceives the self  not to be a tobacco smoker" []
 is_a: ADDICTO:0000381 ! identity
-property_value: IAO:0000119 "CN" xsd:string
 
 [Term]
 id: ADDICTO:0000719
@@ -2493,7 +2518,7 @@ property_value: IAO:0000112 "\"Solitary drinking was defined as drinking while p
 
 [Term]
 id: ADDICTO:0000733
-name: alcoholic beverage
+name: alcohol containing beverage
 def: "A liquid product that contains alcohol." []
 comment: Define the level of alcohol content and type of beverage.
 is_a: ADDICTO:0000536 ! liquid product
@@ -2501,15 +2526,15 @@ property_value: IAO:0000118 "alcoholic drink" xsd:string
 
 [Term]
 id: ADDICTO:0000736
-name: beverage type
+name: beverage
 def: "A type of liquid product that is consumed." []
 is_a: ADDICTO:0000536 ! liquid product
 
 [Term]
 id: ADDICTO:0000737
-name: blunts
+name: blunt
 def: "A cigar which has been emptied of its tobacco and replaced with cannabis." []
-is_a: ADDICTO:0000200 ! cigar
+is_a: ADDICTO:0000311 ! tobacco-containing product
 property_value: IAO:0000112 "10.1093/ntr/ntw182" xsd:string
 
 [Term]
@@ -2530,6 +2555,12 @@ id: ADDICTO:0000743
 name: cigarillo
 def: "A small narrrow cigar." []
 is_a: ADDICTO:0000200 ! cigar
+
+[Term]
+id: ADDICTO:0000744
+name: coffee
+def: "A beverage that has been prepared from coffee beans." []
+is_a: ADDICTO:0000736 ! beverage
 
 [Term]
 id: ADDICTO:0000745
@@ -2625,8 +2656,8 @@ property_value: IAO:0000118 "Drinker" xsd:string
 [Term]
 id: ADDICTO:0000770
 name: chain smoker
-def: "A tobacco smoker  who, when circumstances allow, smokes continually with little or no tempora gap between cigarettes for much of their waking hours." []
-is_a: ADDICTO:0000405 ! tobacco smoker
+def: "A daily cigarette smoker  who, when circumstances allow, smokes continually with little or no tempora gap between cigarettes for much of their waking hours." []
+is_a: ADDICTO:0000368 ! daily cigarette smoker
 property_value: IAO:0000118 "Heavy smoker" xsd:string
 
 [Term]
@@ -2648,7 +2679,7 @@ property_value: IAO:0000118 "Ever smoker" xsd:string
 
 [Term]
 id: ADDICTO:0000773
-name: ex e-cig current smoker
+name: ex e-cigarette user current smoker
 def: "A tobacco smoker who reports current smoking but has in the past also used an e-cigarette." []
 comment: The time period and frequency of past e-cigarette use should also be defined,
 is_a: ADDICTO:0000405 ! tobacco smoker
@@ -2659,7 +2690,7 @@ property_value: IAO:0000118 "Smoker" xsd:string
 
 [Term]
 id: ADDICTO:0000774
-name: ex-smoking e-cig user
+name: ex-smoking e-cigarette user
 def: "An e-cigarette user who has, in the past, been a tobacco smoker, who now reports e-cigarette use." []
 comment: The time period and frequency of past tobacco smoking use should also be defined,
 is_a: ADDICTO:0000375 ! e-cigarette user
@@ -2742,6 +2773,7 @@ is_a: ADDICTO:0000405 ! tobacco smoker
 id: ADDICTO:0000787
 name: recent former regular smoker
 def: "A former tobacco smoker who has smoked within the past 12 months." []
+comment: This is a fuzzy because the time frame is not universally agreed and if this term is used the reference to recent must be defined.
 is_a: ADDICTO:0000777 ! former tobacco smoker
 property_value: IAO:0000118 " past regular smoker" xsd:string
 property_value: IAO:0000118 "Ex-smoker" xsd:string
@@ -2757,11 +2789,24 @@ property_value: IAO:0000118 " smoker" xsd:string
 property_value: IAO:0000118 "Current smoker" xsd:string
 
 [Term]
+id: ADDICTO:0000790
+name: group 1 carcinogen
+def: "A carcinogen where there is sufficent evidence, with an established casual relationship, to suggest it is carcinogenic to humans." []
+is_a: ADDICTO:0000794 ! carcinogen
+property_value: IAO:0000119 "IARC" xsd:string
+
+[Term]
+id: ADDICTO:0000791
+name: group 2 carcinogen
+def: "A carcinogen where there is limited evidence in humans, but sufficient evidence in animals to suggest it is  probably carcinogenic to humans." []
+is_a: ADDICTO:0000794 ! carcinogen
+property_value: IAO:0000119 "IARC" xsd:string
+
+[Term]
 id: ADDICTO:0000792
 name: crack cocaine
 def: "Cocaine which has been heated, purified, concentrated, and compressed into smokeable, pebble-sized crystals." []
 is_a: CHEBI:27958 ! cocaine
-property_value: curator_notes "there are 5 different definitions from this source." xsd:string
 property_value: IAO:0000119 "UMLS Metathesaurus Browser" xsd:string
 
 [Term]
@@ -2770,6 +2815,240 @@ name: carcinogen
 def: "A chemical substance that can act as a carconigenic agent." []
 is_a: CHEBI:59999 ! chemical substance
 relationship: RO:0000087 CHEBI:50903 ! has role carcinogenic agent
+
+[Term]
+id: ADDICTO:0000795
+name: adult at risk of relapse to smoking
+def: "An ex-smoker who reports being at risk of relapse to smoking." []
+comment: If possible how risk of relapse is being defined should be stated.
+is_a: ADDICTO:0000713 ! ex-smoker
+property_value: IAO:0000118 "risk-relapse" xsd:string
+
+[Term]
+id: ADDICTO:0000796
+name: age of smoking cessation
+def: "Age at which a person reports quitting smoking tobacco." []
+is_a: ADDICTO:0000353 ! age
+property_value: IAO:0000118 " Age quit smoking" xsd:string
+property_value: IAO:0000118 "Quit age" xsd:string
+
+[Term]
+id: ADDICTO:0000797
+name: cannabis smoker
+def: "A cannabis user who smokes cannabis." []
+comment: This defintion deliberately seperates cannabis smoking from the use of cannabis by edibles.
+is_a: ADDICTO:0000362 ! cannabis user
+
+[Term]
+id: ADDICTO:0000798
+name: cannabis vaper
+def: "A cannabis user who vapes cannabis." []
+comment: This defintion deliberately seperates cannabis smoking from vaping.
+is_a: ADDICTO:0000362 ! cannabis user
+
+[Term]
+id: ADDICTO:0000799
+name: daily cannabis smoker
+def: "A daily cannabis user who smokers cannabis daily." []
+is_a: ADDICTO:0000362 ! cannabis user
+
+[Term]
+id: ADDICTO:0000800
+name: daily cannabis user
+def: "A cannabis user who uses cannabis products daily." []
+is_a: ADDICTO:0000362 ! cannabis user
+
+[Term]
+id: ADDICTO:0000801
+name: daily e-cigarette user
+def: "An e-cigarette user who uses e-cigarettes daily." []
+comment:  if not daily e-cigarette user.
+comment: If other products are used alongside the e-cigarette this should be noted
+is_a: ADDICTO:0000375 ! e-cigarette user
+property_value: IAO:0000118 "daily vaper" xsd:string
+
+[Term]
+id: ADDICTO:0000802
+name: daily non-treatment-seeking cigarette smoker
+def: "A daily cigarette smoker who is not seeking smoking cessation treatment." []
+is_a: ADDICTO:0000368 ! daily cigarette smoker
+property_value: IAO:0000118 " daily tobacco user" xsd:string
+property_value: IAO:0000118 " unmotivated smoker" xsd:string
+property_value: IAO:0000118 "Daily smoker" xsd:string
+
+[Term]
+id: ADDICTO:0000804
+name: e-cigarette first user
+def: "An e-cigarette user who self-reports first time ever use of an e-cigarette." []
+comment: The purpose of this defintion is only to highlight first use. In addition to this it is important to state whether the person using the e-cigarette is a current smoker, ex-smoker or never.
+is_a: ADDICTO:0000375 ! e-cigarette user
+property_value: IAO:0000118 "New e-cigarette user" xsd:string
+
+[Term]
+id: ADDICTO:0000805
+name: exclusive cannabis smoker
+def: "A cannabis smoker who only smokes their cannabis." []
+comment: Intended defintion for those who smoke their cannabis only and do not use cannabis in any other form.
+is_a: ADDICTO:0000797 ! cannabis smoker
+property_value: IAO:0000118 "cannabis smoker" xsd:string
+
+[Term]
+id: ADDICTO:0000806
+name: exclusive cannabis vaper
+def: "A cannabis vaper who only vapes their cannabis." []
+comment: This defintion is for those who chose to vape their cannabis and are not using their cannabis in any form which involves combustion.
+is_a: ADDICTO:0000798 ! cannabis vaper
+property_value: IAO:0000118 "cannabis vaper" xsd:string
+
+[Term]
+id: ADDICTO:0000807
+name: exclusive e-cigarette user
+def: "An e-cigarette user who only uses e-cigarettes and does not use other tobacco- or  nicotine-containingn products." []
+comment: Exclusive user referes to the complete absense of other nicotine and tobacco containing products.
+is_a: ADDICTO:0000375 ! e-cigarette user
+property_value: IAO:0000118 " daily e-cigarette user" xsd:string
+property_value: IAO:0000118 "Vaper" xsd:string
+
+[Term]
+id: ADDICTO:0000808
+name: long-term ex smoker
+def: "An ex-smoker who has been quit for approximately one-year or more." []
+comment: This is fuzzy set because the time frame is approximate and needs to be defined in published work.
+is_a: ADDICTO:0000772 ! ever tobacco smoker
+property_value: IAO:0000118 "ex-smoker" xsd:string
+
+[Term]
+id: ADDICTO:0000809
+name: non daily e-cigarette user
+def: "An e-cigarette user who does not use their e-cigarette on a daily basis." []
+comment: The frequency of use should still be quatified if possible and other products e.g., cigarettes, if used alongside should be recorded.
+is_a: ADDICTO:0000375 ! e-cigarette user
+property_value: IAO:0000118 " non daily vaper" xsd:string
+property_value: IAO:0000118 "occassional e-cigarette user" xsd:string
+
+[Term]
+id: ADDICTO:0000810
+name: non-treatment seeking
+def: "A psychoactive substance user who is not seeking treatment for their substance use at the current time of recording data." []
+is_a: ADDICTO:0000513 ! psychoactive substance user
+
+[Term]
+id: ADDICTO:0000811
+name: user of edible cannabis products
+def: "A cannabis user who ingests cannabis through edible products." []
+comment: This defintion deliberately seperates cannabis smoking from the use of cannabis by edibles.
+is_a: ADDICTO:0000362 ! cannabis user
+
+[Term]
+id: ADDICTO:0000812
+name: CE4 e-cigarette tank
+def: "An e cigarette part that is the tank for a CE4 e cigarette" []
+is_a: ADDICTO:0000223 ! e-cigarette part
+
+[Term]
+id: ADDICTO:0000813
+name: THC vape pens
+def: "A THC vaping device that consists of an internal batter, a chamber for the THC and a mouthpiece.  They are small, simple to operate and portable." []
+is_a: ADDICTO:0000302 ! THC vaping device
+property_value: IAO:0000118 " THC vape pens" xsd:string
+property_value: IAO:0000118 "weed vape pens" xsd:string
+
+[Term]
+id: ADDICTO:0000814
+name: cardiovascular toxicant
+def: "A toxicant that has an effect on the cardiovascular system." []
+is_a: ADDICTO:0000824 ! toxicant
+
+[Term]
+id: ADDICTO:0000815
+name: developmental toxicant
+def: "A toxicant that has interferes with homeostasis, normal growth, differentiation or behaviour within the developmental process." []
+is_a: ADDICTO:0000824 ! toxicant
+
+[Term]
+id: ADDICTO:0000817
+name: dry herb vaporiser pen
+def: "A dry herb vaporiser that consists of an internal battery, a chamber for the THC and a mouthpiece.  It is small, simple to operate and is portable." []
+is_a: ADDICTO:0000746 ! dry herb vaporiser
+property_value: IAO:0000118 "weed vape pens" xsd:string
+
+[Term]
+id: ADDICTO:0000818
+name: energy drink
+def: "A liquid product that contains a high percentage of sugar, caffeine or another stimulant and is promoted as a product capable of increasing alertness and reducing fatigue." []
+is_a: ADDICTO:0000536 ! liquid product
+relationship: RO:0000087 ADDICTO:0000762 ! has role psychostimulant
+
+[Term]
+id: ADDICTO:0000819
+name: grams of alcohol
+def: "A data item referring to an amount of alcohol expressed in gram units." []
+comment: Indicate amount in grams
+is_a: IAO:0000027 ! data item
+
+[Term]
+id: ADDICTO:0000821
+name: reproductive toxicant
+def: "A toxicant that has an effect on the reproductive systsem." []
+is_a: ADDICTO:0000824 ! toxicant
+
+[Term]
+id: ADDICTO:0000822
+name: respiratory toxicant
+def: "A toxicant that has an effect on the respiratory system." []
+is_a: ADDICTO:0000824 ! toxicant
+
+[Term]
+id: ADDICTO:0000823
+name: toxic effect
+def: "The effect produced by a substance which contains toxins." []
+is_a: PATO:0000001 ! quality
+
+[Term]
+id: ADDICTO:0000824
+name: toxicant
+def: "A quality of a toxin substance." []
+is_a: PATO:0000001 ! quality
+
+[Term]
+id: ADDICTO:0000825
+name: long-term e-cigarette user
+def: "An e-cigarette user who has been using e-cigarettes for one-year or more" []
+is_a: ADDICTO:0000375 ! e-cigarette user
+property_value: IAO:0000118 "experienced e-cigarette user" xsd:string
+
+[Term]
+id: ADDICTO:0000826
+name: nicotine containing e-liquid
+def: "An e-liquid that contains nicotine." []
+comment: The strength of the e-liquid should always be defined.
+is_a: ADDICTO:0000232 ! e-liquid
+property_value: IAO:0000118 "nicotine e-liquid" xsd:string
+
+[Term]
+id: ADDICTO:0000827
+name: product part
+def: "A part of a product." []
+is_a: ADDICTO:0000279 ! product
+
+[Term]
+id: ADDICTO:0000828
+name: recent ex-smoker
+def: "An ex-smoker who has been quit for approximately less than one-year." []
+comment: This is a fuzzy because the time frame is not universally agreed and if this term is used the reference to recent must be defined.
+is_a: ADDICTO:0000713 ! ex-smoker
+property_value: IAO:0000118 " recent quitter" xsd:string
+property_value: IAO:0000118 "past smoker" xsd:string
+
+[Term]
+id: ADDICTO:0000829
+name: independent e-cigarette retailer
+def: "An e-cigarette retailer that has no commercial or financial association with a tobacco company." []
+is_a: ADDICTO:0000421 ! e-cigarette retailer
+property_value: IAO:0000118 " independent vape retailer" xsd:string
+property_value: IAO:0000118 " Independent vape shop" xsd:string
+property_value: IAO:0000118 " vape retailer" xsd:string
+property_value: IAO:0000118 "Independent e-cig shop" xsd:string
 
 [Term]
 id: APOLLO_SV:00000298
