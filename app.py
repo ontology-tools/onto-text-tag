@@ -30,15 +30,17 @@ idName = "ID"
 # or: en_core_web_sm or en_core_web_lg
 nlp = spacy.load('en_core_web_md')
 
-location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
+location = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
+
+# location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
 print("Fetching release file from", location)
 data = urlopen(location).read()  # bytes
 ontofile = data.decode('utf-8')
 
 onto_extractor = ExtractorComponent(
     nlp,
-    name="ADDICTO",
-    label="ADDICTO",
+    name="BCIO",
+    label="BCIO",
     ontologyfile=ontofile)
 nlp.add_pipe(onto_extractor, after="ner")
 
