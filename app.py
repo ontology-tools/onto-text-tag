@@ -161,11 +161,11 @@ def pubmed():
 @ app.route('/tag', methods=['POST'])
 def tag():
     text=request.form['inputText']
-    details=request.form['inputDetails']
-    date=request.form['dateDetails']
-    title=request.form['titleDetails']
-    authors=request.form['authorsDetails']
-    id=request.form.get('pubmed_id')
+    # details=request.form['inputDetails']
+    # date=request.form['dateDetails']
+    # title=request.form['titleDetails']
+    # authors=request.form['authorsDetails']
+    # id=request.form.get('pubmed_id')
     # print("/tag id is: " + id)
     # print(f"Got input text {text}")
     # process the text
@@ -197,11 +197,11 @@ def tag():
 
     return render_template('index.html',
                            text = text,
-                           details = details,
-                           date = date,
-                           title = title,
-                           authors = authors,
-                           id = idName,
+                        #    details = details,
+                        #    date = date,
+                        #    title = title,
+                        #    authors = authors,
+                        #    id = idName,
                            tag_results = tag_results)
 
 
