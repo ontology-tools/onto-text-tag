@@ -1,6 +1,6 @@
-Flask
+Flask==1.0.2
 gunicorn
 google-cloud-secret-manager
-spacy
-pronto
-biopython
+spacy==2.3.4
+py-horned-owl==0.1.4
+biopython==1.78
