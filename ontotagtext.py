@@ -136,49 +136,49 @@ class ExtractorComponent(object):
 
 
 # Testing
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
     # python -m spacy download en_core_web_md
     # or: en_core_web_sm or en_core_web_lg
-    nlp = spacy.load('en_core_web_md')
+    # nlp = spacy.load('en_core_web_md')
 
-    onto_extractor = ExtractorComponent(
-        nlp,
-        name="ADDICTO",
-        label="ADDICTO",
-        ontologyfile="/Users/hastingj/Work/Onto/addiction-ontology/addicto-merged.owx")
-    nlp.add_pipe(onto_extractor, after="parser")
+    # onto_extractor = ExtractorComponent(
+    #     nlp,
+    #     name="ADDICTO",
+    #     label="ADDICTO",
+    #     ontologyfile="/Users/hastingj/Work/Onto/addiction-ontology/addicto-merged.owx")
+    # nlp.add_pipe(onto_extractor, after="parser")
 
-    test = '''
-    The promotion of the London Smoking Cessation Transformation Programme during September 2017 was associated with a significant increase in quit attempts compared with the rest of England. The results were inconclusive regarding an effect on quit success among those who tried.
-    Smokers were more successful than non-smokers and this was good. Those who smoked were associated with ...
-    '''
+    # test = '''
+    # The promotion of the London Smoking Cessation Transformation Programme during September 2017 was associated with a significant increase in quit attempts compared with the rest of England. The results were inconclusive regarding an effect on quit success among those who tried.
+    # Smokers were more successful than non-smokers and this was good. Those who smoked were associated with ...
+    # '''
 
-    doc = nlp(test)
+    # doc = nlp(test)
 
-    # print ontology IDs identified
-    for token in doc:
-        if token._.is_ontol_term:
-            print(token._.ontol_id, token.text, token.idx)
+    # # print ontology IDs identified
+    # for token in doc:
+    #     if token._.is_ontol_term:
+    #         print(token._.ontol_id, token.text, token.idx)
 
 
-    from spacy import displacy
+    # from spacy import displacy
 
-    svg = displacy.serve(doc, style='ent')
+    # svg = displacy.serve(doc, style='ent')
 
-    from spacy.matcher import PhraseMatcher
+    # from spacy.matcher import PhraseMatcher
 
-    matcher = PhraseMatcher(nlp.vocab, attr='LEMMA')
+    # matcher = PhraseMatcher(nlp.vocab, attr='LEMMA')
 
-    terms = ['smoking cessation', 'smoker', 'non-smoker', 'smoke', 'effect']
-    patterns = [nlp(text) for text in terms]
-    matcher.add("TerminologyList", patterns)
+    # terms = ['smoking cessation', 'smoker', 'non-smoker', 'smoke', 'effect']
+    # patterns = [nlp(text) for text in terms]
+    # matcher.add("TerminologyList", patterns)
 
-    matches = matcher(doc)
-    print(matches)
+    # matches = matcher(doc)
+    # print(matches)
 
-    for (match_id, start, end) in matches:
-        print(nlp.vocab.strings[match_id], doc[start:end])
+    # for (match_id, start, end) in matches:
+    #     print(nlp.vocab.strings[match_id], doc[start:end])
 
 
     ## Another approach using spacylookup

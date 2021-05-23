@@ -29,20 +29,39 @@ idName = "ID"
 # python -m spacy download en_core_web_md
 # or: en_core_web_sm or en_core_web_lg
 nlp = spacy.load('en_core_web_md')
+nlp2 = spacy.load('en_core_web_md')
 
-location = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
 
-# location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
+location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
+location2 = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
+# location = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
+
 print("Fetching release file from", location)
 data = urlopen(location).read()  # bytes
-ontofile = data.decode('utf-8')
+print("Fetching release file from", location2)
+data2 = urlopen(location2).read()  # bytes
+
+ontofile1 = data.decode('utf-8')
+ontofile2 = data2.decode('utf-8')
+
+# ontofile = ontofile1+ontofile2
+
+# ontofile = data2.decode('utf-8')
 
 onto_extractor = ExtractorComponent(
     nlp,
+    name="ADDICT0",
+    label="ADDICT0",
+    ontologyfile=ontofile1)
+nlp.add_pipe(onto_extractor, after="ner")
+
+#two of these? Combine them? 
+onto_extractor2 = ExtractorComponent(
+    nlp2,
     name="BCIO",
     label="BCIO",
-    ontologyfile=ontofile)
-nlp.add_pipe(onto_extractor, after="ner")
+    ontologyfile=ontofile2)
+nlp2.add_pipe(onto_extractor2, after="ner")
 
 
 # Interaction with PubMed: get detailed results for a list of IDs
@@ -146,11 +165,12 @@ def pubmed():
                 resultDetail = results[result]
                 abstractText = get_abstract_text(resultDetail)
                     # print(f"Got abstract text {abstractText}")
-                articleDetails = get_article_details(resultDetail)
-                print(f"Got articleDetails {articleDetails}") #when we get the right details... how to separate 
-                dateA, titleA, authorsA = articleDetails.split(';')
+                # articleDetails = get_article_details(resultDetail)
+                # print(f"Got articleDetails {articleDetails}") #when we get the right details... how to separate 
+                # dateA, titleA, authorsA = articleDetails.split(';')
                 if abstractText:
-                    r = requests.post(url_for("tag", _external=True), data={"inputDetails":articleDetails, "inputText":abstractText, "dateDetails":dateA, "titleDetails":titleA, "authorsDetails":authorsA})
+                    r = requests.post(url_for("tag", _external=True), data={"inputText":abstractText})
+                    # r = requests.post(url_for("tag", _external=True), data={"inputDetails":articleDetails, "inputText":abstractText, "dateDetails":dateA, "titleDetails":titleA, "authorsDetails":authorsA})
                     return r.text, r.status_code, r.headers.items()
         except Exception as err: #400 bad request handling, also if no internet connection
             print(err)
@@ -171,8 +191,9 @@ def tag():
     # print("/tag id is: " + id)
     # print(f"Got input text {text}")
     # process the text
-    doc=nlp(text)
     tag_results=[]
+    
+    doc=nlp(text)    
     # get ontology IDs identified
     for token in doc:
         if token._.is_ontol_term:
@@ -195,7 +216,32 @@ def tag():
                                 "ontol_namespace": ontol_namespace,
                                 "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
                                 "match_index": token.idx})
-    # print(f"Got tag results {tag_results}")
+    doc2=nlp2(text)
+    # get ontology IDs identified
+    for token in doc2:
+        if token._.is_ontol_term:
+            #todo: this is not getting appended..
+            term2=onto_extractor2.get_term(token._.ontol_id)
+            if term2:
+                ontol_label2=term2.name
+                ontol_def2=str(term2.definition)
+                ontol_namespace2=term2.namespace
+                if ontol_namespace2 is None:
+                    ontol_namespace2=term2.id[0:term2.id.index(":")]
+            else:
+                ontol_label2=""
+                ontol_def2=""
+                ontol_namespace2=""
+            tag_results.append({"ontol_id": token._.ontol_id,
+                                "span_text": token.text,
+                                "ontol_label": ontol_label2,
+                                "ontol_def": ontol_def2,
+                                "ontol_namespace": ontol_namespace2,
+                                "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
+                                "match_index": token.idx})
+            
+            
+    print(f"Got tag results {tag_results}")
 
     return render_template('index.html',
                            text = text,
