@@ -220,23 +220,23 @@ def tag():
     # get ontology IDs identified
     for token in doc2:
         if token._.is_ontol_term:
-            #todo: this is not getting appended..
-            term2=onto_extractor2.get_term(token._.ontol_id)
-            if term2:
-                ontol_label2=term2.name
-                ontol_def2=str(term2.definition)
-                ontol_namespace2=term2.namespace
-                if ontol_namespace2 is None:
-                    ontol_namespace2=term2.id[0:term2.id.index(":")]
+            # print(token._.ontol_id, token.text, token.idx)
+            term=onto_extractor2.get_term(token._.ontol_id) #todo: why does this work fine with onto_extractor ?
+            if term:
+                ontol_label=term.name
+                ontol_def=str(term.definition)
+                ontol_namespace=term.namespace
+                if ontol_namespace is None:
+                    ontol_namespace=term.id[0:term.id.index(":")]
             else:
-                ontol_label2=""
-                ontol_def2=""
-                ontol_namespace2=""
+                ontol_label=""
+                ontol_def=""
+                ontol_namespace=""
             tag_results.append({"ontol_id": token._.ontol_id,
                                 "span_text": token.text,
-                                "ontol_label": ontol_label2,
-                                "ontol_def": ontol_def2,
-                                "ontol_namespace": ontol_namespace2,
+                                "ontol_label": ontol_label,
+                                "ontol_def": ontol_def,
+                                "ontol_namespace": ontol_namespace,
                                 "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
                                 "match_index": token.idx})
             
