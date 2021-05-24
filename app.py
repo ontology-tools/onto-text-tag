@@ -14,7 +14,8 @@
 
 from flask import Flask, request, redirect, url_for
 from flask.templating import render_template
-from ontotagtext import ExtractorComponent
+# from ontotagtext import ExtractorComponent
+from ontotagtext import MultiExtractorComponent
 import spacy
 from Bio import Entrez
 import requests
@@ -30,6 +31,7 @@ idName = "ID"
 # or: en_core_web_sm or en_core_web_lg
 nlp = spacy.load('en_core_web_md')
 nlp2 = spacy.load('en_core_web_md')
+nlp3 = spacy.load('en_core_web_md')
 
 
 location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
@@ -48,20 +50,29 @@ ontofile2 = data2.decode('utf-8')
 
 # ontofile = data2.decode('utf-8')
 
-onto_extractor = ExtractorComponent(
-    nlp,
-    name="ADDICT0",
-    label="ADDICT0",
-    ontologyfile=ontofile1)
-nlp.add_pipe(onto_extractor, after="ner")
+# onto_extractor = ExtractorComponent(
+#     nlp,
+#     name="ADDICT0",
+#     label="ADDICT0",
+#     ontologyfile=ontofile1)
+# nlp.add_pipe(onto_extractor, after="ner")
 
-#two of these? Combine them? 
-onto_extractor2 = ExtractorComponent(
-    nlp2,
-    name="BCIO",
-    label="BCIO",
-    ontologyfile=ontofile2)
-nlp2.add_pipe(onto_extractor2, after="ner")
+# #two of these? Combine them? 
+# onto_extractor2 = ExtractorComponent(
+#     nlp2,
+#     name="BCIO",
+#     label="BCIO",
+#     ontologyfile=ontofile2)
+# nlp2.add_pipe(onto_extractor2, after="ner")
+
+# combined test
+onto_extractor3 = MultiExtractorComponent(
+    nlp3,
+    name="COMBINED",
+    label="COMBINED",
+    ontologyfile1=ontofile1,
+    ontologyfile2=ontofile2)
+nlp3.add_pipe(onto_extractor3, after="ner")
 
 
 # Interaction with PubMed: get detailed results for a list of IDs
@@ -217,12 +228,59 @@ def tag():
     # process the text
     tag_results=[]
     
-    doc=nlp(text)    
+    # doc=nlp(text)    
+    # # get ontology IDs identified
+    # for token in doc:
+    #     if token._.is_ontol_term:
+    #         # print(token._.ontol_id, token.text, token.idx)
+    #         term=onto_extractor.get_term(token._.ontol_id)
+    #         if term:
+    #             ontol_label=term.name
+    #             ontol_def=str(term.definition)
+    #             ontol_namespace=term.namespace
+    #             if ontol_namespace is None:
+    #                 ontol_namespace=term.id[0:term.id.index(":")]
+    #         else:
+    #             ontol_label=""
+    #             ontol_def=""
+    #             ontol_namespace=""
+    #         tag_results.append({"ontol_id": token._.ontol_id,
+    #                             "span_text": token.text,
+    #                             "ontol_label": ontol_label,
+    #                             "ontol_def": ontol_def,
+    #                             "ontol_namespace": ontol_namespace,
+    #                             "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
+    #                             "match_index": token.idx})
+    # doc2=nlp2(text)
+    # # get ontology IDs identified
+    # for token in doc2:
+    #     if token._.is_ontol_term:
+    #         # print(token._.ontol_id, token.text, token.idx)
+    #         term=onto_extractor2.get_term(token._.ontol_id) #todo: why does this work fine with onto_extractor ?
+    #         if term:
+    #             ontol_label=term.name
+    #             ontol_def=str(term.definition)
+    #             ontol_namespace=term.namespace
+    #             if ontol_namespace is None:
+    #                 ontol_namespace=term.id[0:term.id.index(":")]
+    #         else:
+    #             ontol_label=""
+    #             ontol_def=""
+    #             ontol_namespace=""
+    #         tag_results.append({"ontol_id": token._.ontol_id,
+    #                             "span_text": token.text,
+    #                             "ontol_label": ontol_label,
+    #                             "ontol_def": ontol_def,
+    #                             "ontol_namespace": ontol_namespace,
+    #                             "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
+    #                             "match_index": token.idx})
+
+    doc3=nlp3(text)
     # get ontology IDs identified
-    for token in doc:
+    for token in doc3:
         if token._.is_ontol_term:
             # print(token._.ontol_id, token.text, token.idx)
-            term=onto_extractor.get_term(token._.ontol_id)
+            term=onto_extractor3.get_term(token._.ontol_id) #todo: why does this work fine with onto_extractor ?
             if term:
                 ontol_label=term.name
                 ontol_def=str(term.definition)
@@ -239,31 +297,7 @@ def tag():
                                 "ontol_def": ontol_def,
                                 "ontol_namespace": ontol_namespace,
                                 "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
-                                "match_index": token.idx})
-    doc2=nlp2(text)
-    # get ontology IDs identified
-    for token in doc2:
-        if token._.is_ontol_term:
-            # print(token._.ontol_id, token.text, token.idx)
-            term=onto_extractor2.get_term(token._.ontol_id) #todo: why does this work fine with onto_extractor ?
-            if term:
-                ontol_label=term.name
-                ontol_def=str(term.definition)
-                ontol_namespace=term.namespace
-                if ontol_namespace is None:
-                    ontol_namespace=term.id[0:term.id.index(":")]
-            else:
-                ontol_label=""
-                ontol_def=""
-                ontol_namespace=""
-            tag_results.append({"ontol_id": token._.ontol_id,
-                                "span_text": token.text,
-                                "ontol_label": ontol_label,
-                                "ontol_def": ontol_def,
-                                "ontol_namespace": ontol_namespace,
-                                "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
-                                "match_index": token.idx})
-            
+                                "match_index": token.idx})           
             
     # print(f"Got tag results {tag_results}")
 
