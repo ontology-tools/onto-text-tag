@@ -77,53 +77,55 @@ def fetch_details(id_list):
 #parse the title, authors and date published 
 #try return separate values for year, day, month, AuthourList and ArticleTitle
 def get_article_details(result):
-    articleDetails = None
-    dayCompleted = None
-    monthCompleted = None
-    yearCompleted = None
-    for detail in result:
-        if 'MedlineCitation' in detail:
-            # print(f"")
-            print(f"MedlineCitation is: ")
-            pp.pprint(detail['MedlineCitation']) #pretty print
-            # print(str(detail['MedlineCitation']))
-            if 'DateCompleted' in detail['MedlineCitation']: #this works.
-                print(f"")
-                print(f"DateCompleted is: ")
-                print(str(detail['MedlineCitation']['DateCompleted']))
-                dayCompleted = str(detail['MedlineCitation']['DateCompleted']['Day'])
-                monthCompleted = str(detail['MedlineCitation']['DateCompleted']['Month'])
-                yearCompleted = str(detail['MedlineCitation']['DateCompleted']['Year'])
-            else:
-                yearCompleted = ""
-                monthCompleted = ""
-                dayCompleted = "" #todo: we still end up with // here if no data returned..
+    articleDetails = "DATE;TITLE;AUTHORS"
+    # dayCompleted = ""
+    # monthCompleted = ""
+    # yearCompleted = ""
+    # for detail in result:
+    #     if 'MedlineCitation' in detail:
+    #         # print(f"")
+    #         print(f"MedlineCitation is: ")
+    #         pp.pprint(detail['MedlineCitation']) #pretty print
+    #         # print(str(detail['MedlineCitation']))
+    #         if 'DateCompleted' in detail['MedlineCitation']: #this works.
+    #             print(f"")
+    #             print(f"DateCompleted is: ")
+    #             print(str(detail['MedlineCitation']['DateCompleted']))
+    #             dayCompleted = str(detail['MedlineCitation']['DateCompleted']['Day'])
+    #             monthCompleted = str(detail['MedlineCitation']['DateCompleted']['Month'])
+    #             yearCompleted = str(detail['MedlineCitation']['DateCompleted']['Year'])
+    #         else:
+    #             yearCompleted = ""
+    #             monthCompleted = ""
+    #             dayCompleted = "" #todo: we still end up with // here if no data returned..
             
-            if 'ArticleTitle' in detail['MedlineCitation']['Article']: 
-                print(f"")
-                print(f"ArticleTitle is: ") #works, got title!
-                pp.pprint(detail['MedlineCitation']['Article']['ArticleTitle'])
-                # pp.pprint({id} + " " + "ID")
-                articleDetails = dayCompleted + "/" + monthCompleted + "/" + yearCompleted + ";" + str(detail['MedlineCitation']['Article']['ArticleTitle'])
-            else:
-                print(f"ArticleTitle not found")
+    #         if 'ArticleTitle' in detail['MedlineCitation']['Article']: 
+    #             print(f"")
+    #             print(f"ArticleTitle is: ") #works, got title!
+    #             pp.pprint(detail['MedlineCitation']['Article']['ArticleTitle'])
+    #             # pp.pprint({id} + " " + "ID")
+    #             articleDetails = dayCompleted + "/" + monthCompleted + "/" + yearCompleted + ";" + str(detail['MedlineCitation']['Article']['ArticleTitle'])
+    #         else:
+    #             print(f"ArticleTitle not found")
+    #             articleDetails = "/ / ;"
 
-            if 'AuthorList' in detail['MedlineCitation']['Article']: #this works, need to refine though
-                print(f"")
-                print(f"AuthorList is: ")
-                pp.pprint(detail['MedlineCitation']['Article']['AuthorList'])
+    #         if 'AuthorList' in detail['MedlineCitation']['Article']: #this works, need to refine though
+    #             print(f"")
+    #             print(f"AuthorList is: ")
+    #             pp.pprint(detail['MedlineCitation']['Article']['AuthorList'])
 
-                articleDetails += ";Authors: "
-                #this one works! Just assign to string and we on!
-                for s in range(len(detail['MedlineCitation']['Article']['AuthorList'])):
-                    pp.pprint(detail['MedlineCitation']['Article']['AuthorList'][s]['LastName'])                    
-                    articleDetails += detail['MedlineCitation']['Article']['AuthorList'][s]['LastName']
-                    if(s == (len(detail['MedlineCitation']['Article']['AuthorList'])-1)):
-                        articleDetails += "."
-                    else:
-                        articleDetails += ", "
-            else:
-                print(f"AuthorList not found")
+    #             articleDetails += ";Authors: "
+    #             #this one works! Just assign to string and we on!
+    #             for s in range(len(detail['MedlineCitation']['Article']['AuthorList'])):
+    #                 pp.pprint(detail['MedlineCitation']['Article']['AuthorList'][s]['LastName'])                    
+    #                 articleDetails += detail['MedlineCitation']['Article']['AuthorList'][s]['LastName']
+    #                 if(s == (len(detail['MedlineCitation']['Article']['AuthorList'])-1)):
+    #                     articleDetails += "."
+    #                 else:
+    #                     articleDetails += ", "
+    #         else:
+    #             print(f"AuthorList not found")
+    #             articleDetails += ";Authors: "
 
     return articleDetails
 
@@ -165,12 +167,13 @@ def pubmed():
                 resultDetail = results[result]
                 abstractText = get_abstract_text(resultDetail)
                     # print(f"Got abstract text {abstractText}")
-                # articleDetails = get_article_details(resultDetail)
-                # print(f"Got articleDetails {articleDetails}") #when we get the right details... how to separate 
-                # dateA, titleA, authorsA = articleDetails.split(';')
+                articleDetails = get_article_details(resultDetail)
+                print(f"Got articleDetails {articleDetails}") #when we get the right details... how to separate 
+                dateA, titleA, authorsA = articleDetails.split(';')
                 if abstractText:
-                    r = requests.post(url_for("tag", _external=True), data={"inputText":abstractText})
-                    # r = requests.post(url_for("tag", _external=True), data={"inputDetails":articleDetails, "inputText":abstractText, "dateDetails":dateA, "titleDetails":titleA, "authorsDetails":authorsA})
+                    # r = requests.post(url_for("tag", _external=True), data={"inputText":abstractText, "dateDetails":dateA, "titleDetails":titleA, "authorsDetails":authorsA})
+                    # r = requests.post(url_for("tag", _external=True), data={"inputText":abstractText})
+                    r = requests.post(url_for("tag", _external=True), data={"inputDetails":articleDetails, "inputText":abstractText, "dateDetails":dateA, "titleDetails":titleA, "authorsDetails":authorsA})
                     return r.text, r.status_code, r.headers.items()
         except Exception as err: #400 bad request handling, also if no internet connection
             print(err)
@@ -183,10 +186,18 @@ def pubmed():
 @ app.route('/tag', methods=['POST'])
 def tag():
     text=request.form['inputText']
-    # details=request.form['inputDetails']
-    # date=request.form['dateDetails']
-    # title=request.form['titleDetails']
-    # authors=request.form['authorsDetails']
+
+    #test:
+    # details="details"
+    # date="date"
+    # title="title"
+    # authors="authors"
+    # id="pubmed ID"
+
+    details=request.form['inputDetails']
+    date=request.form['dateDetails']
+    title=request.form['titleDetails']
+    authors=request.form['authorsDetails']
     # id=request.form.get('pubmed_id')
     # print("/tag id is: " + id)
     # print(f"Got input text {text}")
@@ -241,15 +252,15 @@ def tag():
                                 "match_index": token.idx})
             
             
-    print(f"Got tag results {tag_results}")
+    # print(f"Got tag results {tag_results}")
 
     return render_template('index.html',
                            text = text,
-                        #    details = details,
-                        #    date = date,
-                        #    title = title,
-                        #    authors = authors,
-                        #    id = idName,
+                           details = details,
+                           date = date,
+                           title = title,
+                           authors = authors,
+                           id = idName,
                            tag_results = tag_results)
 
 
