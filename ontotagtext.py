@@ -149,7 +149,7 @@ class MultiExtractorComponent(object):
 
         # load ontology
         print("Loading ontology")
-        self.ontol = pyhornedowl.open_ontology(ontologyfile2) #todo: change back to ontologyfile
+        self.ontol = pyhornedowl.open_ontology(ontologyfile1) 
         self.ontol2 = pyhornedowl.open_ontology(ontologyfile2)
         
         for prefix in PREFIXES:
@@ -197,38 +197,38 @@ class MultiExtractorComponent(object):
                   except:
                       print("Problem getting plural of ",s)
                       continue
-        print("patterns are: ", patterns)
+        # print("patterns are: ", patterns)
 
         
 
         # self.terms2 = {}
         # patterns2 = []
-        # # iterate over terms in ontology2
-        # for termid in self.ontol2.get_classes():
-        #   termshortid = self.ontol2.get_id_for_iri(termid)
-        #   label2 = self.ontol2.get_annotation(termid, RDFSLABEL)
-        #   if label2 is not None and label2.strip().lower() not in stopwords:
-        #       self.terms2[label2.strip().lower()] = {'id': termid if termshortid is None else termshortid}
-        #       patterns2.append(nlp.make_doc(label2.strip()))
-        #       plural = engine.plural(label2.strip())
-        #       self.terms2[plural.lower()] = {'id': termid if termshortid is None else termshortid}
-        #       patterns2.append(nlp.make_doc(plural))
-        #   synonyms = self.ontol2.get_annotations(termid, SYN)
-        #   for s in synonyms:
-        #       if s.strip().lower() not in stopwords:
-        #           self.terms2[s.strip().lower()] = {'id': termid if termshortid is None else termshortid}
-        #           patterns2.append(nlp.make_doc(s.strip()))
-        #           try:
-        #               plural = engine.plural(s.strip())
-        #               self.terms2[plural.lower()] = {'id': termid if termshortid is None else termshortid}
-        #               patterns2.append(nlp.make_doc(plural))
-        #           except:
-        #               print("Problem getting plural of ",s)
-        #               continue
+        # iterate over terms in ontology2
+        for termid in self.ontol2.get_classes():
+          termshortid = self.ontol2.get_id_for_iri(termid)
+          label2 = self.ontol2.get_annotation(termid, RDFSLABEL)
+          if label2 is not None and label2.strip().lower() not in stopwords:
+              self.terms[label2.strip().lower()] = {'id': termid if termshortid is None else termshortid}
+              patterns.append(nlp.make_doc(label2.strip()))
+              plural = engine.plural(label2.strip())
+              self.terms[plural.lower()] = {'id': termid if termshortid is None else termshortid}
+              patterns.append(nlp.make_doc(plural))
+          synonyms = self.ontol2.get_annotations(termid, SYN)
+          for s in synonyms:
+              if s.strip().lower() not in stopwords:
+                  self.terms[s.strip().lower()] = {'id': termid if termshortid is None else termshortid}
+                  patterns.append(nlp.make_doc(s.strip()))
+                  try:
+                      plural = engine.plural(s.strip())
+                      self.terms[plural.lower()] = {'id': termid if termshortid is None else termshortid}
+                      patterns.append(nlp.make_doc(plural))
+                  except:
+                      print("Problem getting plural of ",s)
+                      continue
         #   i += 1
-
+        print("patterns are: ", patterns)
         # print("patterns2 are: ", patterns2)
-        print("patterns type is: ", type(patterns))
+        # print("patterns type is: ", type(patterns))
 
         #todo: join patterns and patterns2 here:
         # patterns3 = patterns + patterns2
