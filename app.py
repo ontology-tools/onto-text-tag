@@ -68,8 +68,10 @@ ontofile2 = data2.decode('utf-8')
 # combined test
 onto_extractor3 = MultiExtractorComponent(
     nlp3,
-    name="COMBINED",
-    label="COMBINED",
+    name1="Addict0",
+    label1="Addict0",
+    name2="BCIO",
+    label2="BCIO",
     ontologyfile1=ontofile1,
     ontologyfile2=ontofile2)
 nlp3.add_pipe(onto_extractor3, after="ner")
