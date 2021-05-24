@@ -194,11 +194,24 @@ def tag():
     # authors="authors"
     # id="pubmed ID"
 
-    details=request.form['inputDetails']
-    date=request.form['dateDetails']
-    title=request.form['titleDetails']
-    authors=request.form['authorsDetails']
-    # id=request.form.get('pubmed_id')
+    # details=request.form['inputDetails']
+    # date=request.form['dateDetails']
+    # title=request.form['titleDetails']
+    # authors=request.form['authorsDetails']
+    details=request.form.get('inputDetails')
+    date=request.form.get('dateDetails')
+    title=request.form.get('titleDetails')
+    authors=request.form.get('authorsDetails')
+    if details == None:
+        details = ""
+    if date == None:
+        date = ""
+    if title == None:
+        title = ""
+    if authors == None:
+        authors = ""
+    
+    # id=request.form.get('pubmed_id') #not necessary
     # print("/tag id is: " + id)
     # print(f"Got input text {text}")
     # process the text
