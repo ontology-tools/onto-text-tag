@@ -223,7 +223,7 @@ class MultiExtractorComponent(object):
                       print("Problem getting plural of ",s)
                       continue
         #   i += 1
-        print("patterns are: ", patterns)
+        # print("patterns are: ", patterns)
         
         # initialize matcher and add patterns
         self.matcher = PhraseMatcher(nlp.vocab, attr='LOWER')        
@@ -265,6 +265,8 @@ class MultiExtractorComponent(object):
     def get_term(self, term_id):
         if term_id in self.ontol_ids:
             return self.ontol.get_term(term_id)
+        elif term_id in self.ontol_ids2:
+            return self.ontol2.get_term(term_id)
         else:
             return None
 

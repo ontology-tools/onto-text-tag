@@ -98,13 +98,13 @@ def get_article_details(result):
     for detail in result:
         if 'MedlineCitation' in detail:
             # print(f"")
-            print(f"MedlineCitation is: ")
-            pp.pprint(detail['MedlineCitation']) #pretty print
+            # print(f"MedlineCitation is: ")
+            # pp.pprint(detail['MedlineCitation']) #pretty print
             # print(str(detail['MedlineCitation']))
             if 'DateCompleted' in detail['MedlineCitation']: #this works.
-                print(f"")
-                print(f"DateCompleted is: ")
-                print(str(detail['MedlineCitation']['DateCompleted']))
+                # print(f"")
+                # print(f"DateCompleted is: ")
+                # print(str(detail['MedlineCitation']['DateCompleted']))
                 dayCompleted = str(detail['MedlineCitation']['DateCompleted']['Day'])
                 monthCompleted = str(detail['MedlineCitation']['DateCompleted']['Month'])
                 yearCompleted = str(detail['MedlineCitation']['DateCompleted']['Year'])
@@ -114,33 +114,33 @@ def get_article_details(result):
                 dayCompleted = "" #todo: we still end up with // here if no data returned..
             
             if 'ArticleTitle' in detail['MedlineCitation']['Article']: 
-                print(f"")
-                print(f"ArticleTitle is: ") #works, got title!
-                pp.pprint(detail['MedlineCitation']['Article']['ArticleTitle'])
+                # print(f"")
+                # print(f"ArticleTitle is: ") #works, got title!
+                # pp.pprint(detail['MedlineCitation']['Article']['ArticleTitle'])
                 # pp.pprint({id} + " " + "ID")
                 test_articleDetails = dayCompleted + "/" + monthCompleted + "/" + yearCompleted + ";" + str(detail['MedlineCitation']['Article']['ArticleTitle'])
             else:
-                print(f"ArticleTitle not found")
+                # print(f"ArticleTitle not found")
                 articleDetails = "/ / ;"
 
             if 'AuthorList' in detail['MedlineCitation']['Article']: #this works, need to refine though
-                print(f"")
-                print(f"AuthorList is: ")
-                pp.pprint(detail['MedlineCitation']['Article']['AuthorList'])
+                # print(f"")
+                # print(f"AuthorList is: ")
+                # pp.pprint(detail['MedlineCitation']['Article']['AuthorList'])
 
                 test_articleDetails += ";Authors: "
                 #this one works! Just assign to string and we on!
                 for s in range(len(detail['MedlineCitation']['Article']['AuthorList'])):
-                    pp.pprint(detail['MedlineCitation']['Article']['AuthorList'][s]['LastName'])                    
+                    # pp.pprint(detail['MedlineCitation']['Article']['AuthorList'][s]['LastName'])                    
                     test_articleDetails += detail['MedlineCitation']['Article']['AuthorList'][s]['LastName']
                     if(s == (len(detail['MedlineCitation']['Article']['AuthorList'])-1)):
                         test_articleDetails += "."
                     else:
                         test_articleDetails += ", "
             else:
-                print(f"AuthorList not found")
+                # print(f"AuthorList not found")
                 test_articleDetails += ";Authors: "
-    pp.pprint(test_articleDetails)
+    # pp.pprint(test_articleDetails)
     return test_articleDetails
 
 # Parse the PubMed result to get the abstract text if it is there
@@ -150,8 +150,12 @@ def get_abstract_text(result):
         if 'MedlineCitation' in detail:
             if 'Article' in detail['MedlineCitation']:
                 if 'Abstract' in detail['MedlineCitation']['Article']:
+                    # print("Article is: ", detail['MedlineCitation']['Article'])
                     if 'AbstractText' in detail['MedlineCitation']['Article']['Abstract']:
                         abstractText = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText'])
+                        # if'StringElement' in detail['MedlineCitation']['Article']['Abstract']['AbstractText']:
+                        #     abstractText = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText']['StringElement'])
+                        # abstractText = abstractText[2:-2] #remove brackets and quotation
 
     return abstractText
 
@@ -180,7 +184,7 @@ def pubmed():
                 abstractText = get_abstract_text(resultDetail)
                     # print(f"Got abstract text {abstractText}")
                 articleDetails = get_article_details(resultDetail)
-                print("Got articleDetails: ", articleDetails) #when we get the right details... 
+                # print("Got articleDetails: ", articleDetails) #when we get the right details... 
                 try:
                     dateA, titleA, authorsA = articleDetails.split(';')
                 except:
@@ -278,10 +282,13 @@ def tag():
         if token._.is_ontol_term:
             # print(token._.ontol_id, token.text, token.idx)
             term=onto_extractor3.get_term(token._.ontol_id) 
-            if term:
+            if term: #todo: not getting term???
                 ontol_label=term.name
+                print("ontol_label: ", ontol_label)
                 ontol_def=str(term.definition)
+                print("ontol_def: ", ontol_def)
                 ontol_namespace=term.namespace
+                print("ontol_namespace: ", ontol_namespace)
                 if ontol_namespace is None:
                     ontol_namespace=term.id[0:term.id.index(":")]
             else:
