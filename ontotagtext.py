@@ -136,11 +136,14 @@ PREFIXES = [ ["ADDICTO","http://addictovocab.org/ADDICTO_"],
 
 class MultiExtractorComponent(object):
     def __init__(self, nlp, name1, label1, name2, label2, ontologyfile1, ontologyfile2):
+        # todo: make this loop over ontologies? Should work for n... ontologies
+
         # label that is applied to the matches
         self.label1 = label1
         self.name1 = name1
         self.label2 = label2
         self.name2 = name2
+        self.label3 = label1+label2
         # stop words, don't try to match these
         stopwords = nlp.Defaults.stop_words
         stopwords.add("ands")
@@ -159,9 +162,6 @@ class MultiExtractorComponent(object):
         self.ontol_ids = self.ontol.get_classes()
         self.ontol_ids2 = self.ontol2.get_classes()
 
-        # self.ontol_ids.update(self.ontol_ids2) #combine two sets
-        # print("self.ontol_ids is: " , self.ontol_ids)
-
         # for making plural forms of labels for text matching
         engine = inflect.engine()
 
@@ -170,10 +170,10 @@ class MultiExtractorComponent(object):
         patterns = []
 
         # i = 0
-        # nr_terms1 = len(self.ontol2.get_classes())
-        # print(f"Importing {nr_terms1} terms")
-        # nr_terms = len(self.ontol.get_classes())
-        # print(f"Importing 2 {nr_terms} terms")
+        nr_terms1 = len(self.ontol2.get_classes())
+        print(f"Importing {nr_terms1} terms")
+        nr_terms = len(self.ontol.get_classes())
+        print(f"Importing 2 {nr_terms} terms")
 
         # iterate over terms in ontology
         for termid in self.ontol.get_classes():
@@ -200,9 +200,6 @@ class MultiExtractorComponent(object):
         # print("patterns are: ", patterns)
 
         
-
-        # self.terms2 = {}
-        # patterns2 = []
         # iterate over terms in ontology2
         for termid in self.ontol2.get_classes():
           termshortid = self.ontol2.get_id_for_iri(termid)
@@ -227,21 +224,10 @@ class MultiExtractorComponent(object):
                       continue
         #   i += 1
         print("patterns are: ", patterns)
-        # print("patterns2 are: ", patterns2)
-        # print("patterns type is: ", type(patterns))
-
-        #todo: join patterns and patterns2 here:
-        # patterns3 = patterns + patterns2
+        
         # initialize matcher and add patterns
-        self.matcher = PhraseMatcher(nlp.vocab, attr='LOWER')
-        # self.matcher.add(label2, None, *patterns2)
+        self.matcher = PhraseMatcher(nlp.vocab, attr='LOWER')        
         self.matcher.add(label1, None, *patterns)
-        # self.matcher.add(label2, None, *patterns3)
-        
-
-        
-        # self.matcher.add(label2, *patterns) #todo: investigate label1 significance
-
 
         # set extensions to tokens, spans and docs
         Token.set_extension("is_ontol_term", default=False, force=True)
@@ -254,7 +240,7 @@ class MultiExtractorComponent(object):
     def __call__(self, doc):
         # print("type is: ", type(self.ontol))
         matches = self.matcher(doc)
-        spans = [Span(doc, match[1], match[2], label=self.label1) for match in matches]
+        spans = [Span(doc, match[1], match[2], label=self.label3) for match in matches]
         # spans.extend[Span(doc, match[1], match[2], label=self.label1) for match in matches]
         for i, span in enumerate(spans):
           span._.set("has_ontols", True)
