@@ -91,56 +91,57 @@ def fetch_details(id_list):
 #try return separate values for year, day, month, AuthourList and ArticleTitle
 def get_article_details(result):
     articleDetails = "DATE;TITLE;AUTHORS"
-    # dayCompleted = ""
-    # monthCompleted = ""
-    # yearCompleted = ""
-    # for detail in result:
-    #     if 'MedlineCitation' in detail:
-    #         # print(f"")
-    #         print(f"MedlineCitation is: ")
-    #         pp.pprint(detail['MedlineCitation']) #pretty print
-    #         # print(str(detail['MedlineCitation']))
-    #         if 'DateCompleted' in detail['MedlineCitation']: #this works.
-    #             print(f"")
-    #             print(f"DateCompleted is: ")
-    #             print(str(detail['MedlineCitation']['DateCompleted']))
-    #             dayCompleted = str(detail['MedlineCitation']['DateCompleted']['Day'])
-    #             monthCompleted = str(detail['MedlineCitation']['DateCompleted']['Month'])
-    #             yearCompleted = str(detail['MedlineCitation']['DateCompleted']['Year'])
-    #         else:
-    #             yearCompleted = ""
-    #             monthCompleted = ""
-    #             dayCompleted = "" #todo: we still end up with // here if no data returned..
+    test_articleDetails = ""
+    dayCompleted = ""
+    monthCompleted = ""
+    yearCompleted = ""
+    for detail in result:
+        if 'MedlineCitation' in detail:
+            # print(f"")
+            print(f"MedlineCitation is: ")
+            pp.pprint(detail['MedlineCitation']) #pretty print
+            # print(str(detail['MedlineCitation']))
+            if 'DateCompleted' in detail['MedlineCitation']: #this works.
+                print(f"")
+                print(f"DateCompleted is: ")
+                print(str(detail['MedlineCitation']['DateCompleted']))
+                dayCompleted = str(detail['MedlineCitation']['DateCompleted']['Day'])
+                monthCompleted = str(detail['MedlineCitation']['DateCompleted']['Month'])
+                yearCompleted = str(detail['MedlineCitation']['DateCompleted']['Year'])
+            else:
+                yearCompleted = ""
+                monthCompleted = ""
+                dayCompleted = "" #todo: we still end up with // here if no data returned..
             
-    #         if 'ArticleTitle' in detail['MedlineCitation']['Article']: 
-    #             print(f"")
-    #             print(f"ArticleTitle is: ") #works, got title!
-    #             pp.pprint(detail['MedlineCitation']['Article']['ArticleTitle'])
-    #             # pp.pprint({id} + " " + "ID")
-    #             articleDetails = dayCompleted + "/" + monthCompleted + "/" + yearCompleted + ";" + str(detail['MedlineCitation']['Article']['ArticleTitle'])
-    #         else:
-    #             print(f"ArticleTitle not found")
-    #             articleDetails = "/ / ;"
+            if 'ArticleTitle' in detail['MedlineCitation']['Article']: 
+                print(f"")
+                print(f"ArticleTitle is: ") #works, got title!
+                pp.pprint(detail['MedlineCitation']['Article']['ArticleTitle'])
+                # pp.pprint({id} + " " + "ID")
+                test_articleDetails = dayCompleted + "/" + monthCompleted + "/" + yearCompleted + ";" + str(detail['MedlineCitation']['Article']['ArticleTitle'])
+            else:
+                print(f"ArticleTitle not found")
+                articleDetails = "/ / ;"
 
-    #         if 'AuthorList' in detail['MedlineCitation']['Article']: #this works, need to refine though
-    #             print(f"")
-    #             print(f"AuthorList is: ")
-    #             pp.pprint(detail['MedlineCitation']['Article']['AuthorList'])
+            if 'AuthorList' in detail['MedlineCitation']['Article']: #this works, need to refine though
+                print(f"")
+                print(f"AuthorList is: ")
+                pp.pprint(detail['MedlineCitation']['Article']['AuthorList'])
 
-    #             articleDetails += ";Authors: "
-    #             #this one works! Just assign to string and we on!
-    #             for s in range(len(detail['MedlineCitation']['Article']['AuthorList'])):
-    #                 pp.pprint(detail['MedlineCitation']['Article']['AuthorList'][s]['LastName'])                    
-    #                 articleDetails += detail['MedlineCitation']['Article']['AuthorList'][s]['LastName']
-    #                 if(s == (len(detail['MedlineCitation']['Article']['AuthorList'])-1)):
-    #                     articleDetails += "."
-    #                 else:
-    #                     articleDetails += ", "
-    #         else:
-    #             print(f"AuthorList not found")
-    #             articleDetails += ";Authors: "
-
-    return articleDetails
+                test_articleDetails += ";Authors: "
+                #this one works! Just assign to string and we on!
+                for s in range(len(detail['MedlineCitation']['Article']['AuthorList'])):
+                    pp.pprint(detail['MedlineCitation']['Article']['AuthorList'][s]['LastName'])                    
+                    test_articleDetails += detail['MedlineCitation']['Article']['AuthorList'][s]['LastName']
+                    if(s == (len(detail['MedlineCitation']['Article']['AuthorList'])-1)):
+                        test_articleDetails += "."
+                    else:
+                        test_articleDetails += ", "
+            else:
+                print(f"AuthorList not found")
+                test_articleDetails += ";Authors: "
+    pp.pprint(test_articleDetails)
+    return test_articleDetails
 
 # Parse the PubMed result to get the abstract text if it is there
 def get_abstract_text(result):
@@ -166,10 +167,8 @@ def home():
 def pubmed():
     id = request.form.get('pubmed_id')
     global idName
-    # idName=id
-    # idName="Pubmed ID: " + id #todo: fix this line - error, even though it worked before...
-    idName="PubmedID here.."
-    # id = request.get_json()
+    articleDetails = ""
+    idName=""
     print(f"Pubmed id {id}")
     if id:
         print(f"Got it {id}")
@@ -181,8 +180,11 @@ def pubmed():
                 abstractText = get_abstract_text(resultDetail)
                     # print(f"Got abstract text {abstractText}")
                 articleDetails = get_article_details(resultDetail)
-                print(f"Got articleDetails {articleDetails}") #when we get the right details... how to separate 
-                dateA, titleA, authorsA = articleDetails.split(';')
+                print("Got articleDetails: ", articleDetails) #when we get the right details... 
+                try:
+                    dateA, titleA, authorsA = articleDetails.split(';')
+                except:
+                    pass
                 if abstractText:
                     # r = requests.post(url_for("tag", _external=True), data={"inputText":abstractText, "dateDetails":dateA, "titleDetails":titleA, "authorsDetails":authorsA})
                     # r = requests.post(url_for("tag", _external=True), data={"inputText":abstractText})
@@ -207,10 +209,6 @@ def tag():
     # authors="authors"
     # id="pubmed ID"
 
-    # details=request.form['inputDetails']
-    # date=request.form['dateDetails']
-    # title=request.form['titleDetails']
-    # authors=request.form['authorsDetails']
     details=request.form.get('inputDetails')
     date=request.form.get('dateDetails')
     title=request.form.get('titleDetails')
@@ -224,9 +222,6 @@ def tag():
     if authors == None:
         authors = ""
     
-    # id=request.form.get('pubmed_id') #not necessary
-    # print("/tag id is: " + id)
-    # print(f"Got input text {text}")
     # process the text
     tag_results=[]
     
@@ -258,7 +253,7 @@ def tag():
     # for token in doc2:
     #     if token._.is_ontol_term:
     #         # print(token._.ontol_id, token.text, token.idx)
-    #         term=onto_extractor2.get_term(token._.ontol_id) #todo: why does this work fine with onto_extractor ?
+    #         term=onto_extractor2.get_term(token._.ontol_id) 
     #         if term:
     #             ontol_label=term.name
     #             ontol_def=str(term.definition)
@@ -282,7 +277,7 @@ def tag():
     for token in doc3:
         if token._.is_ontol_term:
             # print(token._.ontol_id, token.text, token.idx)
-            term=onto_extractor3.get_term(token._.ontol_id) #todo: why does this work fine with onto_extractor ?
+            term=onto_extractor3.get_term(token._.ontol_id) 
             if term:
                 ontol_label=term.name
                 ontol_def=str(term.definition)
