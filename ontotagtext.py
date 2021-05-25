@@ -177,6 +177,7 @@ class MultiExtractorComponent(object):
 
         # iterate over terms in ontology
         for termid in self.ontol.get_classes():
+          self.terms["name"] = "hello"
           termshortid = self.ontol.get_id_for_iri(termid)
           label1 = self.ontol.get_annotation(termid, RDFSLABEL)
           if label1 is not None and label1.strip().lower() not in stopwords:
@@ -262,7 +263,7 @@ class MultiExtractorComponent(object):
     def has_ontols(self, tokens):
         return any([t._.get("is_ontol_term") for t in tokens])
 
-    def get_term(self, term_id):
+    def get_term(self, term_id): #todo: why is this function not working, and what does it do?
         if term_id in self.ontol_ids:
             return self.ontol.get_term(term_id)
         elif term_id in self.ontol_ids2:
