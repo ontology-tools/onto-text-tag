@@ -64,16 +64,18 @@ ontoDict = {
     ]
 }
 
-ontologies = ontoDict["ontologies"]
-for ontology in ontologies:
-    for key, value in ontology.items():
-        if(key == "label"):
-            print(value)
+# get values test:
+# ontologies = ontoDict["ontologies"]
+# for ontology in ontologies:
+#     for key, value in ontology.items():
+#         if(key == "label"):
+#             print(value)
             # print (key, value)
     
 
 onto_extractor3 = MultiExtractorComponent(
     nlp3,
+    ontoDict=ontoDict,
     name1="Addict0",
     label1="Addict0",
     name2="BCIO",

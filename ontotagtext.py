@@ -41,11 +41,11 @@ PREFIXES = [ ["ADDICTO","http://addictovocab.org/ADDICTO_"],
 
 
 class MultiExtractorComponent(object):
-    def __init__(self, nlp, name1, label1, name2, label2, ontologyfile1, ontologyfile2):
+    def __init__(self, nlp, ontoDict, name1, label1, name2, label2, ontologyfile1, ontologyfile2):
         # todo: make this loop over ontologies? Should work for n... ontologies
 
         # HOW ABOUT A DICTIONARY {"label": ontologyFile, ...}
-
+        self.ontoDict = ontoDict
         # label that is applied to the matches
         self.label1 = label1
         self.name1 = name1
@@ -58,6 +58,11 @@ class MultiExtractorComponent(object):
         stopwords.add("ends")
         stopwords.add("ci")
 
+        ontologies = ontoDict["ontologies"]
+        for ontology in ontologies:
+            for key, value in ontology.items():
+                if(key == "label"):
+                    print(value)
         #todo: combine ontologyfile1 and ontologyfile2? Somehow?
         # load ontology
         print("Loading ontology")
