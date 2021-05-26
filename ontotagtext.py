@@ -178,19 +178,10 @@ class MultiExtractorComponent(object):
         print(f"Importing 2 {nr_terms} terms")
 
         #build unified table of all ID, IRI, Label and Synonyms:
-        for termid in self.ontol_ids_combined: 
+        #todo: from here
+        for termid in self.ontol_ids_combined:
           termshortid = self.ontol.get_id_for_iri(termid)
-          if termshortid:
-              pass
-          else: 
-              termshortid = self.ontol2.get_id_for_iri(termid)
-        #   print("termshortID is: ", termshortid)
           label1 = self.ontol.get_annotation(termid, RDFSLABEL)
-          if label1:
-              pass
-          else:
-              label1 = self.ontol2.get_annotation(termid, RDFSLABEL)
-        #   print("label1 is: ", label1)
           if label1 is not None and label1.strip().lower() not in stopwords:
               self.terms[label1.strip().lower()] = {'id': termid if termshortid is None else termshortid}
               patterns.append(nlp.make_doc(label1.strip()))
@@ -209,6 +200,38 @@ class MultiExtractorComponent(object):
                   except:
                       print("Problem getting plural of ",s)
                       continue
+
+        # for termid in self.ontol_ids_combined: 
+        #   termshortid = self.ontol2.get_id_for_iri(termid)
+        #   if termshortid:
+        #       pass #todo: no, missing some here.
+        #   else: 
+        #       termshortid = self.ontol.get_id_for_iri(termid)
+        # #   print("termshortID is: ", termshortid)
+        #   label1 = self.ontol2.get_annotation(termid, RDFSLABEL)
+        #   if label1:
+        #       pass #todo: no
+        #   else:
+        #       label1 = self.ontol.get_annotation(termid, RDFSLABEL)
+        # #   print("label1 is: ", label1)
+        #   if label1 is not None and label1.strip().lower() not in stopwords:
+        #       self.terms[label1.strip().lower()] = {'id': termid if termshortid is None else termshortid}
+        #       patterns.append(nlp.make_doc(label1.strip()))
+        #       plural = engine.plural(label1.strip())
+        #       self.terms[plural.lower()] = {'id': termid if termshortid is None else termshortid}
+        #       patterns.append(nlp.make_doc(plural))
+        #   synonyms = self.ontol.get_annotations(termid, SYN)
+        #   for s in synonyms:
+        #       if s.strip().lower() not in stopwords:
+        #           self.terms[s.strip().lower()] = {'id': termid if termshortid is None else termshortid}
+        #           patterns.append(nlp.make_doc(s.strip()))
+        #           try:
+        #               plural = engine.plural(s.strip())
+        #               self.terms[plural.lower()] = {'id': termid if termshortid is None else termshortid}
+        #               patterns.append(nlp.make_doc(plural))
+        #           except:
+        #               print("Problem getting plural of ",s)
+        #               continue
         # iterate over terms in ontology
         # for termid in self.ontol_ids:
         #   termshortid = self.ontol.get_id_for_iri(termid)
