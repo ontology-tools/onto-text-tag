@@ -16,13 +16,13 @@
 
 {% if error_msg %}
 <div class="alert alert-danger" role="alert">
-  
-    {{error_msg}}
- 
-  
+
+  {{error_msg}}
+
+
 </div>
-<script type = "text/javascript">
-console.log("error message");
+<script type="text/javascript">
+  console.log("error message");
 </script>
 {% endif %}
 
@@ -101,13 +101,29 @@ console.log("error message");
   })
 
   var results = {{ tag_results | safe}};
-  // var namespace = {{ ontol_namespace | safe }};
-  // console.log("namespace is: " + namespace);
-  // var textText = $("#compressedText").text(); //got the text here!
-
+  // 
+  
+  //check for unique namespaces, add to array, assign a colour and 
+  namespaces = [];
+  namespaceColours = [];
+  generateColours(results);
   replaceText(results);
-
+  
   // $(".highlight").css({ backgroundColor: "#FFFF88" }); //highlight all same
+
+  function generateColours(matches) {
+    $.each(matches, function (index, value) {
+      if (!namespaces.includes(value.ontol_namespace)) {
+        namespaces.push(value.ontol_namespace);
+      }
+    });
+
+    for(i in namespaces){
+      // console.log(namespaces[i]);
+      var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16); //generate random colour
+      namespaceColours.push(randomColor);
+    }
+  }
 
   function replaceText(matches) {
     $.each(matches, function (index, value) {
@@ -116,9 +132,15 @@ console.log("error message");
         // $(this).highlight(value.span_text); //to highlight all the same colour
         var shortValue = value.span_text.toLowerCase().replace(/\s+/g, ''); //remove spaces for adding to className
         $(this).highlight(value.span_text, { className: 'jQueryLink' + shortValue }); //this adds an unique className per Value
-        var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16); //generate random colour
-        $(".jQueryLink" + shortValue).css("color", invertColor(randomColor, true)); //inverse colour for text
-        $(".jQueryLink" + shortValue).css("backgroundColor", randomColor); //different colours depending on className
+        var specificColor;
+        //check ontology of tag, set correct colour
+        for(i in namespaces){
+          if(namespaces.includes(value.ontol_namespace)){
+            specificColor = namespaceColours[namespaces.indexOf(value.ontol_namespace)];
+          }
+        }
+        $(".jQueryLink" + shortValue).css("color", invertColor(specificColor, true)); //inverse colour for text
+        $(".jQueryLink" + shortValue).css("backgroundColor", specificColor); //different colours depending on namespace
         $(".jQueryLink" + shortValue).attr("data-toggle", "popover");
         $(".jQueryLink" + shortValue).popover({ html: true, title: value.ontol_id + "<br><br><a href='" + value.ontol_link + "'target='_blank'> View in AddictO Vocab </a>", content: value.ontol_label + ": " + value.ontol_def, trigger: "manual", placement: "top" })
           .on("mouseenter", function () {
@@ -182,7 +204,7 @@ console.log("error message");
 <div class="row mb-3">
   <div class="col-md-12">
     <div class="float-right">
-        <form action="pubmed" method="post" class="green-border-focus">
+      <form action="pubmed" method="post" class="green-border-focus">
         <label for="pubmed_id">Enter PubMed ID: </label>
         <input type="text" id="pubmed_id" name="pubmed_id" class="form-control">
         <br>
