@@ -55,8 +55,9 @@ class MultiExtractorComponent(object):
         # self.name1 = name1
         # self.label2 = label2
         # self.name2 = name2
-        # self.label3 = []
-        # self.label3 = label1+label2
+        # self.all_labels = []
+        # self.all_labels = label1+label2
+        self.all_labels = ""
         # stop words, don't try to match these
         stopwords = nlp.Defaults.stop_words
         stopwords.add("ands")
@@ -64,19 +65,21 @@ class MultiExtractorComponent(object):
         stopwords.add("ci")
 
         ontology_list = []
-        labels = []
-        names = []
+    
         ontologies = ontoDict["ontologies"]
         for ontology in ontologies:
             for key, value in ontology.items():
                 if(key == "ontologyfile"):
                     ontology_list.append(value)
                 if(key == "label"):
-                    labels.append(value)
-                if(key == "name"):
-                    names.append(value)
+                    # labels.append(value)
+                    self.all_labels = self.all_labels + value
+                
         # for i in labels:
-        self.label3 = labels[0] + labels[1] # ...+ labels[n]?
+        # self.all_labels = labels
+        # self.all_labels = labels[0] + labels[1] # ...+ labels[n]?
+        # print("type of labels is: ", labels)
+        print("all_labels = ", self.all_labels)
         
         # print("ontology_list[0] is: ", ontology_list[0])
         #todo: extract values from ontoDict and replace individual self.values 
@@ -148,7 +151,7 @@ class MultiExtractorComponent(object):
 
         # initialize matcher and add patterns
         self.matcher = PhraseMatcher(nlp.vocab, attr='LOWER')        
-        self.matcher.add(self.label3, None, *patterns)
+        self.matcher.add(self.all_labels, None, *patterns)
 
         # set extensions to tokens, spans and docs
         Token.set_extension("is_ontol_term", default=False, force=True)
@@ -161,7 +164,7 @@ class MultiExtractorComponent(object):
     def __call__(self, doc):
         # print("type is: ", type(self.ontol))
         matches = self.matcher(doc)
-        spans = [Span(doc, match[1], match[2], label=self.label3) for match in matches]
+        spans = [Span(doc, match[1], match[2], label=self.all_labels) for match in matches]
         # spans.extend[Span(doc, match[1], match[2], label=self.label1) for match in matches]
         for i, span in enumerate(spans):
           span._.set("has_ontols", True)
