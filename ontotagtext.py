@@ -12,6 +12,7 @@ import inflect
 
 RDFSLABEL = "http://www.w3.org/2000/01/rdf-schema#label"
 SYN = "http://purl.obolibrary.org/obo/IAO_0000118"
+DEFINITION = "http://purl.obolibrary.org/obo/IAO_0000115"
 PREFIXES = [ ["ADDICTO","http://addictovocab.org/ADDICTO_"],
              ["BFO","http://purl.obolibrary.org/obo/BFO_"],
              ["CHEBI","http://purl.obolibrary.org/obo/CHEBI_"],
@@ -108,20 +109,24 @@ class MultiExtractorComponent(object):
             for termid in ontol.get_classes():
                 termshortid = ontol.get_id_for_iri(termid)
                 label = ontol.get_annotation(termid, RDFSLABEL)
+                definition = ontol.get_annotation(termid, DEFINITION)
+                term_entry = {'id': termid if termshortid is None else termshortid,
+                              'name': label.strip(),
+                              'definition': definition}
                 if label is not None and label.strip().lower() not in stopwords:
-                    self.terms[label.strip().lower()] = {'id': termid if termshortid is None else termshortid}
+                    self.terms[label.strip().lower()] = term_entry
                     patterns.append(nlp.make_doc(label.strip().lower()))
                     plural = engine.plural(label.strip())
-                    self.terms[plural.lower()] = {'id': termid if termshortid is None else termshortid}
+                    self.terms[plural.lower()] = term_entry
                     patterns.append(nlp.make_doc(plural.lower()))
                 synonyms = ontol.get_annotations(termid, SYN)
                 for s in synonyms:
                     if s.strip().lower() not in stopwords:
-                        self.terms[s.strip().lower()] = {'id': termid if termshortid is None else termshortid}
+                        self.terms[s.strip().lower()] = term_entry
                         patterns.append(nlp.make_doc(s.strip().lower()))
                         try:
                             plural = engine.plural(s.strip().lower())
-                            self.terms[plural.lower()] = {'id': termid if termshortid is None else termshortid}
+                            self.terms[plural.lower()] = term_entry
                             patterns.append(nlp.make_doc(plural.lower()))
                         except:
                             print("Problem getting plural of ",s)
@@ -165,10 +170,10 @@ class MultiExtractorComponent(object):
         return any([t._.get("is_ontol_term") for t in tokens])
 
     def get_term(self, term_id): #todo: why is this function not working, and what does it do? Fix this
-        if term_id in self.terms.values(): #should be there?
-            keys = [k for k, v in self.terms.items() if v == term_id]
+        if term_id in [ v['id'] for v in self.terms.values()]: #should be there?
+            keys = [k for k, v in self.terms.items() if v['id'] == term_id]
             print("get_term returned: ", keys[0])
-            return keys[0]
+            return self.terms[keys[0]]
         else:
             return None
 
