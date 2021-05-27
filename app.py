@@ -255,11 +255,11 @@ def tag():
     for token in doc3:
         if token._.is_ontol_term:
             print("token details: ", token._.ontol_id, token.text, token.idx)
-            # term=onto_extractor3.get_term(token._.ontol_id) #todo: not getting term? This returns None every time.
+            term=onto_extractor3.get_term(token._.ontol_id) #todo: not getting term? This returns None every time.
             # this not working either.
-            term = onto_extractor3.get_term(token.text)
+            # term = onto_extractor3.get_term(token.text)
 
-            print("term is: ", term)
+            # print("term is: ", term)
             if term:
                 ontol_label = term.name
                 print("ontol_label: ", ontol_label)
@@ -269,12 +269,14 @@ def tag():
                 print("ontol_namespace: ", ontol_namespace)
                 if ontol_namespace is None:
                     ontol_namespace = term.id[0:term.id.index(":")]
+                    print("ontol_namespace: ", ontol_namespace)
             else:
                 ontol_label = token.idx
                 ontol_def = token.text
                 # ontol_label=""
                 # ontol_def=""
                 ontol_namespace = ""
+                # print("ontol_namespace not found")
             tag_results.append({"ontol_id": token._.ontol_id,
                                 "span_text": token.text,
                                 "ontol_label": ontol_label,

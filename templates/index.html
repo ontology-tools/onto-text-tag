@@ -101,6 +101,8 @@ console.log("error message");
   })
 
   var results = {{ tag_results | safe}};
+  // var namespace = {{ ontol_namespace | safe }};
+  // console.log("namespace is: " + namespace);
   // var textText = $("#compressedText").text(); //got the text here!
 
   replaceText(results);

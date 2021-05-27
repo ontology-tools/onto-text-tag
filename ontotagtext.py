@@ -42,6 +42,7 @@ PREFIXES = [ ["ADDICTO","http://addictovocab.org/ADDICTO_"],
 
 class MultiExtractorComponent(object):
     def __init__(self, nlp, ontoDict, name1, label1, name2, label2, ontologyfile1, ontologyfile2):
+    # def __init__(self, nlp, ontoDict, name1, label1, name2, label2):
         # todo: make this loop over ontologies? Should work for n... ontologies
 
         # HOW ABOUT A DICTIONARY {"label": ontologyFile, ...}
@@ -58,17 +59,35 @@ class MultiExtractorComponent(object):
         stopwords.add("ends")
         stopwords.add("ci")
 
+        ontology_list = []
         ontologies = ontoDict["ontologies"]
         for ontology in ontologies:
             for key, value in ontology.items():
-                if(key == "label"):
-                    print(value)
-        #todo: combine ontologyfile1 and ontologyfile2? Somehow?
-        # load ontology
-        print("Loading ontology")
-        self.ontol = pyhornedowl.open_ontology(ontologyfile1)
-        self.ontol2 = pyhornedowl.open_ontology(ontologyfile2)
+                if(key == "ontologyfile"):
+                    ontology_list.append(value)
         
+        # print("ontology_list[0] is: ", ontology_list[0])
+        #todo: extract values from ontoDict and replace individual self.values 
+        
+        # load ontology
+        self.ontols = []
+        print("len(ontology_list is: ", len(ontology_list))
+        for i in range(len(ontology_list)):
+            self.ontols.append(pyhornedowl.open_ontology(ontology_list[i]))
+            print("self.ontols[", i, "] is: " , self.ontols[i], )
+            
+        # print("ontols[1] is: ", self.ontols[1])            
+        print("Loading ontology")
+        self.ontol = self.ontols[0] #todo: temp, delete
+        self.ontol2 = self.ontols[1] #todo: temp, delete
+        # self.ontol = pyhornedowl.open_ontology(ontologyfile1)
+        # self.ontol2 = pyhornedowl.open_ontology(ontologyfile2)
+        
+        for ontol in self.ontols:
+            print("ontol is: ", ontol)
+            for prefix2 in PREFIXES:
+                ontol.add_prefix_mapping(prefix2[0], prefix2[1])
+        #todo: finish mapping ontoDict to this class from here...
         for prefix in PREFIXES:
             self.ontol.add_prefix_mapping(prefix[0], prefix[1])
             self.ontol2.add_prefix_mapping(prefix[0], prefix[1])
@@ -146,8 +165,9 @@ class MultiExtractorComponent(object):
         return any([t._.get("is_ontol_term") for t in tokens])
 
     def get_term(self, term_id): #todo: why is this function not working, and what does it do? Fix this
-        if term_id in self.terms.values():
+        if term_id in self.terms.values(): #should be there?
             keys = [k for k, v in self.terms.items() if v == term_id]
+            print("get_term returned: ", keys[0])
             return keys[0]
         else:
             return None
