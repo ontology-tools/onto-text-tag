@@ -42,7 +42,8 @@ PREFIXES = [ ["ADDICTO","http://addictovocab.org/ADDICTO_"],
 
 
 class MultiExtractorComponent(object):
-    def __init__(self, nlp, ontoDict, name1, label1, name2, label2, ontologyfile1, ontologyfile2):
+    def __init__(self, nlp, ontoDict):
+    # def __init__(self, nlp, ontoDict, name1, label1, name2, label2, ontologyfile1, ontologyfile2):
     # def __init__(self, nlp, ontoDict, name1, label1, name2, label2):
         # todo: make this loop over ontologies? Should work for n... ontologies
 
@@ -50,11 +51,12 @@ class MultiExtractorComponent(object):
         #todo: add name and label from ontoDict
         self.ontoDict = ontoDict
         # label that is applied to the matches
-        self.label1 = label1
-        self.name1 = name1
-        self.label2 = label2
-        self.name2 = name2
-        self.label3 = label1+label2
+        # self.label1 = label1
+        # self.name1 = name1
+        # self.label2 = label2
+        # self.name2 = name2
+        # self.label3 = []
+        # self.label3 = label1+label2
         # stop words, don't try to match these
         stopwords = nlp.Defaults.stop_words
         stopwords.add("ands")
@@ -62,11 +64,19 @@ class MultiExtractorComponent(object):
         stopwords.add("ci")
 
         ontology_list = []
+        labels = []
+        names = []
         ontologies = ontoDict["ontologies"]
         for ontology in ontologies:
             for key, value in ontology.items():
                 if(key == "ontologyfile"):
                     ontology_list.append(value)
+                if(key == "label"):
+                    labels.append(value)
+                if(key == "name"):
+                    names.append(value)
+        # for i in labels:
+        self.label3 = labels[0] + labels[1] # ...+ labels[n]?
         
         # print("ontology_list[0] is: ", ontology_list[0])
         #todo: extract values from ontoDict and replace individual self.values 
