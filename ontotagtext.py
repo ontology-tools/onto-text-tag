@@ -47,6 +47,7 @@ class MultiExtractorComponent(object):
         # todo: make this loop over ontologies? Should work for n... ontologies
 
         # HOW ABOUT A DICTIONARY {"label": ontologyFile, ...}
+        #todo: add name and label from ontoDict
         self.ontoDict = ontoDict
         # label that is applied to the matches
         self.label1 = label1
@@ -72,26 +73,26 @@ class MultiExtractorComponent(object):
         
         # load ontology
         self.ontols = []
-        print("len(ontology_list is: ", len(ontology_list))
+        # print("len(ontology_list is: ", len(ontology_list))
         for i in range(len(ontology_list)):
             self.ontols.append(pyhornedowl.open_ontology(ontology_list[i]))
-            print("self.ontols[", i, "] is: " , self.ontols[i], )
+            # print("self.ontols[", i, "] is: " , self.ontols[i], )
             
         # print("ontols[1] is: ", self.ontols[1])            
-        print("Loading ontology")
-        self.ontol = self.ontols[0] #todo: temp, delete
-        self.ontol2 = self.ontols[1] #todo: temp, delete
+        # print("Loading ontology")
+        # self.ontol = self.ontols[0] #todo: temp, delete
+        # self.ontol2 = self.ontols[1] #todo: temp, delete
         # self.ontol = pyhornedowl.open_ontology(ontologyfile1)
         # self.ontol2 = pyhornedowl.open_ontology(ontologyfile2)
         
         for ontol in self.ontols:
-            print("ontol is: ", ontol)
-            for prefix2 in PREFIXES:
-                ontol.add_prefix_mapping(prefix2[0], prefix2[1])
+            # print("ontol is: ", ontol)
+            for prefix in PREFIXES:
+                ontol.add_prefix_mapping(prefix[0], prefix[1])
         #todo: finish mapping ontoDict to this class from here...
-        for prefix in PREFIXES:
-            self.ontol.add_prefix_mapping(prefix[0], prefix[1])
-            self.ontol2.add_prefix_mapping(prefix[0], prefix[1])
+        # for prefix in PREFIXES:
+        #     self.ontol.add_prefix_mapping(prefix[0], prefix[1])
+        #     self.ontol2.add_prefix_mapping(prefix[0], prefix[1])
 
         # for making plural forms of labels for text matching
         engine = inflect.engine()
@@ -100,13 +101,16 @@ class MultiExtractorComponent(object):
         self.terms = {}
         patterns = []
 
-        nr_terms = len(self.ontol2.get_classes())+len(self.ontol.get_classes())
-        print(f"Importing {nr_terms} terms")
+        #todo: get this to work with "ontols":
+        # nr_terms = len(self.ontol2.get_classes())+len(self.ontol.get_classes())
+        # print(f"Importing {nr_terms} terms")
 
         #build unified table of all ID, IRI, Label and Synonyms:
         #todo: from here
-        for ontol in [self.ontol,self.ontol2]:
+        # for ontol in [self.ontol,self.ontol2]:
+        for k, ontol in [self.ontols]: #should be all ontols in 
             for termid in ontol.get_classes():
+                # print("k is: ", k)
                 termshortid = ontol.get_id_for_iri(termid)
                 label = ontol.get_annotation(termid, RDFSLABEL)
                 definition = ontol.get_annotation(termid, DEFINITION)
@@ -169,10 +173,10 @@ class MultiExtractorComponent(object):
     def has_ontols(self, tokens):
         return any([t._.get("is_ontol_term") for t in tokens])
 
-    def get_term(self, term_id): #todo: why is this function not working, and what does it do? Fix this
-        if term_id in [ v['id'] for v in self.terms.values()]: #should be there?
+    def get_term(self, term_id): 
+        if term_id in [ v['id'] for v in self.terms.values()]: 
             keys = [k for k, v in self.terms.items() if v['id'] == term_id]
-            print("get_term returned: ", keys[0])
+            # print("get_term returned: ", keys[0])
             return self.terms[keys[0]]
         else:
             return None

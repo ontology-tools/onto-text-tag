@@ -120,6 +120,7 @@
 
     for(i in namespaces){
       // console.log(namespaces[i]);
+      //todo: randomColor can't be white - invert function doesn't work for that - or fix invert function to work..
       var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16); //generate random colour
       namespaceColours.push(randomColor);
     }
