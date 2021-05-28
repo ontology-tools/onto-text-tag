@@ -21,6 +21,8 @@ from Bio import Entrez
 import requests
 from urllib.request import urlopen
 
+import re
+
 import pprint
 pp = pprint.PrettyPrinter(depth=4)
 
@@ -134,20 +136,23 @@ def get_article_details(result):
 
 def get_abstract_text(result):
     abstractText = None
+    fixed_abstractText = ""
+    fixed = []
     for detail in result:
         if 'MedlineCitation' in detail:
             if 'Article' in detail['MedlineCitation']:
                 if 'Abstract' in detail['MedlineCitation']['Article']:
                     # print("Article is: ", detail['MedlineCitation']['Article'])
                     if 'AbstractText' in detail['MedlineCitation']['Article']['Abstract']:
-                        abstractText = str(
-                            detail['MedlineCitation']['Article']['Abstract']['AbstractText'])
-                        #todo: abstractText still needs cleaning up
-                        # if'StringElement' in detail['MedlineCitation']['Article']['Abstract']['AbstractText']:
-                        #     abstractText = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText']['StringElement'])
-                        # abstractText = abstractText[2:-2] #remove brackets and quotation
-
-    return abstractText
+                        abstractText = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText'])
+                        # fixed_abstractText = abstractText
+                        if("StringElement" in abstractText):
+                            fixed = re.findall(r'StringElement\((.+?)attributes',abstractText)
+                            fixed_abstractText = "".join(fixed)
+                        else:
+                            fixed_abstractText = abstractText #todo: remove "[]"
+                        
+    return fixed_abstractText
 
 
 # Pages for the app
