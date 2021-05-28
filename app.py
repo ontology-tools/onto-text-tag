@@ -63,14 +63,6 @@ ontoDict = {
         }
     ]
 }
-
-# get values test:
-# ontologies = ontoDict["ontologies"]
-# for ontology in ontologies:
-#     for key, value in ontology.items():
-#         if(key == "label"):
-#             print(value)
-            # print (key, value)
     
 
 onto_extractor3 = MultiExtractorComponent(
@@ -95,21 +87,14 @@ def fetch_details(id_list):
 
 
 def get_article_details(result):
-    articleDetails = "DATE;TITLE;AUTHORS"
-    test_articleDetails = ""
+    # articleDetails = "DATE;TITLE;AUTHORS"
+    articleDetails = ""
     dayCompleted = ""
     monthCompleted = ""
     yearCompleted = ""
     for detail in result:
         if 'MedlineCitation' in detail:
-            # print(f"")
-            # print(f"MedlineCitation is: ")
-            # pp.pprint(detail['MedlineCitation']) #pretty print
-            # print(str(detail['MedlineCitation']))
-            if 'DateCompleted' in detail['MedlineCitation']:  # this works.
-                # print(f"")
-                # print(f"DateCompleted is: ")
-                # print(str(detail['MedlineCitation']['DateCompleted']))
+            if 'DateCompleted' in detail['MedlineCitation']:  
                 dayCompleted = str(
                     detail['MedlineCitation']['DateCompleted']['Day'])
                 monthCompleted = str(
@@ -123,11 +108,7 @@ def get_article_details(result):
                 dayCompleted = ""
 
             if 'ArticleTitle' in detail['MedlineCitation']['Article']:
-                # print(f"")
-                # print(f"ArticleTitle is: ") #works, got title!
-                # pp.pprint(detail['MedlineCitation']['Article']['ArticleTitle'])
-                # pp.pprint({id} + " " + "ID")
-                test_articleDetails = dayCompleted + "/" + monthCompleted + "/" + \
+                articleDetails = dayCompleted + "/" + monthCompleted + "/" + \
                     yearCompleted + ";" + \
                     str(detail['MedlineCitation']['Article']['ArticleTitle'])
             else:
@@ -136,24 +117,17 @@ def get_article_details(result):
 
             # this works, need to refine though
             if 'AuthorList' in detail['MedlineCitation']['Article']:
-                # print(f"")
-                # print(f"AuthorList is: ")
-                # pp.pprint(detail['MedlineCitation']['Article']['AuthorList'])
-
-                test_articleDetails += ";Authors: "
-                # this one works! Just assign to string and we on!
+                articleDetails += ";Authors: "
                 for s in range(len(detail['MedlineCitation']['Article']['AuthorList'])):
-                    # pp.pprint(detail['MedlineCitation']['Article']['AuthorList'][s]['LastName'])
-                    test_articleDetails += detail['MedlineCitation']['Article']['AuthorList'][s]['LastName']
+                    articleDetails += detail['MedlineCitation']['Article']['AuthorList'][s]['LastName']
                     if(s == (len(detail['MedlineCitation']['Article']['AuthorList'])-1)):
-                        test_articleDetails += "."
+                        articleDetails += "."
                     else:
-                        test_articleDetails += ", "
+                        articleDetails += ", "
             else:
                 # print(f"AuthorList not found")
-                test_articleDetails += ";Authors: "
-    # pp.pprint(test_articleDetails)
-    return test_articleDetails
+                articleDetails += ";Authors: "
+    return articleDetails
 
 # Parse the PubMed result to get the abstract text if it is there
 
@@ -168,6 +142,7 @@ def get_abstract_text(result):
                     if 'AbstractText' in detail['MedlineCitation']['Article']['Abstract']:
                         abstractText = str(
                             detail['MedlineCitation']['Article']['Abstract']['AbstractText'])
+                        #todo: abstractText still needs cleaning up
                         # if'StringElement' in detail['MedlineCitation']['Article']['Abstract']['AbstractText']:
                         #     abstractText = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText']['StringElement'])
                         # abstractText = abstractText[2:-2] #remove brackets and quotation
@@ -205,15 +180,12 @@ def pubmed():
                 except:
                     pass
                 if abstractText:
-                    # r = requests.post(url_for("tag", _external=True), data={"inputText":abstractText, "dateDetails":dateA, "titleDetails":titleA, "authorsDetails":authorsA})
-                    # r = requests.post(url_for("tag", _external=True), data={"inputText":abstractText})
                     r = requests.post(url_for("tag", _external=True), data={
                                       "inputDetails": articleDetails, "inputText": abstractText, "dateDetails": dateA, "titleDetails": titleA, "authorsDetails": authorsA})
                     return r.text, r.status_code, r.headers.items()
         except Exception as err:  # 400 bad request handling, also if no internet connection
             print(err)
     return render_template('index.html', error_msg=f"No abstract found for PubMed ID {id}")
-    # return render_template('index.html')
 
 
 # Text tagging app
@@ -221,14 +193,6 @@ def pubmed():
 @ app.route('/tag', methods=['POST'])
 def tag():
     text = request.form['inputText']
-
-    # test:
-    # details="details"
-    # date="date"
-    # title="title"
-    # authors="authors"
-    # id="pubmed ID"
-
     details = request.form.get('inputDetails')
     date = request.form.get('dateDetails')
     title = request.form.get('titleDetails')
@@ -263,8 +227,6 @@ def tag():
             else:
                 ontol_label = token.idx
                 ontol_def = token.text
-                # ontol_label=""
-                # ontol_def=""
                 ontol_namespace = ""
                 # print("ontol_namespace not found")
             tag_results.append({"ontol_id": token._.ontol_id,

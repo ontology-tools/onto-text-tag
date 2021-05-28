@@ -1,6 +1,4 @@
 
-#from pronto import Ontology
-
 import pyhornedowl
 import spacy
 from spacy import displacy
@@ -43,21 +41,10 @@ PREFIXES = [ ["ADDICTO","http://addictovocab.org/ADDICTO_"],
 
 class MultiExtractorComponent(object):
     def __init__(self, nlp, ontoDict):
-    # def __init__(self, nlp, ontoDict, name1, label1, name2, label2, ontologyfile1, ontologyfile2):
-    # def __init__(self, nlp, ontoDict, name1, label1, name2, label2):
-        # todo: make this loop over ontologies? Should work for n... ontologies
-
-        # HOW ABOUT A DICTIONARY {"label": ontologyFile, ...}
-        #todo: add name and label from ontoDict
+        # add ontology and label from ontoDict
         self.ontoDict = ontoDict
-        # label that is applied to the matches
-        # self.label1 = label1
-        # self.name1 = name1
-        # self.label2 = label2
-        # self.name2 = name2
-        # self.all_labels = []
-        # self.all_labels = label1+label2
         self.all_labels = ""
+
         # stop words, don't try to match these
         stopwords = nlp.Defaults.stop_words
         stopwords.add("ands")
@@ -72,17 +59,11 @@ class MultiExtractorComponent(object):
                 if(key == "ontologyfile"):
                     ontology_list.append(value)
                 if(key == "label"):
-                    # labels.append(value)
                     self.all_labels = self.all_labels + value
-                
-        # for i in labels:
-        # self.all_labels = labels
-        # self.all_labels = labels[0] + labels[1] # ...+ labels[n]?
-        # print("type of labels is: ", labels)
+
         print("all_labels = ", self.all_labels)
         
         # print("ontology_list[0] is: ", ontology_list[0])
-        #todo: extract values from ontoDict and replace individual self.values 
         
         # load ontology
         self.ontols = []
@@ -91,21 +72,11 @@ class MultiExtractorComponent(object):
             self.ontols.append(pyhornedowl.open_ontology(ontology_list[i]))
             # print("self.ontols[", i, "] is: " , self.ontols[i], )
             
-        # print("ontols[1] is: ", self.ontols[1])            
-        # print("Loading ontology")
-        # self.ontol = self.ontols[0] #todo: temp, delete
-        # self.ontol2 = self.ontols[1] #todo: temp, delete
-        # self.ontol = pyhornedowl.open_ontology(ontologyfile1)
-        # self.ontol2 = pyhornedowl.open_ontology(ontologyfile2)
         
         for ontol in self.ontols:
             # print("ontol is: ", ontol)
             for prefix in PREFIXES:
                 ontol.add_prefix_mapping(prefix[0], prefix[1])
-        #todo: finish mapping ontoDict to this class from here...
-        # for prefix in PREFIXES:
-        #     self.ontol.add_prefix_mapping(prefix[0], prefix[1])
-        #     self.ontol2.add_prefix_mapping(prefix[0], prefix[1])
 
         # for making plural forms of labels for text matching
         engine = inflect.engine()
@@ -119,8 +90,6 @@ class MultiExtractorComponent(object):
         # print(f"Importing {nr_terms} terms")
 
         #build unified table of all ID, IRI, Label and Synonyms:
-        #todo: from here
-        # for ontol in [self.ontol,self.ontol2]:
         for k, ontol in [self.ontols]: #should be all ontols in 
             for termid in ontol.get_classes():
                 # print("k is: ", k)
@@ -162,10 +131,8 @@ class MultiExtractorComponent(object):
         Span.set_extension("has_ontols", getter=self.has_ontols, force=True)
 
     def __call__(self, doc):
-        # print("type is: ", type(self.ontol))
         matches = self.matcher(doc)
         spans = [Span(doc, match[1], match[2], label=self.all_labels) for match in matches]
-        # spans.extend[Span(doc, match[1], match[2], label=self.label1) for match in matches]
         for i, span in enumerate(spans):
           span._.set("has_ontols", True)
           for token in span:
@@ -189,7 +156,6 @@ class MultiExtractorComponent(object):
     def get_term(self, term_id): 
         if term_id in [ v['id'] for v in self.terms.values()]: 
             keys = [k for k, v in self.terms.items() if v['id'] == term_id]
-            # print("get_term returned: ", keys[0])
             return self.terms[keys[0]]
         else:
             return None
