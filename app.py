@@ -150,7 +150,7 @@ def get_abstract_text(result):
                             fixed = re.findall(r'StringElement\((.+?)attributes',abstractText)
                             fixed_abstractText = "".join(fixed)
                         else:
-                            fixed_abstractText = abstractText #todo: remove "[]"
+                            fixed_abstractText = abstractText.strip('[]') # remove "[]"
                         
     return fixed_abstractText
 
