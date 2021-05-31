@@ -46,19 +46,17 @@ data2 = urlopen(location2).read()  # bytes
 ontofile1 = data.decode('utf-8')
 ontofile2 = data2.decode('utf-8')
 
-
 # combined test
-# todo: create a dictionary which can be populated with {"label1": name1, ontofile1}, {"label2": ...}
 ontoDict = {
     "ontologies": [
         {
-            "label": "Addict0",
-            "name": "Addict0",
+            "label": "AddictO",
+            "name": "AddictO",
             "ontologyfile": ontofile1
         },
         {
             "label": "BCIO",
-            "name": "Addict0",
+            "name": "BCIO",
             "ontologyfile": ontofile1
         }
     ]
