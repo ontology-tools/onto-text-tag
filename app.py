@@ -50,7 +50,7 @@ ontofile2 = data2.decode('utf-8')
 
 
 # combined test
-# todo: create a dictionary which can be populated with {"label1": name1, ontofile1}, {"label2": ...}
+# populated with {"label1": name1, ontofile1}, {"label2": ...}
 ontoDict = {
     "ontologies": [
         {
@@ -61,7 +61,7 @@ ontoDict = {
         {
             "label": "BCIO",
             "name": "BCIO",
-            "ontologyfile": ontofile1
+            "ontologyfile": ontofile2
         }
     ]
 }
@@ -164,6 +164,12 @@ def home():
 
 @app.route('/associations')
 def associations():
+
+    return render_template('associations.html')
+
+@app.route('/visualise_associations', methods=['POST'])
+def visualise_associations():
+    
     return render_template('associations.html')
 
 @app.route('/pubmed', methods=['POST', 'GET'])
