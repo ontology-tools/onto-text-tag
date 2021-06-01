@@ -20,7 +20,7 @@ import spacy
 from Bio import Entrez
 import requests
 from urllib.request import urlopen
-
+import json
 import re
 
 import pprint
@@ -164,13 +164,24 @@ def home():
 
 @app.route('/associations', methods=['GET', 'POST'])
 def associations():
-    ontology_id = request.form.get('ontology_id')
-    print("got ontology_id: ", ontology_id)
-    return render_template('associations.html')
+    ontology_id = ""
+   
+    return render_template('associations.html', id_results = ontology_id)
+
+# @app.route('/get_ids', methods=['GET', 'POST'])
+# def get_ids():
+#     ontology_id = request.form.get('ontology_id')
+#     print("got ontology_id: ", ontology_id)
+#     return ( json.dumps({"message":"Success",
+#                              "response": ontology_id}), 200 )
 
 @app.route('/visualise_associations', methods=['POST'])
-def visualise_associations():    
-    return render_template('associations.html')
+def visualise_associations():  
+    ontology_id_list = request.form.get('ontology_id_list') 
+    print("visualise! ", ontology_id_list);
+    return ( json.dumps({"message":"Success"}), 200 )
+    # return ( json.dumps({"message":"Success", "response": ontology_id}), 200 )
+    # return render_template('associations.html')
 
 @app.route('/pubmed', methods=['POST', 'GET'])
 def pubmed():

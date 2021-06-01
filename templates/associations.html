@@ -9,38 +9,89 @@
 
 <h2>VISUALISE ASSOCIATIONS</h2>
 <div class="row mb-3">
+
     <div class="col-md-12">
+
         <div class="float-left">
-            <form action="associations" method="post" class="green-border-focus">
-                <label for="ontology_id">Add Ontology ID: </label>
-                <input type="text" id="ontology_id" name="ontology_id" class="form-control">
-                <br>
-                <input type="submit" value="Add ID" class="btn btn-outline-danger float-right">
-            </form>
+            <label for="ontology_id"> Add Ontology ID: </label>
+            <br>
+            <textarea id="ontology_id" name="ontology_id" rows="1"></textarea>
+            <br>
+            <button id="ontology_id_submit_btn" class="btn btn-outline-danger float-right">Add ID</button>
         </div>
     </div>
 </div>
+
 <!-- Ontology ID form input -->
 <form id="submitText" action="{{ url_for('visualise_associations') }}" method="post">
     <div class="row mb-3">
-      <div class="col-md-12">
-        <div class="form-group green-border-focus">
-          <label for="inputText">Ontology ID's:</label>
-          <textarea id="textArea" form="submitText" class="form-control" id="inputText" name="inputText" rows="20">
-  
-              </textarea>
+        <div class="col-md-12">
+            <div class="form-group green-border-focus">
+                <label for="inputText">Ontology ID's:</label>
+                <textarea id="textArea" form="submitText" class="form-control" id="inputText" name="inputText"
+                    rows="20">
+          </textarea>
+            </div>
         </div>
-      </div>
     </div>
-  
+
     <div class="row mb-3">
-      <div class="col-md-12">
-        <div class="float-right">
-          <button type="submit" id=visualise-associations class="btn btn-outline-success"></i> Visualise associations</button>
+        <div class="col-md-12">
+            <div class="float-right">
+                <button type="submit" id="visualise-associations" class="btn btn-outline-success"> Visualise
+                    associations</button>
+            </div>
         </div>
-      </div>
     </div>
-  </form>
+</form>
+
+<script type="text/javascript">
+    var idResultList = [];
+    var idlist = "{{ id_results }}"; //todo: should be a list here
+    console.log("idlist is: " + idlist);
+
+
+
+
+    $(document).ready(function () {
+        //add id to list and display in textArea:
+        $("#ontology_id_submit_btn").click(function () {
+            id = $("#ontology_id").val();
+            console.log("got id:" + id);
+            idResultList.push(id);
+            $("#textArea").val(idResultList);
+            $("#ontology_id").val("");
+        });
+
+        //submit full text:
+        $('#submitText').submit(function (e) {
+            e.preventDefault();
+            console.log("idResultList should be sent here. " + idResultList);
+            var request = new XMLHttpRequest();
+                request.onreadystatechange = function () {
+                    if (request.readyState === 4) {
+                        if (!request.status) {
+                            bootbox.alert("Problem communicating with server");
+                        } else if (request.status === 200) {
+                            //update ID when data send confirmed: 
+                            console.log("success achieved");
+                        } else if (request.status === 400) {
+                            bootbox.alert("error sending ID's, try again");
+                        } else {
+                            console.log("other response for: " + request.status);
+                            //handle other responses?
+                        }
+                    }
+                }
+                request.open('POST', '/visualise_associations', true);
+                request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                request.send('ontology_id_list=' + JSON.stringify(idResultList));
+            
+        });
+
+    });
+
+</script>
 {% endblock %}
 
 {% block footer %}
