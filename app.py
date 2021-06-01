@@ -159,9 +159,12 @@ def get_abstract_text(result):
 @app.route('/')
 @app.route('/home')
 def home():
-    return render_template('associations.html') 
+    return redirect(url_for('associations')) #todo: temporary testing redirect - remove this
     # return render_template('index.html')
 
+@app.route('/associations')
+def associations():
+    return render_template('associations.html')
 
 @app.route('/pubmed', methods=['POST', 'GET'])
 def pubmed():
