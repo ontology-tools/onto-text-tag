@@ -55,7 +55,7 @@ ontoDict = {
     "ontologies": [
         {
             "label": "AddictO",
-+            "name": "AddictO",
+             "name": "AddictO",
             "ontologyfile": ontofile1
         },
         {
@@ -159,7 +159,8 @@ def get_abstract_text(result):
 @app.route('/')
 @app.route('/home')
 def home():
-    return render_template('index.html')
+    return render_template('associations.html') 
+    # return render_template('index.html')
 
 
 @app.route('/pubmed', methods=['POST', 'GET'])
