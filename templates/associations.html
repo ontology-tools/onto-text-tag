@@ -6,20 +6,21 @@
 
 {% block body %}
 {{ super() }}
+
 <h2>VISUALISE ASSOCIATIONS</h2>
 <div class="row mb-3">
     <div class="col-md-12">
         <div class="float-left">
-            <form action="ontology" method="post" class="green-border-focus">
-                <label for="ontology_id">Enter Ontology ID: </label>
+            <form action="associations" method="post" class="green-border-focus">
+                <label for="ontology_id">Add Ontology ID: </label>
                 <input type="text" id="ontology_id" name="ontology_id" class="form-control">
                 <br>
-                <input type="submit" value="SEND" class="btn btn-outline-danger float-right">
+                <input type="submit" value="Add ID" class="btn btn-outline-danger float-right">
             </form>
         </div>
     </div>
 </div>
-<!-- PubMed ID form input -->
+<!-- Ontology ID form input -->
 <form id="submitText" action="{{ url_for('visualise_associations') }}" method="post">
     <div class="row mb-3">
       <div class="col-md-12">

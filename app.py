@@ -162,14 +162,14 @@ def home():
     return redirect(url_for('associations')) #todo: temporary testing redirect - remove this
     # return render_template('index.html')
 
-@app.route('/associations')
+@app.route('/associations', methods=['GET', 'POST'])
 def associations():
-
+    ontology_id = request.form.get('ontology_id')
+    print("got ontology_id: ", ontology_id)
     return render_template('associations.html')
 
 @app.route('/visualise_associations', methods=['POST'])
-def visualise_associations():
-    
+def visualise_associations():    
     return render_template('associations.html')
 
 @app.route('/pubmed', methods=['POST', 'GET'])
