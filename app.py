@@ -54,13 +54,13 @@ ontofile2 = data2.decode('utf-8')
 ontoDict = {
     "ontologies": [
         {
-            "label": "Addict0",
-            "name": "Addict0",
+            "label": "AddictO",
++            "name": "AddictO",
             "ontologyfile": ontofile1
         },
         {
             "label": "BCIO",
-            "name": "Addict0",
+            "name": "BCIO",
             "ontologyfile": ontofile1
         }
     ]
