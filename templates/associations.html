@@ -47,9 +47,13 @@
 
 <script type="text/javascript">
     var idResultList = [];
-    var idlist = "{{ id_results }}"; //todo: should be a list here
-    console.log("idlist is: " + idlist);
 
+    var labelList = JSON.parse('{{label_list | tojson | safe}}');
+    var allLabels = labelList.labels;
+    allLabels.forEach(function (label){
+        console.log("got label: " + label);
+    });
+       
 
 
 
@@ -68,25 +72,25 @@
             e.preventDefault();
             console.log("idResultList should be sent here. " + idResultList);
             var request = new XMLHttpRequest();
-                request.onreadystatechange = function () {
-                    if (request.readyState === 4) {
-                        if (!request.status) {
-                            bootbox.alert("Problem communicating with server");
-                        } else if (request.status === 200) {
-                            //update ID when data send confirmed: 
-                            console.log("success achieved");
-                        } else if (request.status === 400) {
-                            bootbox.alert("error sending ID's, try again");
-                        } else {
-                            console.log("other response for: " + request.status);
-                            //handle other responses?
-                        }
+            request.onreadystatechange = function () {
+                if (request.readyState === 4) {
+                    if (!request.status) {
+                        bootbox.alert("Problem communicating with server");
+                    } else if (request.status === 200) {
+                        //update ID when data send confirmed: 
+                        console.log("success achieved");
+                    } else if (request.status === 400) {
+                        bootbox.alert("error sending ID's, try again");
+                    } else {
+                        console.log("other response for: " + request.status);
+                        //handle other responses?
                     }
                 }
-                request.open('POST', '/visualise_associations', true);
-                request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                request.send('ontology_id_list=' + JSON.stringify(idResultList));
-            
+            }
+            request.open('POST', '/visualise_associations', true);
+            request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            request.send('ontology_id_list=' + JSON.stringify(idResultList));
+
         });
 
     });

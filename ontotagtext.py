@@ -58,6 +58,7 @@ class MultiExtractorComponent(object):
             for key, value in ontology.items():
                 if(key == "ontologyfile"):
                     ontology_list.append(value)
+                    # print("got ontology", value)
                 if(key == "label"):
                     self.all_labels = self.all_labels + value
 

@@ -48,21 +48,22 @@ data2 = urlopen(location2).read()  # bytes
 ontofile1 = data.decode('utf-8')
 ontofile2 = data2.decode('utf-8')
 
+# print(ontofile1, ontofile2)
 
 # combined test
 # populated with {"label1": name1, ontofile1}, {"label2": ...}
 ontoDict = {
-    "ontologies": [
-        {
-            "label": "AddictO",
-             "name": "AddictO",
-            "ontologyfile": ontofile1
-        },
+    "ontologies": [        
         {
             "label": "BCIO",
             "name": "BCIO",
-            "ontologyfile": ontofile2
-        }
+            "ontologyfile": ontofile2, #todo: why ontofile2 not working here if BCIO added after AddictO?
+        },
+        {
+            "label": "AddictO",
+             "name": "AddictO",
+            "ontologyfile": ontofile1,
+        },
     ]
 }
     
@@ -164,13 +165,15 @@ def home():
 
 @app.route('/associations', methods=['GET', 'POST'])
 def associations():
-    ontology_id = ""
-   
-    return render_template('associations.html', id_results = ontology_id)
+    # label_list = "hello" #should be dictionary? to populate textbox
+    label_list = { 'labels': ["Cplusplus", "Python", "PHP", "Java", "C", "Ruby", "R", "Csharp", "Dart", "Fortran", "Pascal", "Javascript"]
+    }
+    return render_template('associations.html', label_list = label_list)
 
+# get id from label here:
 # @app.route('/get_ids', methods=['GET', 'POST'])
 # def get_ids():
-#     ontology_id = request.form.get('ontology_id')
+#     ontology_id = request.form.get('ontology_id') #get ontology_label?
 #     print("got ontology_id: ", ontology_id)
 #     return ( json.dumps({"message":"Success",
 #                              "response": ontology_id}), 200 )
@@ -180,8 +183,8 @@ def visualise_associations():
     ontology_id_list = request.form.get('ontology_id_list') 
     print("visualise! ", ontology_id_list);
     return ( json.dumps({"message":"Success"}), 200 )
-    # return ( json.dumps({"message":"Success", "response": ontology_id}), 200 )
-    # return render_template('associations.html')
+    # return ( json.dumps({"message":"Success", "response": ontology_id_list}), 200 ) //return result for visualisation?
+    
 
 @app.route('/pubmed', methods=['POST', 'GET'])
 def pubmed():
@@ -241,7 +244,7 @@ def tag():
         if token._.is_ontol_term:
             # print("token details: ", token._.ontol_id, token.text, token.idx)
             term=onto_extractor3.get_term(token._.ontol_id)
-
+            # print("ontol_id is: ", token._.ontol_id)
             # print("term is: ", term)
             if term:
                 ontol_label = term['name']
