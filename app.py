@@ -168,10 +168,11 @@ def associations():
     # label_list = "hello" #should be dictionary? to populate textbox
     # label_list = { 'labels': ["Cplusplus", "Python", "PHP", "Java", "C", "Ruby", "R", "Csharp", "Dart", "Fortran", "Pascal", "Javascript"]
     # }
-    label_list = {'labels': ["ADDICTO:123457 | smoking", "ADDICTO:123456 | vaping", "ADDICTO:123458 | human being", "BCIO:123456 | smoking", "BCIO:223456 | addiction", "ADDICTO:133456 | ontology" ]}
+    label_list = {'labels': ["ADDICTO:123457|smoking", "ADDICTO:123456|vaping", "ADDICTO:123458|human being", "BCIO:123456|addiction", "BCIO:223456|long term ", "ADDICTO:133456|ontology" ]}
     # label_list = {["id": "0", "name": "ADDICTO:123457 | smoking"], ["id": "1", "name": "ADDICTO:223457 | person"}, {"id": "2", "name": "BCIO:323457 | addiction"} }
-    with open("label_list","w") as f:
-        json.dump(label_list,f) # todo: there has to be a better way than this??
+    # with open("label_list","w") as f:
+    #     json.dump(label_list,f) # todo: there has to be a better way than this??
+    json.dumps(label_list)
     return render_template('associations.html', label_list = label_list)
 
 #bootstrap-autocomplete:

@@ -146,19 +146,19 @@ ul.bs-autocomplete-menu a {
       </div>
     </div>
   </div>
-<div class="row mb-3">
+<!-- <div class="row mb-3"> -->
 
-    <div class="col-md-12">
+    <!-- <div class="col-md-12"> -->
 
-        <div class="float-left">
+        <!-- <div class="float-left"> -->
             <!-- <label for="ontology_id"> Add Ontology ID: </label>
             <br>
             <textarea id="ontology_id" name="ontology_id" rows="1"></textarea> -->
-            <br>
-            <button id="ontology_id_submit_btn" class="btn btn-outline-danger float-right">Add ID</button>
-        </div>
-    </div>
-</div>
+            <!-- <br> -->
+            <!-- <button id="ontology_id_submit_btn" class="btn btn-outline-danger float-right">Add ID</button> -->
+        <!-- </div> -->
+    <!-- </div> -->
+<!-- </div> -->
 
 <!-- Ontology ID form input -->
 <form id="submitText" action="{{ url_for('visualise_associations') }}" method="post">
@@ -184,6 +184,7 @@ ul.bs-autocomplete-menu a {
 </form>
 
 <script type="text/javascript">
+    var ontologyArray = [];
     var idResultList = [];
     var labelJson = '{{label_list | tojson | safe}}';
     // console.log("labelJson is: " + labelJson);
@@ -193,7 +194,9 @@ ul.bs-autocomplete-menu a {
     var ii = 0;
     labels.forEach(function (label, i){
         ii++;
+        // var ontologyName = label.split("|")
         labelArray.push({id:ii, name:label});
+        // ontologyArray.push(ontologyName[0]); //send this back to server
         console.log("got label: " + label);
     });
     console.log("labelArray is: " + labelArray[0].id);
@@ -246,7 +249,7 @@ $('.bs-autocomplete').each(function() {
       source: function(request, response) {
         var _regexp = new RegExp(request.term, 'i');
         var data = labelArray.filter(function(item) {
-            console.log("item is: ", item);
+            // console.log("item is: ", item);
           return item.name.match(_regexp);
         });
         response(data);
@@ -322,10 +325,15 @@ $('.bs-autocomplete').each(function() {
                     }
                 }
             }
+            //generate ontology label list:
+            for(result in idResultList){
+              var ontologyName = idResultList[result].split("|")
+              ontologyArray.push(ontologyName[0]); //send this back to server
+            }
             request.open('POST', '/visualise_associations', true);
             request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-            request.send('ontology_id_list=' + JSON.stringify(idResultList));
-
+            request.send('ontology_id_list=' + JSON.stringify(ontologyArray));
+            // request.send('ontology_id_list=' + JSON.stringify(idResultList));
         });
 
     });
