@@ -170,6 +170,16 @@ def associations():
     }
     return render_template('associations.html', label_list = label_list)
 
+#bootstrap-autocomplete:
+@app.route('/autocomplete', methods=['GET'])
+def autocomplete():
+    user_input = request.form.get('q')
+    print("user_input: ", user_input)
+    label_list = { 'labels': ["Cplusplus", "Python", "PHP", "Java", "C", "Ruby", "R", "Csharp", "Dart", "Fortran", "Pascal", "Javascript"]
+    }
+    # label_list = {'labels': ["ADDICTO:123457 | smoking", "ADDICTO:123456 | vaping", "ADDICTO:123458 | human being", "BCIO:123456 | smoking", "BCIO:223456 | addiction", "ADDICTO:133456 | ontology", ]}
+    return ( json.dumps({"label_list":label_list}), 200 )
+    
 # get id from label here:
 # @app.route('/get_ids', methods=['GET', 'POST'])
 # def get_ids():
