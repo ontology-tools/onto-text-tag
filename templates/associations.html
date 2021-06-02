@@ -140,7 +140,7 @@ ul.bs-autocomplete-menu a {
       <div class="col-xs-3">
         <div class="form-group">
           <!-- <label for="city-code" class="control-label">“Hidden” field</label> -->
-          <input class="form-control" id="city-code" name="citycode" value="" type="number" readonly>
+          <input class="form-control" id="city-code" name="citycode" value="" type="number" readonly> <!--todo: what is readonly for?-->
           <!-- <span class="help-block">This field should be hidden!</span> -->
         </div>
       </div>
@@ -496,7 +496,7 @@ $('.bs-autocomplete').each(function() {
 
   _this.autocomplete({
       minLength: 2,
-      autoFocus: true,
+      autoFocus: false,
 
       source: function(request, response) {
         var _regexp = new RegExp(request.term, 'i');
@@ -527,7 +527,7 @@ $('.bs-autocomplete').each(function() {
         event.preventDefault();
         idResultList.push(ui.item[_data.item_label]);
         $("#textArea").val(idResultList);
-        $("#city-code").val("");
+        $("#city-code").val(""); //not working, how to clear?
       }
     })
     .data('ui-autocomplete')._renderItem = function(ul, item) {
