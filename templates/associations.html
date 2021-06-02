@@ -120,42 +120,40 @@ ul.bs-autocomplete-menu a {
 }
 </style>
 
-<!-- test jQueryUI Autocomplete for Bootstrap -->
-<div class="container">
-    <h1>jQuery UI autocomplete for Bootstrap</h1>
-    <p>Demo version with local data.</p>
-    <div class="row">
-      <div class="col-xs-7">
-        <div class="form-group">
-          <label for="ac-demo" class="control-label">Autocomplete demo</label>
-          <input class="form-control bs-autocomplete" id="ac-demo" value="" placeholder="Type two characters of a city name..." type="text" data-source="demo_source.php" data-hidden_field_id="city-code" data-item_id="id" data-item_label="cityName" autocomplete="off">
-        </div>
-      </div>
-      <!-- <div class="col-xs-3">
-        <div class="form-group">
-          <label for="city-code" class="control-label">“Hidden” field</label>
-          <input class="form-control" id="city-code" name="citycode" value="" type="number" readonly>
-          <span class="help-block">This field should be hidden!</span>
-        </div>
-      </div> -->
-    </div>
-    <!-- <p>Spinner icon from <a href="https://projects.lukehaas.me/css-loaders">https://projects.lukehaas.me/css-loaders</a>/</p> -->
-    <!-- <p>Repository: <a href="https://github.com/massimo-cassandro/jQueryUI-autocomplete-bootstrap">https://github.com/massimo-cassandro/jQueryUI-autocomplete-bootstrap</a></p> -->
-  </div>
+
 
 <h2>VISUALISE ASSOCIATIONS</h2>
 <!-- <input class="form-control basicAutoComplete" type="text"
         data-url="autocomplete/label_list.json"
         autocomplete="off"> -->
-
+<!-- test jQueryUI Autocomplete for Bootstrap -->
+<div class="container">
+    <!-- <h1>jQuery UI autocomplete for Bootstrap</h1>
+    <p>Demo version with local data.</p> -->
+    <div class="row">
+      <div class="col-xs-7">
+        <div class="form-group">
+          <label for="ac-demo" class="control-label">Autocomplete demo</label>
+          <input class="form-control bs-autocomplete" id="ac-demo" value="" placeholder="ID or label..." type="text" data-source="demo_source.php" data-hidden_field_id="city-code" data-item_id="id" data-item_label="name" autocomplete="off">
+        </div>
+      </div>
+      <div class="col-xs-3">
+        <div class="form-group">
+          <!-- <label for="city-code" class="control-label">“Hidden” field</label> -->
+          <input class="form-control" id="city-code" name="citycode" value="" type="number" readonly>
+          <!-- <span class="help-block">This field should be hidden!</span> -->
+        </div>
+      </div>
+    </div>
+  </div>
 <div class="row mb-3">
 
     <div class="col-md-12">
 
         <div class="float-left">
-            <label for="ontology_id"> Add Ontology ID: </label>
+            <!-- <label for="ontology_id"> Add Ontology ID: </label>
             <br>
-            <textarea id="ontology_id" name="ontology_id" rows="1"></textarea>
+            <textarea id="ontology_id" name="ontology_id" rows="1"></textarea> -->
             <br>
             <button id="ontology_id_submit_btn" class="btn btn-outline-danger float-right">Add ID</button>
         </div>
@@ -187,12 +185,18 @@ ul.bs-autocomplete-menu a {
 
 <script type="text/javascript">
     var idResultList = [];
-
+    var labelJson = '{{label_list | tojson | safe}}';
+    // console.log("labelJson is: " + labelJson);
+    var lll = []; //get right format
     var labelList = JSON.parse('{{label_list | tojson | safe}}');
     var labels = labelList.labels;
-    labels.forEach(function (label){
+    var ii = 0;
+    labels.forEach(function (label, i){
+        ii++;
+        lll.push({id:ii, name:label});
         console.log("got label: " + label);
     });
+    console.log("lll is: " + lll[0].id);
 
     //test jQuery UI:
     $.widget("ui.autocomplete", $.ui.autocomplete, {
@@ -476,10 +480,13 @@ var cities = [{
   "cityName": "Zagreb"
 }];
 
+console.log("cities: " + cities[0].id);
+
 $('.bs-autocomplete').each(function() {
   var _this = $(this),
     _data = _this.data(),
     _hidden_field = $('#' + _data.hidden_field_id);
+    _hidden_field.hide();
 
   _this.after('<div class="bs-autocomplete-feedback form-control-feedback"><div class="loader">Loading...</div></div>')
     .parent('.form-group').addClass('has-feedback');
@@ -493,8 +500,9 @@ $('.bs-autocomplete').each(function() {
 
       source: function(request, response) {
         var _regexp = new RegExp(request.term, 'i');
-        var data = cities.filter(function(item) {
-          return item.cityName.match(_regexp);
+        var data = lll.filter(function(item) {
+            console.log("item is: ", item);
+          return item.name.match(_regexp);
         });
         response(data);
       },
@@ -517,12 +525,15 @@ $('.bs-autocomplete').each(function() {
         _this.val(ui.item[_data.item_label]);
         _hidden_field.val(ui.item[_data.item_id]);
         event.preventDefault();
+        idResultList.push(ui.item[_data.item_label]);
+        $("#textArea").val(idResultList);
+        $("#city-code").val("");
       }
     })
     .data('ui-autocomplete')._renderItem = function(ul, item) {
       return $('<li></li>')
         .data("item.autocomplete", item)
-        .append('<a>' + item[_data.item_label] + '</a>')
+        .append('<a>' + item[_data.item_label] + '  ' + '</a>')
         .appendTo(ul);
     };
   // end autocomplete
@@ -532,367 +543,17 @@ $('.bs-autocomplete').each(function() {
     //test bootstrap autocomplete
     // $('.basicAutoComplete').autoComplete();
 
-//test javascript autocomplete: //todo: delete, only autocompletes on first letter
 
-// "use strict";
-
-// let autocomplete = (inp, arr) => {
-//   /*the autocomplete function takes two arguments,
-//   the text field element and an array of possible autocompleted values:*/
-//   let currentFocus;
-//   /*execute a function when someone writes in the text field:*/
-//   inp.addEventListener("input", function(e) {
-//     let a, //OUTER html: variable for listed content with html-content
-//       b, // INNER html: filled with array-Data and html
-//       i, //Counter
-//       val = this.value;
-
-//     /*close any already open lists of autocompleted values*/
-//     closeAllLists();
-
-//     if (!val) {
-//       return false;
-//     }
-
-//     currentFocus = -1;
-
-//     /*create a DIV element that will contain the items (values):*/
-//     a = document.createElement("DIV");
-    
-//     a.setAttribute("id", this.id + "autocomplete-list");
-//     a.setAttribute("class", "autocomplete-items list-group text-left");
-    
-//     /*append the DIV element as a child of the autocomplete container:*/
-//     this.parentNode.appendChild(a);
-
-//     /*for each item in the array...*/
-//     for (i = 0; i < arr.length; i++) {
-//       /*check if the item starts with the same letters as the text field value:*/
-//       if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
-//         /*create a DIV element for each matching element:*/
-//         b = document.createElement("DIV");
-//         b.setAttribute("class","list-group-item list-group-item-action");
-//         /*make the matching letters bold:*/
-//         b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
-//         b.innerHTML += arr[i].substr(val.length);
-//         /*insert a input field that will hold the current array item's value:*/
-//         b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
-//         /*execute a function when someone clicks on the item value (DIV element):*/
-//         b.addEventListener("click", function(e) {
-//           /*insert the value for the autocomplete text field:*/
-//           inp.value = this.getElementsByTagName("input")[0].value;
-//           /*close the list of autocompleted values,
-//               (or any other open lists of autocompleted values:*/
-//           closeAllLists();
-//         });
-//         a.appendChild(b);
-//       }
-//     }
-//   });
-  
-//   /*execute a function presses a key on the keyboard:*/
-//   inp.addEventListener("keydown", function(e) {
-//     var x = document.getElementById(this.id + "autocomplete-list");
-//     if (x) x = x.getElementsByTagName("div");
-//     if (e.keyCode == 40) {
-//       /*If the arrow DOWN key is pressed,
-//         increase the currentFocus variable:*/
-//       currentFocus++;
-//       /*and and make the current item more visible:*/
-//       addActive(x);
-//     } else if (e.keyCode == 38) {
-//       //up
-//       /*If the arrow UP key is pressed,
-//         decrease the currentFocus variable:*/
-//       currentFocus--;
-//       /*and and make the current item more visible:*/
-//       addActive(x);
-//     } else if (e.keyCode == 13) {
-//       /*If the ENTER key is pressed, prevent the form from being submitted,*/
-//       e.preventDefault();
-//       if (currentFocus > -1) {
-//         /*and simulate a click on the "active" item:*/
-//         if (x) x[currentFocus].click();
-//       }
-//     }
-//   });
-  
-//   let addActive = (x) => {
-//     /*a function to classify an item as "active":*/
-//     if (!x) return false;
-//     /*start by removing the "active" class on all items:*/
-//     removeActive(x);
-//     if (currentFocus >= x.length) currentFocus = 0;
-//     if (currentFocus < 0) currentFocus = x.length - 1;
-//     /*add class "autocomplete-active":*/
-//     x[currentFocus].classList.add("active");
-//   }
-  
-//   let removeActive = (x) => {
-//     /*a function to remove the "active" class from all autocomplete items:*/
-//     for (let i = 0; i < x.length; i++) {
-//       x[i].classList.remove("active");
-//     }
-//   }
-  
-//   let closeAllLists = (elmnt) => {
-//     /*close all autocomplete lists in the document,
-//     except the one passed as an argument:*/
-//     var x = document.getElementsByClassName("autocomplete-items");
-//     for (var i = 0; i < x.length; i++) {
-//       if (elmnt != x[i] && elmnt != inp) {
-//         x[i].parentNode.removeChild(x[i]);
-//       }
-//     }
-//   }
-  
-//   /*execute a function when someone clicks in the document:*/
-//   document.addEventListener("click", function(e) {
-//     closeAllLists(e.target);
-//   });
-  
-// };
-
-
-// /*An array containing all the country names in the world:*/
-// // let countries = [
-// //   "Afghanistan",
-// //   "Albania",
-// //   "Algeria",
-// //   "Andorra",
-// //   "Angola",
-// //   "Anguilla",
-// //   "Antigua & Barbuda",
-// //   "Argentina",
-// //   "Armenia",
-// //   "Aruba",
-// //   "Australia",
-// //   "Austria",
-// //   "Azerbaijan",
-// //   "Bahamas",
-// //   "Bahrain",
-// //   "Bangladesh",
-// //   "Barbados",
-// //   "Belarus",
-// //   "Belgium",
-// //   "Belize",
-// //   "Benin",
-// //   "Bermuda",
-// //   "Bhutan",
-// //   "Bolivia",
-// //   "Bosnia & Herzegovina",
-// //   "Botswana",
-// //   "Brazil",
-// //   "British Virgin Islands",
-// //   "Brunei",
-// //   "Bulgaria",
-// //   "Burkina Faso",
-// //   "Burundi",
-// //   "Cambodia",
-// //   "Cameroon",
-// //   "Canada",
-// //   "Cape Verde",
-// //   "Cayman Islands",
-// //   "Central Arfrican Republic",
-// //   "Chad",
-// //   "Chile",
-// //   "China",
-// //   "Colombia",
-// //   "Congo",
-// //   "Cook Islands",
-// //   "Costa Rica",
-// //   "Cote D Ivoire",
-// //   "Croatia",
-// //   "Cuba",
-// //   "Curacao",
-// //   "Cyprus",
-// //   "Czech Republic",
-// //   "Denmark",
-// //   "Djibouti",
-// //   "Dominica",
-// //   "Dominican Republic",
-// //   "Ecuador",
-// //   "Egypt",
-// //   "El Salvador",
-// //   "Equatorial Guinea",
-// //   "Eritrea",
-// //   "Estonia",
-// //   "Ethiopia",
-// //   "Falkland Islands",
-// //   "Faroe Islands",
-// //   "Fiji",
-// //   "Finland",
-// //   "France",
-// //   "French Polynesia",
-// //   "French West Indies",
-// //   "Gabon",
-// //   "Gambia",
-// //   "Georgia",
-// //   "Germany",
-// //   "Ghana",
-// //   "Gibraltar",
-// //   "Greece",
-// //   "Greenland",
-// //   "Grenada",
-// //   "Guam",
-// //   "Guatemala",
-// //   "Guernsey",
-// //   "Guinea",
-// //   "Guinea Bissau",
-// //   "Guyana",
-// //   "Haiti",
-// //   "Honduras",
-// //   "Hong Kong",
-// //   "Hungary",
-// //   "Iceland",
-// //   "India",
-// //   "Indonesia",
-// //   "Iran",
-// //   "Iraq",
-// //   "Ireland",
-// //   "Isle of Man",
-// //   "Israel",
-// //   "Italy",
-// //   "Jamaica",
-// //   "Japan",
-// //   "Jersey",
-// //   "Jordan",
-// //   "Kazakhstan",
-// //   "Kenya",
-// //   "Kiribati",
-// //   "Kosovo",
-// //   "Kuwait",
-// //   "Kyrgyzstan",
-// //   "Laos",
-// //   "Latvia",
-// //   "Lebanon",
-// //   "Lesotho",
-// //   "Liberia",
-// //   "Libya",
-// //   "Liechtenstein",
-// //   "Lithuania",
-// //   "Luxembourg",
-// //   "Macau",
-// //   "Macedonia",
-// //   "Madagascar",
-// //   "Malawi",
-// //   "Malaysia",
-// //   "Maldives",
-// //   "Mali",
-// //   "Malta",
-// //   "Marshall Islands",
-// //   "Mauritania",
-// //   "Mauritius",
-// //   "Mexico",
-// //   "Micronesia",
-// //   "Moldova",
-// //   "Monaco",
-// //   "Mongolia",
-// //   "Montenegro",
-// //   "Montserrat",
-// //   "Morocco",
-// //   "Mozambique",
-// //   "Myanmar",
-// //   "Namibia",
-// //   "Nauro",
-// //   "Nepal",
-// //   "Netherlands",
-// //   "Netherlands Antilles",
-// //   "New Caledonia",
-// //   "New Zealand",
-// //   "Nicaragua",
-// //   "Niger",
-// //   "Nigeria",
-// //   "North Korea",
-// //   "Norway",
-// //   "Oman",
-// //   "Pakistan",
-// //   "Palau",
-// //   "Palestine",
-// //   "Panama",
-// //   "Papua New Guinea",
-// //   "Paraguay",
-// //   "Peru",
-// //   "Philippines",
-// //   "Poland",
-// //   "Portugal",
-// //   "Puerto Rico",
-// //   "Qatar",
-// //   "Reunion",
-// //   "Romania",
-// //   "Russia",
-// //   "Rwanda",
-// //   "Saint Pierre & Miquelon",
-// //   "Samoa",
-// //   "San Marino",
-// //   "Sao Tome and Principe",
-// //   "Saudi Arabia",
-// //   "Senegal",
-// //   "Serbia",
-// //   "Seychelles",
-// //   "Sierra Leone",
-// //   "Singapore",
-// //   "Slovakia",
-// //   "Slovenia",
-// //   "Solomon Islands",
-// //   "Somalia",
-// //   "South Africa",
-// //   "South Korea",
-// //   "South Sudan",
-// //   "Spain",
-// //   "Sri Lanka",
-// //   "St Kitts & Nevis",
-// //   "St Lucia",
-// //   "St Vincent",
-// //   "Sudan",
-// //   "Suriname",
-// //   "Swaziland",
-// //   "Sweden",
-// //   "Switzerland",
-// //   "Syria",
-// //   "Taiwan",
-// //   "Tajikistan",
-// //   "Tanzania",
-// //   "Thailand",
-// //   "Timor L'Este",
-// //   "Togo",
-// //   "Tonga",
-// //   "Trinidad & Tobago",
-// //   "Tunisia",
-// //   "Turkey",
-// //   "Turkmenistan",
-// //   "Turks & Caicos",
-// //   "Tuvalu",
-// //   "Uganda",
-// //   "Ukraine",
-// //   "United Arab Emirates",
-// //   "United Kingdom",
-// //   "United States of America",
-// //   "Uruguay",
-// //   "Uzbekistan",
-// //   "Vanuatu",
-// //   "Vatican City",
-// //   "Venezuela",
-// //   "Vietnam",
-// //   "Virgin Islands (US)",
-// //   "Yemen",
-// //   "Zambia",
-// //   "Zimbabwe"
-// // ];
-
-// /*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
-// // autocomplete(document.getElementById("ontology_id"), countries);
-// autocomplete(document.getElementById("ontology_id"), labels);
 
 
     $(document).ready(function () {
         //add id to list and display in textArea:
         $("#ontology_id_submit_btn").click(function () {
-            id = $("#ontology_id").val();
+            id = $("#city-code").val();
             console.log("got id:" + id);
             idResultList.push(id);
             $("#textArea").val(idResultList);
-            $("#ontology_id").val("");
+            $("#city-code").val("");
         });
 
         //submit full text:
