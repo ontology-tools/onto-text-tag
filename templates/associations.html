@@ -134,7 +134,7 @@ ul.bs-autocomplete-menu a {
       <div class="col-xs-7">
         <div class="form-group">
           <label for="ac-demo" class="control-label">Autocomplete demo</label>
-          <input class="form-control bs-autocomplete" id="ac-demo" value="" placeholder="ID or label..." type="text" data-source="demo_source.php" data-hidden_field_id="city-code" data-item_id="id" data-item_label="name" autocomplete="off">
+          <input class="form-control bs-autocomplete" id="ac-demo" value="" placeholder="ID or Label..." type="text" data-source="demo_source.php" data-hidden_field_id="city-code" data-item_id="id" data-item_label="name" autocomplete="off">
         </div>
       </div>
       <div class="col-xs-3">
@@ -193,10 +193,8 @@ ul.bs-autocomplete-menu a {
     var labels = labelList.labels;
     var ii = 0;
     labels.forEach(function (label, i){
-        ii++;
-        // var ontologyName = label.split("|")
+        ii++; //todo: can we start at 0? ii was just for copying the example 1, 2, 3..
         labelArray.push({id:ii, name:label});
-        // ontologyArray.push(ontologyName[0]); //send this back to server
         console.log("got label: " + label);
     });
     console.log("labelArray is: " + labelArray[0].id);
@@ -275,8 +273,7 @@ $('.bs-autocomplete').each(function() {
         event.preventDefault();
         idResultList.push(ui.item[_data.item_label]);
         $("#textArea").val(idResultList);
-        // $("#city-code").val(""); //not working, how to clear?
-        _this.val("");
+        _this.val(""); //clear input on submit
       }
     })
     .data('ui-autocomplete')._renderItem = function(ul, item) {
@@ -297,13 +294,14 @@ $('.bs-autocomplete').each(function() {
 
     $(document).ready(function () {
         //add id to list and display in textArea:
-        $("#ontology_id_submit_btn").click(function () {
-            id = $("#city-code").val();
-            console.log("got id:" + id);
-            idResultList.push(id);
-            $("#textArea").val(idResultList);
-            $("#city-code").val("");
-        });
+        //not using button, dropdown adds on it's own. todo: delete this:
+        // $("#ontology_id_submit_btn").click(function () {
+        //     id = $("#city-code").val();
+        //     console.log("got id:" + id);
+        //     idResultList.push(id);
+        //     $("#textArea").val(idResultList);
+        //     $("#city-code").val("");
+        // });
 
         //submit full text:
         $('#submitText').submit(function (e) {
