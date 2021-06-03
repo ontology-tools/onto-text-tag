@@ -43,7 +43,26 @@ ul.bs-autocomplete-menu a {
   color: #23527c;
   background-color: #eeeeee;
 }
-
+ul.bs-autocomplete-menu li {
+  text-align:left;
+  border-radius: 50%;
+  border: .25em solid #ccc;
+  /* content: counter(list-counter);
+    counter-increment: list-counter;
+    width: 1em;
+    height: 1em;
+    padding: .5em;
+    margin-right: 1em;
+    border-radius: 50%;
+    border: .25em solid #ccc;
+    background: #000;
+    color: #fff;
+    font-family: arial;
+    font-weight: bold;
+    text-align: center;
+    display: inline-block;
+    */
+} 
 .bs-autocomplete-feedback {
   width: 1.5em;
   height: 1.5em;
@@ -279,7 +298,8 @@ $('.bs-autocomplete').each(function() {
     .data('ui-autocomplete')._renderItem = function(ul, item) {
       return $('<li></li>')
         .data("item.autocomplete", item)
-        .append('<a>' + item[_data.item_label] + '  ' + '</a>')
+        .append('<a>' + item[_data.item_label] + '</a>')
+        .append('<br>')
         .appendTo(ul);
     };
   // end autocomplete
