@@ -131,9 +131,9 @@ ul.bs-autocomplete-menu a {
     <!-- <h1>jQuery UI autocomplete for Bootstrap</h1>
     <p>Demo version with local data.</p> -->
     <div class="row">
-      <div class="col-xs-7">
+      <div class="col-md-12">
         <div class="form-group">
-          <label for="ac-demo" class="control-label">Autocomplete demo</label>
+          <label for="ac-demo" class="control-label">Input:</label>
           <input class="form-control bs-autocomplete" id="ac-demo" value="" placeholder="ID or Label..." type="text" data-source="demo_source.php" data-hidden_field_id="city-code" data-item_id="id" data-item_label="name" autocomplete="off">
         </div>
       </div>
@@ -197,7 +197,7 @@ ul.bs-autocomplete-menu a {
         labelArray.push({id:ii, name:label});
         console.log("got label: " + label);
     });
-    console.log("labelArray is: " + labelArray[0].id);
+    // console.log("labelArray is: " + labelArray[0].id);
 
     //test jQuery UI:
     $.widget("ui.autocomplete", $.ui.autocomplete, {

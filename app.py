@@ -161,39 +161,49 @@ def get_abstract_text(result):
     return fixed_abstractText
 
 def get_ids(ontol_list):
+    print("get_ids running here")
     checklist = []
+    ontol_o = []
     ontols = []
+
     all_labels = ""
     for ontology in ontol_list:
             for key, value in ontology.items():
                 if(key == "ontologyfile"):
-                    ontols.append(value)
+                    ontol_o.append(value)
                     # print("got ontology", value)
                 if(key == "label"):
                     all_labels = all_labels + value
 
-    print("all_labels = ", all_labels)
+    # print("all_labels = ", all_labels)
 
-    # for i in range(len(ontols)):
-    #     # print(ontol_list[i])
-    #     ontols.append(pyhornedowl.open_ontology(ontol_list[i]))    
-    #     # print("ontol is: ", ontol)
-    # for ontol in ontols:
-    #     for prefix in PREFIXES:
-    #         ontol.add_prefix_mapping(prefix[0], prefix[1])
-    #         #########
-    #     for classIri in ontol.get_classes():
-    #             classId = ontol.get_id_for_iri(classIri)
-    #             label = ontol.get_annotation(classId, RDFSLABEL)
-    #             if classId:
-    #                 pass
+    for i in range(len(ontol_o)):
+        print("looking at ontols")
+        ontols.append(pyhornedowl.open_ontology(ontol_o[i]))  #not running  
+        # print("ontol is: ", ontol)
+    for ontol in ontols:
+        print("for ontol running")
+        for prefix in PREFIXES:
+            ontol.add_prefix_mapping(prefix[0], prefix[1])
+            #########
+        for classIri in ontol.get_classes():
+            print("for classIri running")        
+            classId = ontol.get_id_for_iri(classIri)
+            label = ontol.get_annotation(classIri, RDFSLABEL)
+            # label = ontol.get_annotation(classId, RDFSLABEL)
+            if classId:
+                print("got classId and labels") 
+                checklist.append(classId + "|"+ label)                   
+                # print(classId)
+                # print(label)
+                    
                     
     
     #todo: how to get labels from and Id's????
 
     #test return:
-    checklist.append("test")
-    checklist.append("test2")
+    # checklist.append("test3")
+    # checklist.append("test4")
     return checklist
 
 
@@ -207,14 +217,11 @@ def home():
 
 @app.route('/associations', methods=['GET', 'POST'])
 def associations():
-    # ontologies = ["ADDICTO", "BCIO"]
     ontologies = ontoDict["ontologies"]
-    test_label_list = get_ids(ontologies) #will become label_list, todo: make into a dictionary here..
-    print("test_label_list is: ", test_label_list)
-    label_list = {'labels': ["ADDICTO:123457|smoking", "ADDICTO:123456|vaping", "ADDICTO:123458|human being", "BCIO:123456|addiction", "BCIO:223456|long term ", "ADDICTO:133456|ontology" ]}
-    # label_list = {["id": "0", "name": "ADDICTO:123457 | smoking"], ["id": "1", "name": "ADDICTO:223457 | person"}, {"id": "2", "name": "BCIO:323457 | addiction"} }
-    # with open("label_list","w") as f:
-    #     json.dump(label_list,f) # todo: there has to be a better way than this??
+    labels = get_ids(ontologies) 
+    label_list={'labels': labels}
+    #test values:
+    # label_list = {'labels': ["ADDICTO:123457|smoking", "ADDICTO:123456|vaping", "ADDICTO:123458|human being", "BCIO:123456|addiction", "BCIO:223456|long term ", "ADDICTO:133456|ontology" ]}
     json.dumps(label_list)
     return render_template('associations.html', label_list = label_list)
 
