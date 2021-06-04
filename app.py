@@ -161,7 +161,7 @@ def get_abstract_text(result):
     return fixed_abstractText
 
 def get_ids(ontol_list):
-    print("get_ids running here")
+    # print("get_ids running here")
     checklist = []
     ontol_o = []
     ontols = []
@@ -178,21 +178,21 @@ def get_ids(ontol_list):
     # print("all_labels = ", all_labels)
 
     for i in range(len(ontol_o)):
-        print("looking at ontols")
+        # print("looking at ontols")
         ontols.append(pyhornedowl.open_ontology(ontol_o[i]))  #not running  
         # print("ontol is: ", ontol)
     for ontol in ontols:
-        print("for ontol running")
+        # print("for ontol running")
         for prefix in PREFIXES:
             ontol.add_prefix_mapping(prefix[0], prefix[1])
             #########
         for classIri in ontol.get_classes():
-            print("for classIri running")        
+            # print("for classIri running")        
             classId = ontol.get_id_for_iri(classIri)
             label = ontol.get_annotation(classIri, RDFSLABEL)
             # label = ontol.get_annotation(classId, RDFSLABEL)
             if classId:
-                print("got classId and labels") 
+                # print("got classId and labels") 
                 checklist.append(classId + "|"+ label)                   
                 # print(classId)
                 # print(label)
@@ -246,7 +246,9 @@ def associations():
 @app.route('/visualise_associations', methods=['POST'])
 def visualise_associations():  
     ontology_id_list = request.form.get('ontology_id_list') 
-    print("visualise! ", ontology_id_list);
+    print("visualise! ", ontology_id_list)
+    split_id_list = ontology_id_list.split(",")
+    
     return ( json.dumps({"message":"Success"}), 200 )
     # return ( json.dumps({"message":"Success", "response": ontology_id_list}), 200 ) //return result for visualisation?
     

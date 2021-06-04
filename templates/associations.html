@@ -47,6 +47,7 @@ ul.bs-autocomplete-menu li {
   text-align:left;
   border-radius: 50%;
   border: .25em solid #ccc;
+
   /* content: counter(list-counter);
     counter-increment: list-counter;
     width: 1em;
@@ -70,7 +71,7 @@ ul.bs-autocomplete-menu li {
   margin-top: .5em;
   margin-right: .5em;
 }
-
+/*
 .loader {
   font-size: 10px;
   text-indent: -9999em;
@@ -115,7 +116,8 @@ ul.bs-autocomplete-menu li {
   bottom: 0;
   right: 0;
 }
-
+*/
+/*
 @-webkit-keyframes load3 {
   0% {
     -webkit-transform: rotate(0deg);
@@ -137,6 +139,7 @@ ul.bs-autocomplete-menu li {
     transform: rotate(360deg);
   }
 }
+*/
 </style>
 
 
@@ -186,7 +189,7 @@ ul.bs-autocomplete-menu li {
             <div class="form-group green-border-focus">
                 <label for="inputText">Ontology ID's:</label>
                 <textarea id="textArea" form="submitText" class="form-control" id="inputText" name="inputText"
-                    rows="20">
+                    rows="10">
           </textarea>
             </div>
         </div>
@@ -324,7 +327,7 @@ $('.bs-autocomplete').each(function() {
         //submit full text:
         $('#submitText').submit(function (e) {
             e.preventDefault();
-            console.log("idResultList should be sent here. " + idResultList);
+            console.log("Sending IDs from: " + idResultList);
             var request = new XMLHttpRequest();
             request.onreadystatechange = function () {
                 if (request.readyState === 4) {
