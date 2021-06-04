@@ -210,13 +210,11 @@ ul.bs-autocomplete-menu li {
     var labelArray = []; //get right format
     var labelList = JSON.parse('{{label_list | tojson | safe}}');
     var labels = labelList.labels;
-    var ii = 0;
     labels.forEach(function (label, i){
-        ii++; //todo: can we start at 0? ii was just for copying the example 1, 2, 3..
-        labelArray.push({id:ii, name:label});
-        console.log("got label: " + label);
+        labelArray.push({id:i, name:label});
+        // console.log("got label: " + label);
     });
-    // console.log("labelArray is: " + labelArray[0].id);
+    
 
     //test jQuery UI:
     $.widget("ui.autocomplete", $.ui.autocomplete, {
@@ -335,6 +333,8 @@ $('.bs-autocomplete').each(function() {
                     } else if (request.status === 200) {
                         //update ID when data send confirmed: 
                         console.log("success achieved");
+                        $("#textArea").val("");
+                        bootbox.alert("Success! Show visualisation here");
                     } else if (request.status === 400) {
                         bootbox.alert("error sending ID's, try again");
                     } else {
@@ -351,7 +351,6 @@ $('.bs-autocomplete').each(function() {
             request.open('POST', '/visualise_associations', true);
             request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
             request.send('ontology_id_list=' + JSON.stringify(ontologyArray));
-            // request.send('ontology_id_list=' + JSON.stringify(idResultList));
         });
 
     });

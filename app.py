@@ -225,7 +225,7 @@ def associations():
     json.dumps(label_list)
     return render_template('associations.html', label_list = label_list)
 
-#bootstrap-autocomplete:
+#bootstrap-autocomplete test todo: delete this:
 # @app.route('/autocomplete', methods=['GET'])
 # def autocomplete():
 #     user_input = request.form.get('q')
