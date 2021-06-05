@@ -246,6 +246,8 @@ def associations():
 @app.route('/visualise_associations', methods=['POST'])
 def visualise_associations():  
     ontology_id_list = request.form.get('ontology_id_list') 
+    include_descendent_classes = request.form.get('include_descendent_classes')
+    print("checkbox says: ", include_descendent_classes)
     print("visualise! ", ontology_id_list)
     split_id_list = ontology_id_list.split(",")
     

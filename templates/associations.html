@@ -198,8 +198,13 @@ ul.bs-autocomplete-menu li {
     <div class="row mb-3">
         <div class="col-md-12">
             <div class="float-right">
+              <div class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" id="include-descendent-classes-checkbox">
+                <label class="custom-control-label" for="include-descendent-classes-checkbox">Include descendent classes</label>
+            </div>
                 <button type="submit" id="visualise-associations" class="btn btn-outline-success"> Visualise
                     associations</button>
+                    
             </div>
         </div>
     </div>
@@ -351,9 +356,15 @@ $('.bs-autocomplete').each(function() {
               var ontologyName = idResultList[result].split("|")
               ontologyArray.push(ontologyName[0]); //send this back to server
             }
+            var checked = "false";
+            //get checkbox: 
+            if ($('#include-descendent-classes-checkbox').is(":checked")){
+              checked = "true";
+            }
             request.open('POST', '/visualise_associations', true);
             request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-            request.send('ontology_id_list=' + JSON.stringify(ontologyArray));
+            request.send('ontology_id_list=' + JSON.stringify(ontologyArray) + 
+              '&include_descendent_classes=' + JSON.stringify(checked));
         });
 
     });
