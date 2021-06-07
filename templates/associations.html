@@ -319,6 +319,9 @@ $('.bs-autocomplete').each(function() {
 
 
     $(document).ready(function () {
+      //correct link to text tag:
+      $("#pagelink").attr("href", "/");
+      $("#pagelink").text("Tag text");
         //add id to list and display in textArea:
         //not using button, dropdown adds on it's own. todo: delete this:
         // $("#ontology_id_submit_btn").click(function () {

@@ -13,7 +13,13 @@
   </p>
   {% endif %} -->
 </div>
-
+<script type="text/javascript">
+$(document).ready(function () {
+      //correct link to text tag:
+      $("#pagelink").attr("href", "/associations");
+      $("#pagelink").text("View associations");
+  });
+</script>
 {% if error_msg %}
 <div class="alert alert-danger" role="alert">
 
@@ -94,15 +100,13 @@
 </style>
 
 <script type="text/javascript">
-
+  
   // enable popovers globally:
   $(function () {
     $('[data-toggle="popover"]').popover({ html: true });
   })
 
   var results = {{ tag_results | safe}};
-  // 
-  
   //check for unique namespaces, add to array, assign a colour and 
   namespaces = [];
   namespaceColours = [];
@@ -225,7 +229,7 @@
     return (zeros + str).slice(-len);
   }
 
-
+  
 </script>
 
 <!-- add more text -->
