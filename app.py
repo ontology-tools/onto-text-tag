@@ -212,8 +212,8 @@ def get_ids(ontol_list):
 @app.route('/')
 @app.route('/home')
 def home():
-    return redirect(url_for('associations')) #todo: temporary testing redirect - remove this
-    # return render_template('index.html')
+    # return redirect(url_for('associations')) #todo: temporary testing redirect - remove this
+    return render_template('index.html')
 
 @app.route('/associations', methods=['GET', 'POST'])
 def associations():
