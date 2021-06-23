@@ -345,7 +345,9 @@ $('.bs-autocomplete').each(function() {
                         //update ID when data send confirmed: 
                         console.log("success achieved");
                         $("#textArea").val("");
-                        bootbox.alert("Success! Show visualisation here");
+                        bootbox.alert("Success! Please be patient while your visualisation is generated...");
+                      //todo: is this the right way?
+                        window.location = '{{url_for( 'chord' ) }}';
                     } else if (request.status === 400) {
                         bootbox.alert("error sending ID's, try again");
                     } else {
@@ -355,15 +357,21 @@ $('.bs-autocomplete').each(function() {
                 }
             }
             //generate ontology label list:
+
+            // todo: need to get ontologyArray direct from #textArea
+            // as some ID's may be directly input!
+            console.log("idResultList is: " + idResultList);
             for(result in idResultList){
               var ontologyName = idResultList[result].split("|")
               ontologyArray.push(ontologyName[0]); //send this back to server
             }
+            
             var checked = "false";
             //get checkbox: 
             if ($('#include-descendent-classes-checkbox').is(":checked")){
               checked = "true";
             }
+            console.log("ontology_id_list is: " + ontologyArray);
             request.open('POST', '/visualise_associations', true);
             request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
             request.send('ontology_id_list=' + JSON.stringify(ontologyArray) + 

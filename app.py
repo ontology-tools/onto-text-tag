@@ -26,6 +26,11 @@ import json
 import re
 
 import pprint
+
+#circle graph generator
+import hv_generate
+from hv_generate import hv_generator
+
 pp = pprint.PrettyPrinter(depth=4)
 
 app = Flask(__name__)
@@ -225,35 +230,28 @@ def associations():
     json.dumps(label_list)
     return render_template('associations.html', label_list = label_list)
 
-#bootstrap-autocomplete test todo: delete this:
-# @app.route('/autocomplete', methods=['GET'])
-# def autocomplete():
-#     user_input = request.form.get('q')
-#     print("user_input: ", user_input)
-#     # label_list = { 'labels': ["Cplusplus", "Python", "PHP", "Java", "C", "Ruby", "R", "Csharp", "Dart", "Fortran", "Pascal", "Javascript"]
-#     # }
-#     # label_list = {'labels': ["ADDICTO:123457 | smoking", "ADDICTO:123456 | vaping", "ADDICTO:123458 | human being", "BCIO:123456 | smoking", "BCIO:223456 | addiction", "ADDICTO:133456 | ontology" ]}
-#     return ( json.dumps({"label_list":label_list}), 200 )
-    
-# get id from label here:
-# @app.route('/get_ids', methods=['GET', 'POST'])
-# def get_ids():
-#     ontology_id = request.form.get('ontology_id') #get ontology_label?
-#     print("got ontology_id: ", ontology_id)
-#     return ( json.dumps({"message":"Success",
-#                              "response": ontology_id}), 200 )
+
 
 @app.route('/visualise_associations', methods=['POST'])
 def visualise_associations():  
-    ontology_id_list = request.form.get('ontology_id_list') 
+    ontology_id_list = request.form.get('ontology_id_list')  #todo: where did these go?
     include_descendent_classes = request.form.get('include_descendent_classes')
     print("checkbox says: ", include_descendent_classes)
     print("visualise! ", ontology_id_list)
     split_id_list = ontology_id_list.split(",")
-    
-    return ( json.dumps({"message":"Success"}), 200 )
     # return ( json.dumps({"message":"Success", "response": ontology_id_list}), 200 ) //return result for visualisation?
+    # return redirect(url_for('chord'), 301) #never working, why?
+    return ( json.dumps({"message":"Success"}), 200 )
     
+@app.route('/chord')
+def chord():
+    hv_generator()
+    iframe = url_for('chordout')
+    return render_template("chord.html", iframe=iframe) 
+    
+@app.route('/chordout')
+def chordout():
+    return render_template('chordout.html')
 
 @app.route('/pubmed', methods=['POST', 'GET'])
 def pubmed():
@@ -346,6 +344,13 @@ def tag():
                            id=idName,
                            tag_results=tag_results)
 
+# get id from label here:
+# @app.route('/get_ids', methods=['GET', 'POST'])
+# def get_ids():
+#     ontology_id = request.form.get('ontology_id') #get ontology_label?
+#     print("got ontology_id: ", ontology_id)
+#     return ( json.dumps({"message":"Success",
+#                              "response": ontology_id}), 200 )
 
 if __name__ == "__main__":
     app.run()
