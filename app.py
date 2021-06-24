@@ -248,10 +248,10 @@ def visualise_associations():
     # ontology_id_list = ["BFO:0000023", "ADDICTO:0000349", "MF:0000016", "ADDICTO:0000632", "ADDICTO:0000904", "ADDICTO:0000491","ADDICTO:0000872" ]
     id_list_list = []
     for a in ontology_id_list.split(','):
-        id_list_list.append(a.replace("[", "").replace("]", "").replace("\"", ""))
+        id_list_list.append(a.replace("[", "").replace("]", "").replace("\"", "").strip()) #todo: replace this hack with actual code - need to get array from JS to Python List...
         print(a)
     print("id_list_list is: ", id_list_list)
-    hv_generator(id_list_list)
+    hv_generator(id_list_list) #todo: comment this out for testing - slow!
     # return ( json.dumps({"message":"Success", "response": ontology_id_list}), 200 ) //return result for visualisation?
     # return redirect(url_for('chord'), 301) #never working, why?
     return ( json.dumps({"message":"Success"}), 200 )
