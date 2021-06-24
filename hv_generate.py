@@ -3,12 +3,20 @@ import holoviews as hv
 from holoviews import opts, dim
 hv.extension('bokeh')
 hv.output(size=200)
+# import argparse
 
 #todo: make ontology_id_list an argument for this function:
-def hv_generator():
+def hv_generator(ontology_id_input):
+    
     df2 = pd.read_csv("static/ontotermmentions.csv",index_col=0)
-
-    ontology_id_list = ["BFO:0000023", "ADDICTO:0000349", "MF:0000016", "ADDICTO:0000632", "ADDICTO:0000904", "ADDICTO:0000491","ADDICTO:0000872" ]
+    # ontology_id_list_test = ontology_id_input.split(",") #todo: this is not working, direct not working either..?
+    # #todo: parse input into correct list format. 
+    # print("ontology_id_list_test type: ", type(ontology_id_list_test))
+    # print("got id list? ", ontology_id_list_test)
+    print("ontology_id_input type is: ", type(ontology_id_input))
+    print("ontology_id_input values: ", ontology_id_input)
+    ontology_id_list = ontology_id_input
+    # ontology_id_list = ["BFO:0000023", "ADDICTO:0000349", "MF:0000016", "ADDICTO:0000632", "ADDICTO:0000904", "ADDICTO:0000491","ADDICTO:0000872" ]
     # This creates a table of pairs of terms in the same abstract
 
     dcp = pd.merge(df2,df2,on="PMID")

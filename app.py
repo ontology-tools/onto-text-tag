@@ -234,18 +234,30 @@ def associations():
 
 @app.route('/visualise_associations', methods=['POST'])
 def visualise_associations():  
-    ontology_id_list = request.form.get('ontology_id_list')  #todo: where did these go?
+    ontology_id_list = request.form.get('ontology_id_list')
     include_descendent_classes = request.form.get('include_descendent_classes')
     print("checkbox says: ", include_descendent_classes)
     print("visualise! ", ontology_id_list)
-    split_id_list = ontology_id_list.split(",")
+    print("type of ontology_id_list is: ", type(ontology_id_list))
+    
+    split_id_list = ontology_id_list
+    # split_id_list = ontology_id_list.split(",") #not correct?
+    # print("type of split_id_list is: ", type(split_id_list))
+    # print("split_id_list is: ", split_id_list)
+    #test values:
+    # ontology_id_list = ["BFO:0000023", "ADDICTO:0000349", "MF:0000016", "ADDICTO:0000632", "ADDICTO:0000904", "ADDICTO:0000491","ADDICTO:0000872" ]
+    id_list_list = []
+    for a in ontology_id_list.split(','):
+        id_list_list.append(a.replace("[", "").replace("]", "").replace("\"", ""))
+        print(a)
+    print("id_list_list is: ", id_list_list)
+    hv_generator(id_list_list)
     # return ( json.dumps({"message":"Success", "response": ontology_id_list}), 200 ) //return result for visualisation?
     # return redirect(url_for('chord'), 301) #never working, why?
     return ( json.dumps({"message":"Success"}), 200 )
     
 @app.route('/chord')
-def chord():
-    hv_generator()
+def chord():    
     iframe = url_for('chordout')
     return render_template("chord.html", iframe=iframe) 
     

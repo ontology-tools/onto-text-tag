@@ -335,6 +335,7 @@ $('.bs-autocomplete').each(function() {
         //submit full text:
         $('#submitText').submit(function (e) {
             e.preventDefault();
+            bootbox.alert("Please be patient while your visualisation is generated... \n Checking more than 6 million Labels, this could take a while!");
             console.log("Sending IDs from: " + idResultList);
             var request = new XMLHttpRequest();
             request.onreadystatechange = function () {
@@ -345,7 +346,7 @@ $('.bs-autocomplete').each(function() {
                         //update ID when data send confirmed: 
                         console.log("success achieved");
                         $("#textArea").val("");
-                        bootbox.alert("Success! Please be patient while your visualisation is generated...");
+                        // bootbox.alert("Success! Please be patient while your visualisation is generated..."); //todo: alert must show while data circle graph is loading
                       //todo: is this the right way?
                         window.location = '{{url_for( 'chord' ) }}';
                     } else if (request.status === 400) {
