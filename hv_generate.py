@@ -57,4 +57,4 @@ def hv_generator(ontology_id_input):
         opts.Chord(cmap='Category20', edge_cmap='Category20', edge_color=dim('source').str(),
                 labels='name', node_color=dim('index').str()))
 
-    hv.save(chord, 'templates/chordout.html') #todo: untested
+    hv.save(chord, 'templates/chordout.html') 
