@@ -8,47 +8,48 @@
 {{ super() }}
 
 <style>
-    ul.bs-autocomplete-menu {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  max-height: 200px;
-  overflow: auto;
-  z-index: 9999;
-  border: 1px solid #eeeeee;
-  border-radius: 4px;
-  background-color: #fff;
-  box-shadow: 0px 1px 6px 1px rgba(0, 0, 0, 0.4);
-}
+  ul.bs-autocomplete-menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-height: 200px;
+    overflow: auto;
+    z-index: 9999;
+    border: 1px solid #eeeeee;
+    border-radius: 4px;
+    background-color: #fff;
+    box-shadow: 0px 1px 6px 1px rgba(0, 0, 0, 0.4);
+  }
 
-ul.bs-autocomplete-menu a {
-  font-weight: normal;
-  color: #333333;
-}
+  ul.bs-autocomplete-menu a {
+    font-weight: normal;
+    color: #333333;
+  }
 
-.ui-helper-hidden-accessible {
-  border: 0;
-  clip: rect(0 0 0 0);
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-  width: 1px;
-}
+  .ui-helper-hidden-accessible {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+  }
 
-.ui-state-active,
-.ui-state-focus {
-  color: #23527c;
-  background-color: #eeeeee;
-}
-ul.bs-autocomplete-menu li {
-  text-align:left;
-  border-radius: 50%;
-  border: .25em solid #ccc;
+  .ui-state-active,
+  .ui-state-focus {
+    color: #23527c;
+    background-color: #eeeeee;
+  }
 
-  /* content: counter(list-counter);
+  ul.bs-autocomplete-menu li {
+    text-align: left;
+    border-radius: 50%;
+    border: .25em solid #ccc;
+
+    /* content: counter(list-counter);
     counter-increment: list-counter;
     width: 1em;
     height: 1em;
@@ -63,15 +64,17 @@ ul.bs-autocomplete-menu li {
     text-align: center;
     display: inline-block;
     */
-} 
-.bs-autocomplete-feedback {
-  width: 1.5em;
-  height: 1.5em;
-  overflow: hidden;
-  margin-top: .5em;
-  margin-right: .5em;
-}
-/*
+  }
+
+  .bs-autocomplete-feedback {
+    width: 1.5em;
+    height: 1.5em;
+    overflow: hidden;
+    margin-top: .5em;
+    margin-right: .5em;
+  }
+
+  /*
 .loader {
   font-size: 10px;
   text-indent: -9999em;
@@ -117,7 +120,7 @@ ul.bs-autocomplete-menu li {
   right: 0;
 }
 */
-/*
+  /*
 @-webkit-keyframes load3 {
   0% {
     -webkit-transform: rotate(0deg);
@@ -150,243 +153,269 @@ ul.bs-autocomplete-menu li {
         autocomplete="off"> -->
 <!-- test jQueryUI Autocomplete for Bootstrap -->
 <div class="container">
-    <!-- <h1>jQuery UI autocomplete for Bootstrap</h1>
+  <!-- <h1>jQuery UI autocomplete for Bootstrap</h1>
     <p>Demo version with local data.</p> -->
-    <div class="row">
-      <div class="col-md-12">
-        <div class="form-group">
-          <label for="ac-demo" class="control-label">Input:</label>
-          <input class="form-control bs-autocomplete" id="ac-demo" value="" placeholder="ID or Label..." type="text" data-source="demo_source.php" data-hidden_field_id="city-code" data-item_id="id" data-item_label="name" autocomplete="off">
-        </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="form-group">
+        <label for="ac-demo" class="control-label">Input:</label>
+        <input class="form-control bs-autocomplete" id="ac-demo" value="" placeholder="ID or Label..." type="text"
+          data-source="demo_source.php" data-hidden_field_id="city-code" data-item_id="id" data-item_label="name"
+          autocomplete="off">
       </div>
-      <div class="col-xs-3">
-        <div class="form-group">
-          <!-- <label for="city-code" class="control-label">“Hidden” field</label> -->
-          <input class="form-control" id="city-code" name="citycode" value="" type="number" readonly> <!--todo: what is readonly for?-->
-          <!-- <span class="help-block">This field should be hidden!</span> -->
-        </div>
+    </div>
+    <div class="col-xs-3">
+      <div class="form-group">
+        <!-- <label for="city-code" class="control-label">“Hidden” field</label> -->
+        <input class="form-control" id="city-code" name="citycode" value="" type="number" readonly>
+        <!--todo: what is readonly for?-->
+        <!-- <span class="help-block">This field should be hidden!</span> -->
       </div>
     </div>
   </div>
+</div>
 <!-- <div class="row mb-3"> -->
 
-    <!-- <div class="col-md-12"> -->
+<!-- <div class="col-md-12"> -->
 
-        <!-- <div class="float-left"> -->
-            <!-- <label for="ontology_id"> Add Ontology ID: </label>
+<!-- <div class="float-left"> -->
+<!-- <label for="ontology_id"> Add Ontology ID: </label>
             <br>
             <textarea id="ontology_id" name="ontology_id" rows="1"></textarea> -->
-            <!-- <br> -->
-            <!-- <button id="ontology_id_submit_btn" class="btn btn-outline-danger float-right">Add ID</button> -->
-        <!-- </div> -->
-    <!-- </div> -->
+<!-- <br> -->
+<!-- <button id="ontology_id_submit_btn" class="btn btn-outline-danger float-right">Add ID</button> -->
+<!-- </div> -->
+<!-- </div> -->
 <!-- </div> -->
 
 <!-- Ontology ID form input -->
 <form id="submitText" action="{{ url_for('visualise_associations') }}" method="post">
-    <div class="row mb-3">
-        <div class="col-md-12">
-            <div class="form-group green-border-focus">
-                <label for="inputText">Ontology ID's:</label>
-                <textarea id="textArea" form="submitText" class="form-control" id="inputText" name="inputText"
-                    rows="10">
+  <div class="row mb-3">
+    <div class="col-md-12">
+      <div class="form-group green-border-focus">
+        <label for="inputText">Ontology ID's:</label>
+        <textarea id="textArea" form="submitText" class="form-control" id="inputText" name="inputText" rows="10">
           </textarea>
-            </div>
-        </div>
+      </div>
     </div>
+  </div>
 
-    <div class="row mb-3">
-        <div class="col-md-12">
-            <div class="float-right">
-              <div class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input" id="include-descendent-classes-checkbox">
-                <label class="custom-control-label" for="include-descendent-classes-checkbox">Include descendent classes</label>
-            </div>
-                <button type="submit" id="visualise-associations" class="btn btn-outline-success"> Visualise
-                    associations</button>
-                    
-            </div>
+  <div class="row mb-3">
+    <div class="col-md-12">
+      <div class="float-right">
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="include-descendent-classes-checkbox">
+          <label class="custom-control-label" for="include-descendent-classes-checkbox">Include descendent
+            classes</label>
         </div>
+        <button type="submit" id="visualise-associations" class="btn btn-outline-success"> Visualise
+          associations</button>
+        <button type="submit" id="visualise-similarities" class="btn btn-outline-success"> Visualise
+          similarities</button>
+      </div>
     </div>
+  </div>
 </form>
 
 <script type="text/javascript">
-    var ontologyArray = [];
-    var idResultList = [];
-    var labelJson = '{{label_list | tojson | safe}}';
-    // console.log("labelJson is: " + labelJson);
-    var labelArray = []; //get right format
-    var labelList = JSON.parse('{{label_list | tojson | safe}}');
-    var labels = labelList.labels;
-    labels.forEach(function (label, i){
-        labelArray.push({id:i, name:label});
-        // console.log("got label: " + label);
-    });
-    
-
-    //test jQuery UI:
-    $.widget("ui.autocomplete", $.ui.autocomplete, {
-
-_renderMenu: function(ul, items) {
-  var that = this;
-  ul.attr("class", "nav nav-pills nav-stacked  bs-autocomplete-menu");
-  $.each(items, function(index, item) {
-    that._renderItemData(ul, item);
+  var ontologyArray = [];
+  var idResultList = [];
+  var labelJson = '{{label_list | tojson | safe}}';
+  // console.log("labelJson is: " + labelJson);
+  var labelArray = []; //get right format
+  var labelList = JSON.parse('{{label_list | tojson | safe}}');
+  var labels = labelList.labels;
+  labels.forEach(function (label, i) {
+    labelArray.push({ id: i, name: label });
+    // console.log("got label: " + label);
   });
-},
-
-_resizeMenu: function() {
-  var ul = this.menu.element;
-  ul.outerWidth(Math.min(
-    // Firefox wraps long text (possibly a rounding bug)
-    // so we add 1px to avoid the wrapping (#7513)
-    ul.width("").outerWidth() + 1,
-    this.element.outerWidth()
-  ));
-}
-
-});
-
-(function() {
-"use strict";
 
 
+  //test jQuery UI:
+  $.widget("ui.autocomplete", $.ui.autocomplete, {
+
+    _renderMenu: function (ul, items) {
+      var that = this;
+      ul.attr("class", "nav nav-pills nav-stacked  bs-autocomplete-menu");
+      $.each(items, function (index, item) {
+        that._renderItemData(ul, item);
+      });
+    },
+
+    _resizeMenu: function () {
+      var ul = this.menu.element;
+      ul.outerWidth(Math.min(
+        // Firefox wraps long text (possibly a rounding bug)
+        // so we add 1px to avoid the wrapping (#7513)
+        ul.width("").outerWidth() + 1,
+        this.element.outerWidth()
+      ));
+    }
+
+  });
+
+  (function () {
+    "use strict";
 
 
-$('.bs-autocomplete').each(function() {
-  var _this = $(this),
-    _data = _this.data(),
-    _hidden_field = $('#' + _data.hidden_field_id);
-    _hidden_field.hide();
 
-  _this.after('<div class="bs-autocomplete-feedback form-control-feedback"><div class="loader">Loading...</div></div>')
-    .parent('.form-group').addClass('has-feedback');
 
-  var feedback_icon = _this.next('.bs-autocomplete-feedback');
-  feedback_icon.hide();
+    $('.bs-autocomplete').each(function () {
+      var _this = $(this),
+        _data = _this.data(),
+        _hidden_field = $('#' + _data.hidden_field_id);
+      _hidden_field.hide();
 
-  _this.autocomplete({
-      minLength: 2,
-      autoFocus: false,
+      _this.after('<div class="bs-autocomplete-feedback form-control-feedback"><div class="loader">Loading...</div></div>')
+        .parent('.form-group').addClass('has-feedback');
 
-      source: function(request, response) {
-        var _regexp = new RegExp(request.term, 'i');
-        var data = labelArray.filter(function(item) {
+      var feedback_icon = _this.next('.bs-autocomplete-feedback');
+      feedback_icon.hide();
+
+      _this.autocomplete({
+        minLength: 2,
+        autoFocus: false,
+
+        source: function (request, response) {
+          var _regexp = new RegExp(request.term, 'i');
+          var data = labelArray.filter(function (item) {
             // console.log("item is: ", item);
-          return item.name.match(_regexp);
-        });
-        response(data);
-      },
+            return item.name.match(_regexp);
+          });
+          response(data);
+        },
 
-      search: function() {
-        feedback_icon.show();
-        _hidden_field.val('');
-      },
+        search: function () {
+          feedback_icon.show();
+          _hidden_field.val('');
+        },
 
-      response: function() {
-        feedback_icon.hide();
-      },
+        response: function () {
+          feedback_icon.hide();
+        },
 
-      focus: function(event, ui) {
-        _this.val(ui.item[_data.item_label]);
-        event.preventDefault();
-      },
+        focus: function (event, ui) {
+          _this.val(ui.item[_data.item_label]);
+          event.preventDefault();
+        },
 
-      select: function(event, ui) {
-        _this.val(ui.item[_data.item_label]);
-        _hidden_field.val(ui.item[_data.item_id]);
-        event.preventDefault();
-        idResultList.push(ui.item[_data.item_label]);
-        $("#textArea").val(idResultList);
-        _this.val(""); //clear input on submit
-      }
-    })
-    .data('ui-autocomplete')._renderItem = function(ul, item) {
-      return $('<li></li>')
-        .data("item.autocomplete", item)
-        .append('<a>' + item[_data.item_label] + '</a>')
-        .append('<br>')
-        .appendTo(ul);
-    };
-  // end autocomplete
-});
-})();
-
-    //test bootstrap autocomplete
-    // $('.basicAutoComplete').autoComplete();
-
-
-
-
-    $(document).ready(function () {
-      //correct link to text tag:
-      $("#pagelink").attr("href", "/");
-      $("#pagelink").text("Tag text");
-        //add id to list and display in textArea:
-        //not using button, dropdown adds on it's own. todo: delete this:
-        // $("#ontology_id_submit_btn").click(function () {
-        //     id = $("#city-code").val();
-        //     console.log("got id:" + id);
-        //     idResultList.push(id);
-        //     $("#textArea").val(idResultList);
-        //     $("#city-code").val("");
-        // });
-
-        //submit full text:
-        $('#submitText').submit(function (e) {
-            e.preventDefault();
-            bootbox.alert("Please be patient while your visualisation is generated... \n Checking more than 6 million Labels, this could take a while!");
-            console.log("Sending IDs from: " + idResultList);
-            var request = new XMLHttpRequest();
-            request.onreadystatechange = function () {
-                if (request.readyState === 4) {
-                    if (!request.status) {
-                        bootbox.alert("Problem communicating with server");
-                    } else if (request.status === 200) {
-                        //update ID when data send confirmed: 
-                        console.log("success achieved");
-                        //clear values:
-                        $("#textArea").val("");
-                        ontologyArray = [];
-                        idResultList = [];
-                        window.location = '{{url_for( 'chord' ) }}'; 
-                    } else if (request.status === 400) {
-                        bootbox.alert("error sending ID's, try again");
-                    } else {
-                        console.log("other response for: " + request.status);
-                        //handle other responses?
-                    }
-                }
-            }
-            
-            //generate ontology label list:
-            ontologyArray = [];
-            textFieldVar = $("#textArea").val(); 
-            console.log("got textFieldVar: ", textFieldVar);
-            var idResultsTextFieldVar = textFieldVar.split(","); 
-            for(result in idResultsTextFieldVar){
-              var ontologyName = idResultsTextFieldVar[result].split("|")
-              ontologyArray.push(ontologyName[0].trim()); //send this back to server
-            }
-            
-            //old version using idResultList:
-            // for(result in idResultList){
-            //   var ontologyName = idResultList[result].split("|")
-            //   ontologyArray.push(ontologyName[0]); //send this back to server
-            // }
-            
-            var checked = "false";
-            //get checkbox: 
-            if ($('#include-descendent-classes-checkbox').is(":checked")){
-              checked = "true";
-            }
-            request.open('POST', '/visualise_associations', true);
-            request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-            request.send('ontology_id_list=' + JSON.stringify(ontologyArray) + 
-              '&include_descendent_classes=' + JSON.stringify(checked));
-        });
-
+        select: function (event, ui) {
+          _this.val(ui.item[_data.item_label]);
+          _hidden_field.val(ui.item[_data.item_id]);
+          event.preventDefault();
+          idResultList.push(ui.item[_data.item_label]);
+          $("#textArea").val(idResultList);
+          _this.val(""); //clear input on submit
+        }
+      })
+        .data('ui-autocomplete')._renderItem = function (ul, item) {
+          return $('<li></li>')
+            .data("item.autocomplete", item)
+            .append('<a>' + item[_data.item_label] + '</a>')
+            .append('<br>')
+            .appendTo(ul);
+        };
+      // end autocomplete
     });
+  })();
+
+  //test bootstrap autocomplete
+  // $('.basicAutoComplete').autoComplete();
+
+
+
+
+  $(document).ready(function () {
+    //correct link to text tag:
+    $("#pagelink").attr("href", "/");
+    $("#pagelink").text("Tag text");
+    //add id to list and display in textArea:
+    //not using button, dropdown adds on it's own. todo: delete this:
+    // $("#ontology_id_submit_btn").click(function () {
+    //     id = $("#city-code").val();
+    //     console.log("got id:" + id);
+    //     idResultList.push(id);
+    //     $("#textArea").val(idResultList);
+    //     $("#city-code").val("");
+    // });
+
+    //submit full text:
+    $('#visualise-associations').click(function (e) {
+      e.preventDefault();
+      sendData("associations");
+    });
+
+    $('#visualise-similarities').click(function (e) {
+      e.preventDefault();
+      sendData("similarities");
+    });
+
+    function sendData(typeOfVisual) {
+      console.log("type of visual is: " + typeOfVisual); // could be associations or similarities
+      bootbox.alert("Please be patient while your visualisation is generated... \n Checking more than 6 million Labels, this could take a while!");
+      console.log("Sending IDs from: " + idResultList);
+      var request = new XMLHttpRequest();
+      request.onreadystatechange = function () {
+        if (request.readyState === 4) {
+          if (!request.status) {
+            bootbox.alert("Problem communicating with server");
+          } else if (request.status === 200) {
+            //update ID when data send confirmed: 
+            console.log("success achieved");
+            //clear values:
+            $("#textArea").val("");
+            ontologyArray = [];
+            idResultList = [];
+            if (typeOfVisual == "associations") {
+              window.location = '{{url_for( 'chord' ) }}';
+            } else if (typeOfVisual == "similarities") {
+              window.location = '{{url_for( 'similarity' ) }}';
+            }
+
+          } else if (request.status === 400) {
+            bootbox.alert("error sending ID's, try again");
+          } else {
+            console.log("other response for: " + request.status);
+            //handle other responses?
+          }
+        }
+      }
+
+      //generate ontology label list:
+      ontologyArray = [];
+      textFieldVar = $("#textArea").val();
+      console.log("got textFieldVar: ", textFieldVar);
+      var idResultsTextFieldVar = textFieldVar.split(",");
+      for (result in idResultsTextFieldVar) {
+        var ontologyName = idResultsTextFieldVar[result].split("|")
+        ontologyArray.push(ontologyName[0].trim()); //send this back to server
+      }
+
+      //old version using idResultList:
+      // for(result in idResultList){
+      //   var ontologyName = idResultList[result].split("|")
+      //   ontologyArray.push(ontologyName[0]); //send this back to server
+      // }
+
+      var checked = "false";
+      //get checkbox: 
+      if ($('#include-descendent-classes-checkbox').is(":checked")) {
+        checked = "true";
+      }
+      if (typeOfVisual == "associations") {
+        request.open('POST', '/visualise_associations', true);
+        request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        request.send('ontology_id_list=' + JSON.stringify(ontologyArray) +
+          '&include_descendent_classes=' + JSON.stringify(checked));
+      } else if (typeOfVisual == "similarities") {
+        request.open('POST', '/visualise_similarities', true);
+        request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        request.send('ontology_id_list=' + JSON.stringify(ontologyArray) +
+          '&include_descendent_classes=' + JSON.stringify(checked));
+      }
+
+    }
+  });
 
 </script>
 {% endblock %}

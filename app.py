@@ -220,6 +220,8 @@ def home():
     # return redirect(url_for('associations')) #todo: temporary testing redirect - remove this
     return render_template('index.html')
 
+
+
 @app.route('/associations', methods=['GET', 'POST'])
 def associations():
     ontologies = ontoDict["ontologies"]
@@ -249,6 +251,21 @@ def chord():
 @app.route('/chordout')
 def chordout():
     return render_template('chordout.html')
+
+@app.route('/visualise_similarities', methods=['POST'])
+def visualise_similarities():  
+    ontology_id_list = json.loads(request.form.get('ontology_id_list')) 
+    print("ontology_id_list is: ", ontology_id_list)
+    include_descendent_classes = request.form.get('include_descendent_classes')
+    print("checkbox says: ", include_descendent_classes)
+    print("time for a similarity visual!")
+    # hv_generator(ontology_id_list) #todo: something different here?
+    return ( json.dumps({"message":"Success"}), 200 )
+
+@app.route('/similarity')
+def similarity():    
+    # iframe = url_for('chordout')
+    return render_template("similarity.html") #, iframe=iframe) 
 
 @app.route('/pubmed', methods=['POST', 'GET'])
 def pubmed():
