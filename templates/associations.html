@@ -351,37 +351,9 @@
     });
 
     function sendData(typeOfVisual) {
-      console.log("type of visual is: " + typeOfVisual); // could be associations or similarities
-      bootbox.alert("Please be patient while your visualisation is generated... \n Checking more than 6 million Labels, this could take a while!");
-      console.log("Sending IDs from: " + idResultList);
-      var request = new XMLHttpRequest();
-      request.onreadystatechange = function () {
-        if (request.readyState === 4) {
-          if (!request.status) {
-            bootbox.alert("Problem communicating with server");
-          } else if (request.status === 200) {
-            //update ID when data send confirmed: 
-            console.log("success achieved");
-            //clear values:
-            $("#textArea").val("");
-            ontologyArray = [];
-            idResultList = [];
-            if (typeOfVisual == "associations") {
-              window.location = '{{url_for( 'chord' ) }}';
-            } else if (typeOfVisual == "similarities") {
-              window.location = '{{url_for( 'similarity' ) }}';
-            }
 
-          } else if (request.status === 400) {
-            bootbox.alert("error sending ID's, try again");
-          } else {
-            console.log("other response for: " + request.status);
-            //handle other responses?
-          }
-        }
-      }
-
-      //generate ontology label list:
+      
+        //generate ontology label list:
       ontologyArray = [];
       textFieldVar = $("#textArea").val();
       console.log("got textFieldVar: ", textFieldVar);
@@ -391,11 +363,6 @@
         ontologyArray.push(ontologyName[0].trim()); //send this back to server
       }
 
-      //old version using idResultList:
-      // for(result in idResultList){
-      //   var ontologyName = idResultList[result].split("|")
-      //   ontologyArray.push(ontologyName[0]); //send this back to server
-      // }
 
       var checked = "false";
       //get checkbox: 
@@ -403,18 +370,170 @@
         checked = "true";
       }
       if (typeOfVisual == "associations") {
-        request.open('POST', '/visualise_associations', true);
-        request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        request.send('ontology_id_list=' + JSON.stringify(ontologyArray) +
-          '&include_descendent_classes=' + JSON.stringify(checked));
-      } else if (typeOfVisual == "similarities") {
-        request.open('POST', '/visualise_similarities', true);
-        request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        request.send('ontology_id_list=' + JSON.stringify(ontologyArray) +
-          '&include_descendent_classes=' + JSON.stringify(checked));
-      }
 
+        console.log("type of visual is: " + typeOfVisual); // could be associations or similarities
+        bootbox.alert("Your visualisation is being generated in a new tab");
+        // bootbox.alert("Please be patient while your visualisation is generated... \n Checking more than 6 million Labels, this could take a while!");
+        console.log("Sending IDs from: " + idResultList);
+
+        form2 = document.createElement("FORM");
+        form2.name='form2';
+        form2.method='POST';
+        form2.action='/visualise_associations'
+        form2.target='VisualisationWindow'
+        // form2.setAttribute("method", "post");
+        // form2.setAttribute("action", "/visualise_associations");
+        // form2.setAttribute("target", 'VisualisationWindow');
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = "ontology_id_list";
+        input.value = JSON.stringify(ontologyArray);
+        form2.appendChild(input);
+        var input2 = document.createElement('input2');
+        input2.type = 'hidden';
+        input2.name = "include_descendent_classes";
+        input2.value = JSON.stringify(checked);
+        form2.appendChild(input2);
+        // form2.target = 'VisualisationWindow';
+        document.body.appendChild(form2);
+        form2.submit();
+        //clear:
+        $("#textArea").val("");
+        ontologyArray = [];
+        idResultList = [];
+      }
     }
+
+    //   console.log("type of visual is: " + typeOfVisual); // could be associations or similarities
+    //   bootbox.alert("Please be patient while your visualisation is generated... \n Checking more than 6 million Labels, this could take a while!");
+    //   console.log("Sending IDs from: " + idResultList);
+    //   var request = new XMLHttpRequest();
+    //   request.onreadystatechange = function () {
+    //     if (request.readyState === 4) {
+    //       if (!request.status) {
+    //         bootbox.alert("Problem communicating with server");
+    //       } else if (request.status === 200) {
+    //         //update ID when data send confirmed: 
+    //         console.log("success achieved");
+    //         //clear values:
+    //         $("#textArea").val("");
+    //         ontologyArray = [];
+    //         idResultList = [];
+    //         if (typeOfVisual == "associations") {
+    //           window.location = '{{url_for( 'chord' ) }}';
+    //         } else if (typeOfVisual == "similarities") {
+    //           window.location = '{{url_for( 'similarity' ) }}';
+    //         }
+
+    //       } else if (request.status === 400) {
+    //         bootbox.alert("error sending ID's, try again");
+    //       } else {
+    //         console.log("other response for: " + request.status);
+    //         //handle other responses?
+    //       }
+    //     }
+    //   }
+
+    //   //generate ontology label list:
+    //   ontologyArray = [];
+    //   textFieldVar = $("#textArea").val();
+    //   console.log("got textFieldVar: ", textFieldVar);
+    //   var idResultsTextFieldVar = textFieldVar.split(",");
+    //   for (result in idResultsTextFieldVar) {
+    //     var ontologyName = idResultsTextFieldVar[result].split("|")
+    //     ontologyArray.push(ontologyName[0].trim()); //send this back to server
+    //   }
+
+    //   //old version using idResultList:
+    //   // for(result in idResultList){
+    //   //   var ontologyName = idResultList[result].split("|")
+    //   //   ontologyArray.push(ontologyName[0]); //send this back to server
+    //   // }
+
+    //   var checked = "false";
+    //   //get checkbox: 
+    //   if ($('#include-descendent-classes-checkbox').is(":checked")) {
+    //     checked = "true";
+    //   }
+    //   if (typeOfVisual == "associations") {
+    //     request.open('POST', '/visualise_associations', true);
+    //     request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    //     request.send('ontology_id_list=' + JSON.stringify(ontologyArray) +
+    //       '&include_descendent_classes=' + JSON.stringify(checked));
+    //   } else if (typeOfVisual == "similarities") {
+    //     request.open('POST', '/visualise_similarities', true);
+    //     request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    //     request.send('ontology_id_list=' + JSON.stringify(ontologyArray) +
+    //       '&include_descendent_classes=' + JSON.stringify(checked));
+    //   }
+
+    // }
+
+    // function sendData(typeOfVisual) {
+    //   console.log("type of visual is: " + typeOfVisual); // could be associations or similarities
+    //   bootbox.alert("Please be patient while your visualisation is generated... \n Checking more than 6 million Labels, this could take a while!");
+    //   console.log("Sending IDs from: " + idResultList);
+    //   var request = new XMLHttpRequest();
+    //   request.onreadystatechange = function () {
+    //     if (request.readyState === 4) {
+    //       if (!request.status) {
+    //         bootbox.alert("Problem communicating with server");
+    //       } else if (request.status === 200) {
+    //         //update ID when data send confirmed: 
+    //         console.log("success achieved");
+    //         //clear values:
+    //         $("#textArea").val("");
+    //         ontologyArray = [];
+    //         idResultList = [];
+    //         if (typeOfVisual == "associations") {
+    //           window.location = '{{url_for( 'chord' ) }}';
+    //         } else if (typeOfVisual == "similarities") {
+    //           window.location = '{{url_for( 'similarity' ) }}';
+    //         }
+
+    //       } else if (request.status === 400) {
+    //         bootbox.alert("error sending ID's, try again");
+    //       } else {
+    //         console.log("other response for: " + request.status);
+    //         //handle other responses?
+    //       }
+    //     }
+    //   }
+
+    //   //generate ontology label list:
+    //   ontologyArray = [];
+    //   textFieldVar = $("#textArea").val();
+    //   console.log("got textFieldVar: ", textFieldVar);
+    //   var idResultsTextFieldVar = textFieldVar.split(",");
+    //   for (result in idResultsTextFieldVar) {
+    //     var ontologyName = idResultsTextFieldVar[result].split("|")
+    //     ontologyArray.push(ontologyName[0].trim()); //send this back to server
+    //   }
+
+    //   //old version using idResultList:
+    //   // for(result in idResultList){
+    //   //   var ontologyName = idResultList[result].split("|")
+    //   //   ontologyArray.push(ontologyName[0]); //send this back to server
+    //   // }
+
+    //   var checked = "false";
+    //   //get checkbox: 
+    //   if ($('#include-descendent-classes-checkbox').is(":checked")) {
+    //     checked = "true";
+    //   }
+    //   if (typeOfVisual == "associations") {
+    //     request.open('POST', '/visualise_associations', true);
+    //     request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    //     request.send('ontology_id_list=' + JSON.stringify(ontologyArray) +
+    //       '&include_descendent_classes=' + JSON.stringify(checked));
+    //   } else if (typeOfVisual == "similarities") {
+    //     request.open('POST', '/visualise_similarities', true);
+    //     request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    //     request.send('ontology_id_list=' + JSON.stringify(ontologyArray) +
+    //       '&include_descendent_classes=' + JSON.stringify(checked));
+    //   }
+
+    // }
   });
 
 </script>

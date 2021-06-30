@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import pyhornedowl
-from flask import Flask, request, redirect, url_for
+from flask import Flask, request, redirect, url_for, session
 from flask.templating import render_template
 # from ontotagtext import ExtractorComponent
 from ontotagtext import MultiExtractorComponent
@@ -240,8 +240,15 @@ def visualise_associations():
     print("ontology_id_list is: ", ontology_id_list)
     include_descendent_classes = request.form.get('include_descendent_classes')
     print("checkbox says: ", include_descendent_classes)
-    hv_generator(ontology_id_list)
-    return ( json.dumps({"message":"Success"}), 200 )
+    #todo: try moving hv_generator to inside iframe (chordout())
+    #will need to do ontology_id_list as a saved variable..
+    # hv_generator(ontology_id_list) #should this be asynchronous? how?
+    session['saved_ontology_id_list'] = ontology_id_list
+    iframe = url_for('chordout')
+    return render_template("chord.html", iframe=iframe) 
+    # return ( json.dumps({"message":"Success"}), 200 )
+    # return render_template("chord.html") #new tab version
+    # return redirect(url_for('chord'))
     
 @app.route('/chord')
 def chord():    
@@ -250,6 +257,9 @@ def chord():
     
 @app.route('/chordout')
 def chordout():
+    if 'saved_ontology_id_list' in session:
+      saved_ontology_id_list = session['saved_ontology_id_list']
+      hv_generator(saved_ontology_id_list)
     return render_template('chordout.html')
 
 @app.route('/visualise_similarities', methods=['POST'])
