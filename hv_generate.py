@@ -16,16 +16,19 @@ def hv_generator(ontology_id_input):
     #test values which work:
     # ontology_id_list = ["BFO:0000023", "ADDICTO:0000349", "MF:0000016", "ADDICTO:0000632", "ADDICTO:0000904", "ADDICTO:0000491","ADDICTO:0000872" ]
     #test values which don't work:
-    ontology_id_list = ['ADDICTO:0000175', 'ADDICTO:0000717', 'ADDICTO:0000687']
+    # ontology_id_list = ["ADDICTO:0000175", "ADDICTO:0000717", "ADDICTO:0000687"]
+    ontology_id_list = ["BFO:0000023", "ADDICTO:0000349", "ADDICTO:0000175", "ADDICTO:0000717", "ADDICTO:0000687"]
     # This creates a table of pairs of terms in the same abstract
 
     dcp = pd.merge(df2,df2,on="PMID")
     print("about to filter dcp to correct values from ", dcp)
     # We filter the table just to the ones in the ID list we provided as input 
     dcp = dcp.drop(dcp[dcp.LABEL_x == dcp.LABEL_y].index)
+    print("dcp after drop Labelx == Labely ", dcp)
     dcp = dcp.drop(dcp[~dcp.ADDICTOID_x.isin(ontology_id_list)].index)
+    print("dcp after drop idx in id_list ", dcp)
     dcp = dcp.drop(dcp[~dcp.ADDICTOID_y.isin(ontology_id_list)].index)
-    print("dcp after dropping: ", dcp)
+    print("dcp after dropping all: ", dcp)
     # We filter the table so that pairs are only represented in one direction, i.e. if we have both (smoking, children) and (children, smoking) for the same PMID we drop the second one
     print("about to drop duplicates")
     for index, row in dcp.iterrows():  # THIS IS SLOW
