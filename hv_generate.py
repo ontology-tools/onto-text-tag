@@ -12,7 +12,7 @@ def hv_generator(ontology_id_input):
    
     # print("ontology_id_input type is: ", type(ontology_id_input))
     print("ontology_id_input values: ", ontology_id_input)
-    # ontology_id_list = ontology_id_input #todo: uncomment, commented for testing
+    # ontology_id_list = ontology_id_input #todo: uncomment, commented for testing - using values below
     #test values which work:
     # ontology_id_list = ["BFO:0000023", "ADDICTO:0000349", "MF:0000016", "ADDICTO:0000632", "ADDICTO:0000904", "ADDICTO:0000491","ADDICTO:0000872" ]
     #test values which don't work:
@@ -27,7 +27,7 @@ def hv_generator(ontology_id_input):
     print("dcp after drop Labelx == Labely ", dcp)
     dcp = dcp.drop(dcp[~dcp.ADDICTOID_x.isin(ontology_id_list)].index)
     print("dcp after drop idx in id_list ", dcp)
-    dcp = dcp.drop(dcp[~dcp.ADDICTOID_y.isin(ontology_id_list)].index)
+    dcp = dcp.drop(dcp[~dcp.ADDICTOID_y.isin(ontology_id_list)].index) #todo: this one is causing empty dataframe most
     print("dcp after dropping all: ", dcp)
     # We filter the table so that pairs are only represented in one direction, i.e. if we have both (smoking, children) and (children, smoking) for the same PMID we drop the second one
     print("about to drop duplicates")
