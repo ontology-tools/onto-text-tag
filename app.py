@@ -250,10 +250,11 @@ def visualise_associations():
     # return render_template("chord.html") #new tab version
     # return redirect(url_for('chord'))
     
-@app.route('/chord')
-def chord():    
-    iframe = url_for('chordout')
-    return render_template("chord.html", iframe=iframe) 
+#todo: below no longer needed?
+# @app.route('/chord')
+# def chord():    
+#     iframe = url_for('chordout')
+#     return render_template("chord.html", iframe=iframe) 
     
 @app.route('/chordout')
 def chordout():
@@ -265,17 +266,19 @@ def chordout():
 @app.route('/visualise_similarities', methods=['POST'])
 def visualise_similarities():  
     ontology_id_list = json.loads(request.form.get('ontology_id_list')) 
-    print("ontology_id_list is: ", ontology_id_list)
+    # print("ontology_id_list is: ", ontology_id_list)
     include_descendent_classes = request.form.get('include_descendent_classes')
-    print("checkbox says: ", include_descendent_classes)
+    # print("checkbox says: ", include_descendent_classes)
     print("time for a similarity visual!")
     # hv_generator(ontology_id_list) #todo: something different here?
-    return ( json.dumps({"message":"Success"}), 200 )
+    # return ( json.dumps({"message":"Success"}), 200 )
+    return render_template('similarity.html')
 
-@app.route('/similarity')
-def similarity():    
-    # iframe = url_for('chordout')
-    return render_template("similarity.html") #, iframe=iframe) 
+#todo: below no longer needed?
+# @app.route('/similarity')
+# def similarity():    
+#     # iframe = url_for('chordout')
+#     return render_template("similarity.html") #, iframe=iframe) 
 
 @app.route('/pubmed', methods=['POST', 'GET'])
 def pubmed():

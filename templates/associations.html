@@ -352,8 +352,8 @@
 
     function sendData(typeOfVisual) {
 
-      
-        //generate ontology label list:
+
+      //generate ontology label list:
       ontologyArray = [];
       textFieldVar = $("#textArea").val();
       console.log("got textFieldVar: ", textFieldVar);
@@ -369,6 +369,7 @@
       if ($('#include-descendent-classes-checkbox').is(":checked")) {
         checked = "true";
       }
+      //todo: re-factor below two forms to remove duplicate code
       if (typeOfVisual == "associations") {
 
         console.log("type of visual is: " + typeOfVisual); // could be associations or similarities
@@ -377,13 +378,10 @@
         console.log("Sending IDs from: " + idResultList);
 
         form2 = document.createElement("FORM");
-        form2.name='form2';
-        form2.method='POST';
-        form2.action='/visualise_associations'
-        form2.target='VisualisationWindow'
-        // form2.setAttribute("method", "post");
-        // form2.setAttribute("action", "/visualise_associations");
-        // form2.setAttribute("target", 'VisualisationWindow');
+        form2.name = 'form2';
+        form2.method = 'POST';
+        form2.action = '/visualise_associations';
+        form2.target = 'VisualisationWindow';
         var input = document.createElement('input');
         input.type = 'hidden';
         input.name = "ontology_id_list";
@@ -395,6 +393,34 @@
         input2.value = JSON.stringify(checked);
         form2.appendChild(input2);
         // form2.target = 'VisualisationWindow';
+        document.body.appendChild(form2);
+        form2.submit();
+        //clear:
+        $("#textArea").val("");
+        ontologyArray = [];
+        idResultList = [];
+      } else if (typeOfVisual == "similarities") {
+
+        console.log("type of visual is: " + typeOfVisual); // could be associations or similarities
+        bootbox.alert("Your visualisation is being generated in a new tab");
+        // bootbox.alert("Please be patient while your visualisation is generated... \n Checking more than 6 million Labels, this could take a while!");
+        console.log("Sending IDs from: " + idResultList);
+
+        form2 = document.createElement("FORM");
+        form2.name = 'form2';
+        form2.method = 'POST';
+        form2.action = '/visualise_similarities';
+        form2.target = 'SimilaritiesWindow';
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = "ontology_id_list";
+        input.value = JSON.stringify(ontologyArray);
+        form2.appendChild(input);
+        var input2 = document.createElement('input2');
+        input2.type = 'hidden';
+        input2.name = "include_descendent_classes";
+        input2.value = JSON.stringify(checked);
+        form2.appendChild(input2);
         document.body.appendChild(form2);
         form2.submit();
         //clear:
