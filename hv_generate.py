@@ -16,8 +16,8 @@ def hv_generator(ontology_id_input):
     #test values which work:
     # ontology_id_list = ["BFO:0000023", "ADDICTO:0000349", "MF:0000016", "ADDICTO:0000632", "ADDICTO:0000904", "ADDICTO:0000491","ADDICTO:0000872" ]
     #test values which don't work:
-    # ontology_id_list = ["ADDICTO:0000175", "ADDICTO:0000717", "ADDICTO:0000687"]
-    ontology_id_list = ["BFO:0000023", "ADDICTO:0000349", "ADDICTO:0000175", "ADDICTO:0000717", "ADDICTO:0000687"]
+    ontology_id_list = ["ADDICTO:0000175", "ADDICTO:0000717", "ADDICTO:0000687"]
+    # ontology_id_list = ["BFO:0000023", "ADDICTO:0000349", "ADDICTO:0000175", "ADDICTO:0000717", "ADDICTO:0000687"]
     # This creates a table of pairs of terms in the same abstract
 
     dcp = pd.merge(df2,df2,on="PMID")
@@ -59,5 +59,11 @@ def hv_generator(ontology_id_input):
     chord.opts(
         opts.Chord(cmap='Category20', edge_cmap='Category20', edge_color=dim('source').str(),
                 labels='name', node_color=dim('index').str()))
-
-    hv.save(chord, 'templates/chordout.html') 
+    #todo: save error message html if no data returned
+    if dcp.empty:
+        print('empty dataframe, should create an error messge chordout.html here')
+        html_error_message = "<!doctype html><div><h4>ERROR CREATING TABLE - possibly some of the ID's were incorrect?</h4></div></html>"
+        html_chord_error = open("templates/chordout.html", 'w')
+        html_chord_error.write(html_error_message)
+    else:
+        hv.save(chord, 'templates/chordout.html') 
