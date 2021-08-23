@@ -13,10 +13,12 @@ def hv_generator(ontology_id_input):
    
     # print("ontology_id_input type is: ", type(ontology_id_input))
     print("ontology_id_input values: ", ontology_id_input)
-    # ontology_id_list = ontology_id_input #todo: uncomment, commented for testing - using values below
+    ontology_id_list = ontology_id_input #todo: uncomment, commented for testing - using values below
     #test values which work:
     # ontology_id_list = ["BFO:0000023", "ADDICTO:0000349", "MF:0000016", "ADDICTO:0000632", "ADDICTO:0000904", "ADDICTO:0000491","ADDICTO:0000872" ]
-    ontology_id_list = ["BFO:0000023", "ADDICTO:0000349", "ADDICTO:0000175", "ADDICTO:0000717", "ADDICTO:0000687"]
+    # ontology_id_list = ["BFO:0000023", "ADDICTO:0000349", "ADDICTO:0000175", "ADDICTO:0000717", "ADDICTO:0000687"]
+    #test Ontology IDs to use: 
+    # BFO:0000023|role,ADDICTO:0000349|addiction,MF:0000016|human being,ADDICTO:0000632|cannabis use,ADDICTO:0000904|sales,ADDICTO:0000491|opioid agonist treatment,ADDICTO:0000872|Food and Drug Administration
     #test values which don't work:
     # ontology_id_list = ["ADDICTO:0000687"]
     # ontology_id_list = ["ADDICTO:0000175", "ADDICTO:0000717", "ADDICTO:0000687"]
@@ -36,13 +38,17 @@ def hv_generator(ontology_id_input):
     print("dcp after dropping all: ", dcp)
     # We filter the table so that pairs are only represented in one direction, i.e. if we have both (smoking, children) and (children, smoking) for the same PMID we drop the second one
     print("about to drop duplicates")
-    for index, row in dcp.iterrows():  # THIS IS SLOW
-        if index % 100 == 0:
-            print(".",index)
-        if ((dcp['ADDICTOID_x'] == row['ADDICTOID_y'])
-            & (dcp['ADDICTOID_y'] == row['ADDICTOID_x'])
-            & (dcp['PMID'] == row['PMID'])).any():  # Does the inverse of this row exist in the table?
-            dcp.drop(index, inplace=True)
+    # solution 2 from Stack Overflow - replaces iterrows():
+    dcp['ADDICTOID'] = dcp[['ADDICTOID_x', 'ADDICTOID_y']].apply(sorted, axis=1).apply(tuple)
+    dcp = dcp.drop_duplicates(subset=['ADDICTOID', 'PMID'], keep='first')
+
+    # for index, row in dcp.iterrows():  # THIS IS SLOW
+    #     if index % 100 == 0:
+    #         print(".",index)
+    #     if ((dcp['ADDICTOID_x'] == row['ADDICTOID_y'])
+    #         & (dcp['ADDICTOID_y'] == row['ADDICTOID_x'])
+    #         & (dcp['PMID'] == row['PMID'])).any():  # Does the inverse of this row exist in the table?
+    #         dcp.drop(index, inplace=True)
 
     # Now we count the distinct numbers of abstracts this combination appeared in
     print("dcp is: ", dcp)
