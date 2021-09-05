@@ -72,8 +72,15 @@
     <br>
     <b id="articleDate" class="container-fluid"> {{authors}} </b>
     <br>
+    
+        <div class="float-right">
+          <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="include-descendent-classes-checkbox">
+            <label class="custom-control-label" for="include-descendent-classes-checkbox">Include descendent
+              classes</label>
+          </div>
     <!-- add button to submit ids_for_chord: float-right: --> 
-    <div class="float-right">
+    
       <button type="submit" id="submit-ids-for-chord" class="btn btn-outline-success">Visualise associations</button>
     </div>
     <!-- <b id="articleDetails" class="container-fluid"> {{details}} </b> -->
@@ -258,9 +265,9 @@
 
       var checked = "false";
       // //get checkbox: 
-      // if ($('#include-descendent-classes-checkbox').is(":checked")) {
-      //   checked = "true";
-      // }
+      if ($('#include-descendent-classes-checkbox').is(":checked")) {
+        checked = "true";
+      }
       //todo: re-factor below two forms to remove duplicate code
       if (typeOfVisual == "associations") {
         console.log("type of visual is: " + typeOfVisual); // could be associations or similarities
