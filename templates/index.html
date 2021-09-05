@@ -7,7 +7,7 @@
 {% block body %}
 {{ super() }}
 <div class="row">
- 
+
 </div>
 
 {% if error_msg %}
@@ -72,15 +72,15 @@
     <br>
     <b id="articleDate" class="container-fluid"> {{authors}} </b>
     <br>
-    
-        <div class="float-right">
-          <div class="custom-control custom-checkbox">
-            <input type="checkbox" class="custom-control-input" id="include-descendent-classes-checkbox">
-            <label class="custom-control-label" for="include-descendent-classes-checkbox">Include descendent
-              classes</label>
-          </div>
-    <!-- add button to submit ids_for_chord: float-right: --> 
-    
+
+    <div class="float-right">
+      <div class="custom-control custom-checkbox">
+        <input type="checkbox" class="custom-control-input" id="include-descendent-classes-checkbox">
+        <label class="custom-control-label" for="include-descendent-classes-checkbox">Include descendent
+          classes</label>
+      </div>
+      <!-- add button to submit ids_for_chord: float-right: -->
+
       <button type="submit" id="submit-ids-for-chord" class="btn btn-outline-success">Visualise associations</button>
     </div>
     <!-- <b id="articleDetails" class="container-fluid"> {{details}} </b> -->
@@ -108,7 +108,7 @@
   })
 
   var results = {{ tag_results | safe}};
-  
+
   // extract IDs and labels from results:
   extractIDandText(results);
 
@@ -124,7 +124,7 @@
   namespaceColours = [];
   generateColours(results);
   replaceText(results);
-  
+
   // $(".highlight").css({ backgroundColor: "#FFFF88" }); //highlight all same
 
   function generateColours(matches) {
@@ -134,7 +134,7 @@
       }
     });
 
-    for(i in namespaces){
+    for (i in namespaces) {
       // console.log(namespaces[i]);
       //todo: randomColor can't be white - invert function doesn't work for that - or fix invert function to work..
       // var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16); //generate random colour
@@ -152,8 +152,8 @@
         $(this).highlight(value.span_text, { className: 'jQueryLink' + shortValue }); //this adds an unique className per Value
         var specificColor;
         //check ontology of tag, set correct colour
-        for(i in namespaces){
-          if(namespaces.includes(value.ontol_namespace)){
+        for (i in namespaces) {
+          if (namespaces.includes(value.ontol_namespace)) {
             specificColor = namespaceColours[namespaces.indexOf(value.ontol_namespace)];
           }
         }
@@ -190,17 +190,17 @@
     var i = ~~(h * 6);
     var f = h * 6 - i;
     var q = 1 - f;
-    switch(i % 6){
-        case 0: r = 1; g = f; b = 0; break;
-        case 1: r = q; g = 1; b = 0; break;
-        case 2: r = 0; g = 1; b = f; break;
-        case 3: r = 0; g = q; b = 1; break;
-        case 4: r = f; g = 0; b = 1; break;
-        case 5: r = 1; g = 0; b = q; break;
+    switch (i % 6) {
+      case 0: r = 1; g = f; b = 0; break;
+      case 1: r = q; g = 1; b = 0; break;
+      case 2: r = 0; g = 1; b = f; break;
+      case 3: r = 0; g = q; b = 1; break;
+      case 4: r = f; g = 0; b = 1; break;
+      case 5: r = 1; g = 0; b = q; break;
     }
     var c = "#" + ("00" + (~ ~(r * 255)).toString(16)).slice(-2) + ("00" + (~ ~(g * 255)).toString(16)).slice(-2) + ("00" + (~ ~(b * 255)).toString(16)).slice(-2);
     return (c);
-}
+  }
 
   //invertColor function from https://stackoverflow.com/questions/35969656/how-can-i-generate-the-opposite-color-according-to-current-color
   function invertColor(hex, bw) {
@@ -230,7 +230,7 @@
     r = (255 - r).toString(16);
     g = (255 - g).toString(16);
     b = (255 - b).toString(16);
-    
+
     // pad each with zeros and return
     return "#" + padZero(r) + padZero(g) + padZero(b);
   }
@@ -242,8 +242,8 @@
   }
 
   $(document).ready(function () {
-     //correct link to text tag:
-     $("#pagelink").attr("href", "/associations");
+    //correct link to text tag:
+    $("#pagelink").attr("href", "/associations");
     $("#pagelink").text("View associations");
 
 
@@ -252,77 +252,82 @@
       sendData("associations");
 
       function sendData(typeOfVisual) {
-      //generate ontology label list:
-      ontologyArray = ids_for_chord;
-      // textFieldVar = $("#textArea").val();
-      // console.log("got textFieldVar: ", textFieldVar);
-      // var idResultsTextFieldVar = textFieldVar.split(",");
-      // for (result in idResultsTextFieldVar) {
-      //   var ontologyName = idResultsTextFieldVar[result].split("|")
-      //   ontologyArray.push(ontologyName[0].trim()); //send this back to server
-      // }
+        //generate ontology label list:
+        ontologyArray = ids_for_chord;
+        // textFieldVar = $("#textArea").val();
+        // console.log("got textFieldVar: ", textFieldVar);
+        // var idResultsTextFieldVar = textFieldVar.split(",");
+        // for (result in idResultsTextFieldVar) {
+        //   var ontologyName = idResultsTextFieldVar[result].split("|")
+        //   ontologyArray.push(ontologyName[0].trim()); //send this back to server
+        // }
 
 
-      var checked = "false";
-      // //get checkbox: 
-      if ($('#include-descendent-classes-checkbox').is(":checked")) {
-        checked = "true";
+        var checked = "false";
+        // //get checkbox: 
+        if ($('#include-descendent-classes-checkbox').is(":checked")) {
+          checked = "true";
+        }
+        console.log("checked is: ", checked);
+        //todo: re-factor below two forms to remove duplicate code
+        if (typeOfVisual == "associations") {
+          console.log("type of visual is: " + typeOfVisual); // could be associations or similarities
+          bootbox.alert("Your visualisation is being generated in a new tab");
+
+          form2 = document.createElement("FORM");
+          form2.name = 'form2';
+          form2.method = 'POST';
+          form2.action = '/visualise_associations';
+          form2.target = 'VisualisationWindow';
+
+          var input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = "ontology_id_list";
+          input.value = JSON.stringify(ontologyArray);
+          form2.appendChild(input);
+
+          var input2 = document.createElement('input');
+          input2.type = 'hidden';
+          input2.name = "include_descendent_classes";
+          input2.value = checked;
+          form2.appendChild(input2);
+
+          document.body.appendChild(form2);
+          form2.submit();
+          //clear:
+          // $("#textArea").val("");
+          ontologyArray = [];
+          document.body.removeChild(form2);
+        } else if (typeOfVisual == "similarities") {
+
+          console.log("type of visual is: " + typeOfVisual); // could be associations or similarities
+          bootbox.alert("Your visualisation is being generated in a new tab");
+
+          form2 = document.createElement("FORM");
+          form2.name = 'form2';
+          form2.method = 'POST';
+          form2.action = '/visualise_similarities';
+          form2.target = 'SimilaritiesWindow';
+          var input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = "ontology_id_list";
+          input.value = JSON.stringify(ontologyArray);
+          form2.appendChild(input);
+          var input2 = document.createElement('input');
+          input2.type = 'hidden';
+          input2.name = "include_descendent_classes";
+          input2.value = checked;
+          form2.appendChild(input2);
+          document.body.appendChild(form2);
+          form2.submit();
+          //clear:
+          // $("#textArea").val("");
+          ontologyArray = [];
+          document.body.removeChild(form2);
+        }
       }
-      //todo: re-factor below two forms to remove duplicate code
-      if (typeOfVisual == "associations") {
-        console.log("type of visual is: " + typeOfVisual); // could be associations or similarities
-        bootbox.alert("Your visualisation is being generated in a new tab");
-
-        form2 = document.createElement("FORM");
-        form2.name = 'form2';
-        form2.method = 'POST';
-        form2.action = '/visualise_associations';
-        form2.target = 'VisualisationWindow';
-        var input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = "ontology_id_list";
-        input.value = JSON.stringify(ontologyArray);
-        form2.appendChild(input);
-        var input2 = document.createElement('input2');
-        input2.type = 'hidden';
-        input2.name = "include_descendent_classes";
-        input2.value = JSON.stringify(checked);
-        form2.appendChild(input2);
-        // form2.target = 'VisualisationWindow';
-        document.body.appendChild(form2);
-        form2.submit();
-        //clear:
-        // $("#textArea").val("");
-        ontologyArray = [];
-      } else if (typeOfVisual == "similarities") {
-
-        console.log("type of visual is: " + typeOfVisual); // could be associations or similarities
-        bootbox.alert("Your visualisation is being generated in a new tab");
-
-        form2 = document.createElement("FORM");
-        form2.name = 'form2';
-        form2.method = 'POST';
-        form2.action = '/visualise_similarities';
-        form2.target = 'SimilaritiesWindow';
-        var input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = "ontology_id_list";
-        input.value = JSON.stringify(ontologyArray);
-        form2.appendChild(input);
-        var input2 = document.createElement('input2');
-        input2.type = 'hidden';
-        input2.name = "include_descendent_classes";
-        input2.value = JSON.stringify(checked);
-        form2.appendChild(input2);
-        document.body.appendChild(form2);
-        form2.submit();
-        //clear:
-        // $("#textArea").val("");
-        ontologyArray = [];
-      }
-    }
     });
-    });
+  });
 </script>
 
 <!-- add more text -->

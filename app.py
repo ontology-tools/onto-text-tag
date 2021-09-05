@@ -237,30 +237,28 @@ def associations():
 @app.route('/visualise_associations', methods=['POST'])
 def visualise_associations():  
     ontology_id_list = json.loads(request.form.get('ontology_id_list')) 
-    print("ontology_id_list is: ", ontology_id_list)
-    include_descendent_classes = request.form.get('include_descendent_classes')
-    print("checkbox says: ", include_descendent_classes)
-    #todo: try moving hv_generator to inside iframe (chordout())
-    #will need to do ontology_id_list as a saved variable..
-    # hv_generator(ontology_id_list) #should this be asynchronous? how?
+    # print("ontology_id_list is: ", ontology_id_list)
+    # include_descendents = "true"
+    include_descendents = request.form.get("include_descendent_classes")
+    print("checkbox says: ", include_descendents) #todo: why is this none here?
+
+    #moving hv_generator to inside iframe (chordout())
     session['saved_ontology_id_list'] = ontology_id_list
+    session['get_descendents'] = include_descendents
     iframe = url_for('chordout')
     return render_template("chord.html", iframe=iframe) 
-    # return ( json.dumps({"message":"Success"}), 200 )
-    # return render_template("chord.html") #new tab version
-    # return redirect(url_for('chord'))
     
-#todo: below no longer needed?
-# @app.route('/chord')
-# def chord():    
-#     iframe = url_for('chordout')
-#     return render_template("chord.html", iframe=iframe) 
     
 @app.route('/chordout')
 def chordout():
     if 'saved_ontology_id_list' in session:
       saved_ontology_id_list = session['saved_ontology_id_list']
-      hv_generator(saved_ontology_id_list)
+      get_descendents = session['get_descendents']
+      print("get_descendents for hv_generator is: ", get_descendents)
+      if get_descendents == "true":
+        hv_generator(saved_ontology_id_list, True)
+      else:
+        hv_generator(saved_ontology_id_list, False) #todo: add get_descendants True/False
     return render_template('chordout.html')
 
 @app.route('/visualise_similarities', methods=['POST'])

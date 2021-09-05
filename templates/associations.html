@@ -255,8 +255,9 @@
       var checked = "false";
       //get checkbox: 
       if ($('#include-descendent-classes-checkbox').is(":checked")) {
-        checked = "true";
+        checked = "true";        
       }
+      console.log("checked is: ", checked);
       //todo: re-factor below two forms to remove duplicate code
       if (typeOfVisual == "associations") {
 
@@ -275,12 +276,11 @@
         input.name = "ontology_id_list";
         input.value = JSON.stringify(ontologyArray);
         form2.appendChild(input);
-        var input2 = document.createElement('input2');
+        var input2 = document.createElement('input');
         input2.type = 'hidden';
         input2.name = "include_descendent_classes";
-        input2.value = JSON.stringify(checked);
+        input2.value = checked;
         form2.appendChild(input2);
-        // form2.target = 'VisualisationWindow';
         document.body.appendChild(form2);
         form2.submit();
         //clear:
@@ -304,10 +304,10 @@
         input.name = "ontology_id_list";
         input.value = JSON.stringify(ontologyArray);
         form2.appendChild(input);
-        var input2 = document.createElement('input2');
+        var input2 = document.createElement('input');
         input2.type = 'hidden';
         input2.name = "include_descendent_classes";
-        input2.value = JSON.stringify(checked);
+        input2.value = checked;
         form2.appendChild(input2);
         document.body.appendChild(form2);
         form2.submit();

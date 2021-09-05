@@ -4,60 +4,46 @@ from holoviews import opts, dim
 hv.extension('bokeh')
 hv.output(size=200)
 import pprint as pp
+import pyhornedowl
 
-def hv_generator(ontology_id_input):
+def hv_generator(ontology_id_input, should_get_descendents):
     
-    df2 = pd.read_csv("static/ontotermmentions.csv",index_col=0)
-     
+    df2 = pd.read_csv("static/ontotermmentions.csv",index_col=0)    
     # print("ontology_id_input type is: ", type(ontology_id_input))
-    print("received ontology_id_input values: ", ontology_id_input)
-    ontology_id_list = ontology_id_input #todo: uncomment, commented for testing - using values below
-    #test values which work:
-    # ontology_id_list = ["BFO:0000023", "ADDICTO:0000349", "MF:0000016", "ADDICTO:0000632", "ADDICTO:0000904", "ADDICTO:0000491","ADDICTO:0000872" ]
-    # ontology_id_list = ["ADDICTO:0000632", "MF:0000016", "ADDICTO:0000491", "ADDICTO:0000687"]
-    # ontology_id_list = ["BFO:0000023", "ADDICTO:0000349", "ADDICTO:0000175", "ADDICTO:0000717", "ADDICTO:0000687"]
-    # ontology_id_list = ["BFO:0000023", "ADDICTO:0000349", "MF:0000016", "ADDICTO:0000632", "ADDICTO:0000904"]
-    #test Ontology IDs to use: 
-    # BFO:0000023|role,ADDICTO:0000349|addiction,MF:0000016|human being,ADDICTO:0000632|cannabis use,ADDICTO:0000904|sales,ADDICTO:0000491|opioid agonist treatment,ADDICTO:0000872|Food and Drug Administration
-    #test values which don't work:
-    # ontology_id_list = ["ADDICTO:0000687", "BFO:0000023"]
-    # ontology_id_list = ["ADDICTO:0000175", "ADDICTO:0000717", "ADDICTO:0000687"]
-    # test values combining working and not working:
-    # ontology_id_list = ["ADDICTO:0000175", "ADDICTO:0000717", "ADDICTO:0000687", "BFO:0000023", "ADDICTO:0000349", "MF:0000016", "ADDICTO:0000632", "ADDICTO:0000904"]
-    # ontology_id_list = ["BFO:0000023", "ADDICTO:0000349", "MF:0000016", "ADDICTO:0000632", "ADDICTO:0000904", "ADDICTO:0000491","ADDICTO:0000872", "ADDICTO:0000175", "ADDICTO:0000717", "ADDICTO:0000687"]
-    
+    # print("received ontology_id_input values: ", ontology_id_input)
+    ontology_id_list = ontology_id_input 
+
+    # get descendants?
+    if should_get_descendents == True:
+        # repo = "AddictO" #todo: need to initialise repo for pyhornedowl
+        print("should be getting descendants here")
+        # for entry in ontology_id_list:
+        #     entryIri = repo.get_iri_for_id(entry.replace("_", ":"))                    
+        #     if entryIri:
+        #         descs = pyhornedowl.get_descendants(repo, entryIri)
+        #         for d in descs:
+        #             ontology_id_list.append(repo.get_id_for_iri(d).replace(":", "_")) #todo: does adding this to same array cause issues? 
+    else:
+        print("get_descendents is: ", should_get_descendents)
     #todo: trying filtering by ontology_id_list before merge - works
     df2 = df2.drop(df2[~df2.ADDICTOID.isin(ontology_id_list)].index)
     # This creates a table of pairs of terms in the same abstract
-    print("df2 after drop: ", df2)
+    # print("df2 after drop: ", df2)
 
     dcp = pd.merge(df2,df2,on="PMID",how="inner")
-    print("dcp after merge: ", dcp)
+    # print("dcp after merge: ", dcp)
     # change nan values to "":  - doesn't seem to help any
     # dcp['LABEL_y'].fillna('', inplace=True) 
     # dcp['LABEL_x'].fillna('', inplace=True) 
 
     dcp = dcp.drop(dcp[dcp.LABEL_x == dcp.LABEL_y].index) 
-    print("dcp after drop Label_x == Label_y ", dcp)
-
-    #todo: test drop "" LABEL_x and LABEL_y:
-    # dcp = dcp.drop(dcp[dcp.LABEL_x == ""].index)
-    # dcp = dcp.drop(dcp[dcp.LABEL_y == ""].index)
+    # print("dcp after drop Label_x == Label_y ", dcp)
 
     # We filter the table just to the ones in the ID list we provided as input 
-    print("about to filter dcp to correct values from ", dcp)
-
-    
-    #trying something, todo: dropping ADDICTOID before merge - uncomment below if this didn't work.
-    # dcp = dcp.drop(dcp[~dcp.ADDICTOID_y.isin(ontology_id_list)].index) 
-    # print("dcp after drop y not in ontology list ")
-    # pp.pprint(dcp)
-    
-    # dcp = dcp.drop(dcp[~dcp.ADDICTOID_x.isin(ontology_id_list)].index) #todo: this one is causing empty dataframe most
-    # print("dcp after dropping all: ", dcp)
+    # print("about to filter dcp to correct values from ", dcp)
     
     # We filter the table so that pairs are only represented in one direction, i.e. if we have both (smoking, children) and (children, smoking) for the same PMID we drop the second one
-    print("about to drop duplicates")
+    # print("about to drop duplicates")
 
     # solution 2 from Stack Overflow - replaces iterrows():
     dcp['ADDICTOID'] = dcp[['ADDICTOID_x', 'ADDICTOID_y']].apply(sorted, axis=1).apply(tuple)
@@ -65,21 +51,13 @@ def hv_generator(ontology_id_input):
     # drop "ADDICTOID" column - this column is not needed anymore:  
     dcp = dcp.drop(['ADDICTOID'], axis=1)
 
-    # for index, row in dcp.iterrows():  # THIS IS SLOW
-    #     if index % 100 == 0:
-    #         print(".",index)
-    #     if ((dcp['ADDICTOID_x'] == row['ADDICTOID_y'])
-    #         & (dcp['ADDICTOID_y'] == row['ADDICTOID_x'])
-    #         & (dcp['PMID'] == row['PMID'])).any():  # Does the inverse of this row exist in the table?
-    #         dcp.drop(index, inplace=True)
-
-    print("final dcp is: ", dcp)
+    # print("final dcp is: ", dcp)
 
     # Now we count the distinct numbers of abstracts this combination appeared in    
     data_chord_plot = dcp.groupby(['LABEL_x', 'LABEL_y'], as_index=False)[['PMID']].count()
     data_chord_plot.columns = ['source','target','value']
 
-    print("Final chord plot: ", data_chord_plot)
+    # print("Final chord plot: ", data_chord_plot)
     # Build the data table expected by the visualisation library
     links = data_chord_plot
     node_names = links.source.append(links.target)
