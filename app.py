@@ -77,6 +77,53 @@ ontoDict = {
     ]
 }
     
+def get_all_descendents(id_list):   
+    descendent_ids = []
+    # joining two ontologies here:    
+    repo1 = pyhornedowl.open_ontology(ontofile1)
+    repo2 = pyhornedowl.open_ontology(ontofile2)
+    
+    for prefix in PREFIXES:
+        repo1.add_prefix_mapping(prefix[0], prefix[1])
+        repo2.add_prefix_mapping(prefix[0], prefix[1])
+    
+
+    print("should be getting descendants here")
+    #todo: refactor below:
+    for entry in id_list:
+        print("looking at entry: ", entry)
+        entryIri = repo1.get_iri_for_id(entry.replace("_", ":"))                    
+        if entryIri:
+            print("looking at entryIri: ", entryIri)
+            descs = pyhornedowl.get_descendants(repo1, entryIri)
+            for d in descs:
+                add_id = repo1.get_id_for_iri(d).replace(":", "_")
+                descendent_ids.append(add_id)
+                # if add_id:
+                #     if add_id not in descendent_ids:
+                #         print("adding id: ", add_id)
+                #         descendent_ids.append(add_id)
+                # id_list.append(repo1.get_id_for_iri(d).replace(":", "_")) #todo: does adding this to same array cause issues? 
+    for entry in id_list:
+        print("looking at entry: ", entry)
+        entryIri = repo2.get_iri_for_id(entry.replace("_", ":"))                    
+        if entryIri:
+            print("looking at entryIri: ", entryIri)
+            descs = pyhornedowl.get_descendants(repo2, entryIri)
+            for d in descs:
+                add_id = repo1.get_id_for_iri(d).replace(":", "_")
+                print("add_id is: ", add_id)
+                descendent_ids.append(add_id)
+                # if add_id:
+                #     if add_id not in descendent_ids:
+                #         print("adding id: ", add_id)
+                        # descendent_ids.append(add_id)
+                # id_list.append(repo2.get_id_for_iri(d).replace(":", "_"))
+    if len(descendent_ids) == 0:
+        return id_list
+    else:
+        return_list = id_list + descendent_ids
+        return return_list
 
 onto_extractor3 = MultiExtractorComponent(
     nlp3,
