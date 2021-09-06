@@ -5,6 +5,9 @@ hv.extension('bokeh')
 hv.output(size=200)
 import pprint as pp
 import pyhornedowl
+import requests
+from urllib.request import urlopen
+import json
 
 def hv_generator(ontology_id_input, should_get_descendents):
     
@@ -16,15 +19,24 @@ def hv_generator(ontology_id_input, should_get_descendents):
     # get descendants?
     if should_get_descendents == True:
         # repo = "AddictO" #todo: need to initialise repo for pyhornedowl
-        ontofile = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
-        repo = pyhornedowl.open_ontology(ontofile)
-        repo.add_prefix_mapping("AddictO")
+        location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
+        data = urlopen(location).read()  # bytes
+        ontofile1 = data.decode('utf-8')
+        location2 = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
+        data2 = urlopen(location2).read()
+        ontofile2 = data.decode('utf-8')
+        repo = pyhornedowl.open_ontology(ontofile2)
+
+        # repo.add_prefix_mapping("AddictO")
         print("should be getting descendants here")
         for entry in ontology_id_list:
+            print("looking at entry: ", entry)
             entryIri = repo.get_iri_for_id(entry.replace("_", ":"))                    
             if entryIri:
+                print("looking at entryIri: ", entryIri)
                 descs = pyhornedowl.get_descendants(repo, entryIri)
                 for d in descs:
+                    print("adding id: ", repo.get_id_for_iri(d).replace(":", "_"))
                     ontology_id_list.append(repo.get_id_for_iri(d).replace(":", "_")) #todo: does adding this to same array cause issues? 
     else:
         print("get_descendents is: ", should_get_descendents)
