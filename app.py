@@ -98,7 +98,7 @@ def get_all_descendents(id_list):
             descs = pyhornedowl.get_descendants(repo1, entryIri)
             for d in descs:
                 add_id = repo1.get_id_for_iri(d).replace(":", "_")
-                descendent_ids.append(add_id)
+                descendent_ids.append(add_id.replace("_", ":"))
                 # if add_id:
                 #     if add_id not in descendent_ids:
                 #         print("adding id: ", add_id)
@@ -113,7 +113,7 @@ def get_all_descendents(id_list):
             for d in descs:
                 add_id = repo1.get_id_for_iri(d).replace(":", "_")
                 print("add_id is: ", add_id)
-                descendent_ids.append(add_id)
+                descendent_ids.append(add_id.replace("_", ":"))
                 # if add_id:
                 #     if add_id not in descendent_ids:
                 #         print("adding id: ", add_id)
@@ -124,6 +124,7 @@ def get_all_descendents(id_list):
     else:
         return_list = id_list + descendent_ids
         return return_list
+        # return descendent_ids #test only descendents
 
 onto_extractor3 = MultiExtractorComponent(
     nlp3,
