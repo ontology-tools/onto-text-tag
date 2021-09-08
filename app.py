@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from logging import error
 import pyhornedowl
 from flask import Flask, request, redirect, url_for, session
 from flask.templating import render_template
@@ -98,8 +99,11 @@ def get_all_descendents(id_list):
             descs = pyhornedowl.get_descendants(repo1, entryIri)
             if len(descs) > 0:
                 for d in descs:
-                    add_id = repo1.get_id_for_iri(d).replace(":", "_")
-                    descendent_ids.append(add_id.replace("_", ":"))
+                    try:
+                        add_id = repo1.get_id_for_iri(d).replace(":", "_")
+                        descendent_ids.append(add_id.replace("_", ":"))
+                    except:
+                        print("error")
                 # if add_id:
                 #     if add_id not in descendent_ids:
                 #         print("adding id: ", add_id)
@@ -113,9 +117,12 @@ def get_all_descendents(id_list):
             descs = pyhornedowl.get_descendants(repo2, entryIri)
             if len(descs) > 0:
                 for d in descs:
-                    add_id = repo1.get_id_for_iri(d).replace(":", "_")
-                    print("add_id is: ", add_id)
-                    descendent_ids.append(add_id.replace("_", ":"))
+                    try:
+                        add_id = repo1.get_id_for_iri(d).replace(":", "_")
+                        print("add_id is: ", add_id)
+                        descendent_ids.append(add_id.replace("_", ":"))
+                    except:
+                        print("error")
                 # if add_id:
                 #     if add_id not in descendent_ids:
                 #         print("adding id: ", add_id)
