@@ -123,6 +123,7 @@ def get_all_descendents(id_list):
                         descendent_ids.append(add_id.replace("_", ":"))
                     except:
                         print("error")
+                #todo: remove duplicates
                 # if add_id:
                 #     if add_id not in descendent_ids:
                 #         print("adding id: ", add_id)
@@ -131,7 +132,8 @@ def get_all_descendents(id_list):
     if len(descendent_ids) == 0:
         return id_list
     else:
-        return_list = id_list + descendent_ids
+        #remove duplicates from descendent_ids:
+        return_list = id_list + list(set(descendent_ids))
         return return_list
         # return descendent_ids #test only descendents
 
