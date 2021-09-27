@@ -51,34 +51,18 @@ class MultiExtractorComponent(object):
         stopwords.add("ends")
         stopwords.add("ci")
 
-        ontology_list = []
-    
+        self.ontols = []
+
         ontologies = ontoDict["ontologies"]
         for ontology in ontologies:
             for key, value in ontology.items():
-                if(key == "ontologyfile"):
-                    ontology_list.append(value)
-                    # print("got ontology", value)
                 if(key == "label"):
                     self.all_labels = self.all_labels + value
+                if (key == "ontology"):
+                    self.ontols.append(value)
 
         print("all_labels = ", self.all_labels)
         
-        # print("ontology_list[0] is: ", ontology_list[0])
-        
-        # load ontology
-        self.ontols = []
-        # print("len(ontology_list is: ", len(ontology_list))
-        for i in range(len(ontology_list)):
-            self.ontols.append(pyhornedowl.open_ontology(ontology_list[i]))
-            # print("self.ontols[", i, "] is: " , self.ontols[i], )
-            
-        
-        for ontol in self.ontols:
-            # print("ontol is: ", ontol)
-            for prefix in PREFIXES:
-                ontol.add_prefix_mapping(prefix[0], prefix[1])
-
         # for making plural forms of labels for text matching
         engine = inflect.engine()
 
@@ -162,47 +146,47 @@ class MultiExtractorComponent(object):
             return None
 
 # Testing
-if __name__ == "__main__":
-    import requests
-    from urllib.request import urlopen
-    location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
-    location2 = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
-    # location = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
+#if __name__ == "__main__":
+#    import requests
+#    from urllib.request import urlopen
+#    location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
+#    location2 = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
+#    # location = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
 
-    print("Fetching release file from", location)
-    data = urlopen(location).read()  # bytes
-    print("Fetching release file from", location2)
-    data2 = urlopen(location2).read()  # bytes
+#    print("Fetching release file from", location)
+#    data = urlopen(location).read()  # bytes
+#    print("Fetching release file from", location2)
+#    data2 = urlopen(location2).read()  # bytes
 
-    ontofile1 = data.decode('utf-8')
-    ontofile2 = data2.decode('utf-8')
+#    ontofile1 = data.decode('utf-8')
+#    ontofile2 = data2.decode('utf-8')
 
 
-    ontoDict = {
-        "ontologies": [        
-            {
-                "label": "BCIO",
-                "name": "BCIO",
-                "ontologyfile": ontofile2, #todo: why ontofile2 not working here if BCIO added after AddictO?
-            },
-            {
-                "label": "AddictO",
-                "name": "AddictO",
-                "ontologyfile": ontofile1,
-            },
-        ]
-    }
+#    ontoDict = {
+#        "ontologies": [
+#            {
+#                "label": "BCIO",
+#                "name": "BCIO",
+#                "ontologyfile": ontofile2, #todo: why ontofile2 not working here if BCIO added after AddictO?
+#            },
+#            {
+#                "label": "AddictO",
+#                "name": "AddictO",
+#                "ontologyfile": ontofile1,
+#            },
+#        ]
+#    }
     # python -m spacy download en_core_web_md
     # or: en_core_web_sm or en_core_web_lg
-    nlp = spacy.load('en_core_web_md')
+#    nlp = spacy.load('en_core_web_md')
 
-    onto_extractor = MultiExtractorComponent(
-        nlp,
-        ontoDict)
-        # name="ADDICTO",
-        # label="ADDICTO",
-        # ontologyfile="/home/tom/Documents/PROGRAMMING/Python/addiction-ontology/addicto-merged.owx")
-    nlp.add_pipe(onto_extractor, after="parser")
+#    onto_extractor = MultiExtractorComponent(
+#        nlp,
+#        ontoDict)
+#        # name="ADDICTO",
+#        # label="ADDICTO",
+#        # ontologyfile="/home/tom/Documents/PROGRAMMING/Python/addiction-ontology/addicto-merged.owx")
+#    nlp.add_pipe(onto_extractor, after="parser")
 
     # test = '''
     # The promotion of the London Smoking Cessation Transformation Programme during September 2017 was associated with a significant increase in quit attempts compared with the rest of England. The results were inconclusive regarding an effect on quit success among those who tried.

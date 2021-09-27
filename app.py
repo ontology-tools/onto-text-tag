@@ -20,6 +20,7 @@ from ontotagtext import MultiExtractorComponent
 from ontotagtext import PREFIXES
 from ontotagtext import RDFSLABEL
 import spacy
+import en_core_web_sm
 from Bio import Entrez
 import requests
 from urllib.request import urlopen
@@ -37,29 +38,25 @@ pp = pprint.PrettyPrinter(depth=4)
 app = Flask(__name__)
 
 
-
 app.config.from_object('config')
 idName = "ID"
 # python -m spacy download en_core_web_md
-# or: en_core_web_sm or en_core_web_lg
-nlp = spacy.load('en_core_web_md')
-nlp2 = spacy.load('en_core_web_md')
-nlp3 = spacy.load('en_core_web_md')
-
+# or: en_core_web_md or en_core_web_lg
+# nlp = spacy.load('en_core_web_md')
+nlp = en_core_web_sm.load()
 
 location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
 location2 = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
 # location = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
 
 print("Fetching release file from", location)
-data = urlopen(location).read()  # bytes
+ontol1 = pyhornedowl.open_ontology(urlopen(location).read().decode('utf-8'))
 print("Fetching release file from", location2)
-data2 = urlopen(location2).read()  # bytes
+ontol2 = pyhornedowl.open_ontology(urlopen(location2).read().decode('utf-8'))
 
-ontofile1 = data.decode('utf-8')
-ontofile2 = data2.decode('utf-8')
-
-# print(ontofile1, ontofile2)
+for prefix in PREFIXES:
+    ontol1.add_prefix_mapping(prefix[0], prefix[1])
+    ontol2.add_prefix_mapping(prefix[0], prefix[1])
 
 # combined test
 # populated with {"label1": name1, ontofile1}, {"label2": ...}
@@ -68,61 +65,53 @@ ontoDict = {
         {
             "label": "BCIO",
             "name": "BCIO",
-            "ontologyfile": ontofile2, #todo: why ontofile2 not working here if BCIO added after AddictO?
+            "ontology": ontol2
         },
         {
             "label": "AddictO",
              "name": "AddictO",
-            "ontologyfile": ontofile1,
+            "ontology": ontol1
         },
     ]
 }
     
 def get_all_descendents(id_list):   
     descendent_ids = []
-    # joining two ontologies here:    
-    repo1 = pyhornedowl.open_ontology(ontofile1)
-    repo2 = pyhornedowl.open_ontology(ontofile2)
-    
-    for prefix in PREFIXES:
-        repo1.add_prefix_mapping(prefix[0], prefix[1])
-        repo2.add_prefix_mapping(prefix[0], prefix[1])
-    
 
-    print("should be getting descendants here")
+    #print("should be getting descendants here")
     #todo: refactor below:
     for entry in id_list:
-        print("looking at entry: ", entry)
-        entryIri = repo1.get_iri_for_id(entry.replace("_", ":"))                    
+        #print("looking at entry: ", entry)
+        entryIri = ontol1.get_iri_for_id(entry.replace("_", ":"))
         if entryIri:
-            print("looking at entryIri: ", entryIri)
-            descs = pyhornedowl.get_descendants(repo1, entryIri)
+            #print("looking at entryIri: ", entryIri)
+            descs = pyhornedowl.get_descendants(ontol1, entryIri)
             if len(descs) > 0:
                 for d in descs:
                     try:
-                        add_id = repo1.get_id_for_iri(d).replace(":", "_")
+                        add_id = ontol1.get_id_for_iri(d).replace(":", "_")
                         descendent_ids.append(add_id.replace("_", ":"))
                     except:
-                        print("error")
+                        print("error when getting descendents of ",d)
                 # if add_id:
                 #     if add_id not in descendent_ids:
                 #         print("adding id: ", add_id)
                 #         descendent_ids.append(add_id)
                 # id_list.append(repo1.get_id_for_iri(d).replace(":", "_")) #todo: does adding this to same array cause issues? 
     for entry in id_list:
-        print("looking at entry: ", entry)
-        entryIri = repo2.get_iri_for_id(entry.replace("_", ":"))                    
+        #print("looking at entry: ", entry)
+        entryIri = ontol2.get_iri_for_id(entry.replace("_", ":"))
         if entryIri:
-            print("looking at entryIri: ", entryIri)
-            descs = pyhornedowl.get_descendants(repo2, entryIri)
+            #print("looking at entryIri: ", entryIri)
+            descs = pyhornedowl.get_descendants(ontol2, entryIri)
             if len(descs) > 0:
                 for d in descs:
                     try:
-                        add_id = repo1.get_id_for_iri(d).replace(":", "_")
-                        print("add_id is: ", add_id)
+                        add_id = ontol1.get_id_for_iri(d).replace(":", "_")
+                        #print("add_id is: ", add_id)
                         descendent_ids.append(add_id.replace("_", ":"))
                     except:
-                        print("error")
+                        print("error getting descendents of ",d)
                 #todo: remove duplicates
                 # if add_id:
                 #     if add_id not in descendent_ids:
@@ -138,10 +127,10 @@ def get_all_descendents(id_list):
         # return descendent_ids #test only descendents
 
 onto_extractor3 = MultiExtractorComponent(
-    nlp3,
+    nlp,
     ontoDict=ontoDict
     )
-nlp3.add_pipe(onto_extractor3, after="ner")
+nlp.add_pipe(onto_extractor3, after="ner")
 
 
 # Interaction with PubMed: get detailed results for a list of IDs
@@ -227,29 +216,7 @@ def get_abstract_text(result):
 def get_ids(ontol_list):
     # print("get_ids running here")
     checklist = []
-    ontol_o = []
-    ontols = []
-
-    all_labels = ""
-    for ontology in ontol_list:
-            for key, value in ontology.items():
-                if(key == "ontologyfile"):
-                    ontol_o.append(value)
-                    # print("got ontology", value)
-                if(key == "label"):
-                    all_labels = all_labels + value
-
-    # print("all_labels = ", all_labels)
-
-    for i in range(len(ontol_o)):
-        # print("looking at ontols")
-        ontols.append(pyhornedowl.open_ontology(ontol_o[i]))  #not running  
-        # print("ontol is: ", ontol)
-    for ontol in ontols:
-        # print("for ontol running")
-        for prefix in PREFIXES:
-            ontol.add_prefix_mapping(prefix[0], prefix[1])
-            #########
+    for ontol in [ontol1,ontol2]:
         for classIri in ontol.get_classes():
             # print("for classIri running")        
             classId = ontol.get_id_for_iri(classIri)
@@ -261,13 +228,6 @@ def get_ids(ontol_list):
                 # print(classId)
                 # print(label)
                     
-                    
-    
-    #todo: how to get labels from and Id's????
-
-    #test return:
-    # checklist.append("test3")
-    # checklist.append("test4")
     return checklist
 
 
@@ -299,7 +259,7 @@ def visualise_associations():
     # print("ontology_id_list is: ", ontology_id_list)
     # include_descendents = "true"
     include_descendents = request.form.get("include_descendent_classes")
-    print("checkbox says: ", include_descendents) #todo: why is this none here?
+    #print("checkbox says: ", include_descendents) #todo: why is this none here?
 
     #moving hv_generator to inside iframe (chordout())
     session['saved_ontology_id_list'] = ontology_id_list
@@ -313,12 +273,12 @@ def chordout():
     if 'saved_ontology_id_list' in session:
       saved_ontology_id_list = session['saved_ontology_id_list']
       get_descendents = session['get_descendents']
-      print("get_descendents for hv_generator is: ", get_descendents)
+      #print("get_descendents for hv_generator is: ", get_descendents)
       if get_descendents == "true":
         hv_generator(saved_ontology_id_list, True)
       else:
         hv_generator(saved_ontology_id_list, False) #todo: add get_descendants True/False
-    return render_template('chordout.html')
+    return render_template('/tmp/chordout.html')
 
 @app.route('/visualise_similarities', methods=['POST'])
 def visualise_similarities():  
@@ -343,9 +303,9 @@ def pubmed():
     global idName
     articleDetails = ""
     idName = ""
-    print(f"Pubmed id {id}")
+    #print(f"Pubmed id {id}")
     if id:
-        print(f"Got it {id}")
+        #print(f"Got it {id}")
         idName = f"{id}"
         try:
             results = fetch_details([id])
@@ -389,7 +349,7 @@ def tag():
     # process the text
     tag_results = []
 
-    doc3 = nlp3(text)
+    doc3 = nlp(text)
     # get ontology IDs identified
     for token in doc3:
         if token._.is_ontol_term:

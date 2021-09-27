@@ -2,5 +2,12 @@ Flask==1.0.2
 gunicorn
 google-cloud-secret-manager
 spacy==2.3.4
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz#egg=en_core_web_sm
 py-horned-owl==0.1.4
 biopython==1.78
+inflect
+pandas
+requests
+holoviews
+bokeh
+
