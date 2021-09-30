@@ -13,7 +13,7 @@
 # limitations under the License.
 from logging import error
 import pyhornedowl
-from flask import Flask, request, redirect, url_for, session
+from flask import Flask, request, redirect, url_for, session, Response, stream_with_context 
 from flask.templating import render_template
 # from ontotagtext import ExtractorComponent
 from ontotagtext import MultiExtractorComponent
@@ -33,10 +33,45 @@ import pprint
 import hv_generate
 from hv_generate import hv_generator
 
+from bokeh.embed import json_item 
+from jinja2 import Template
+
+
+from bokeh.resources import CDN
+
+from bokeh.plotting import figure
+from bokeh.sampledata.iris import flowers
+
+
 pp = pprint.PrettyPrinter(depth=4)
 
 app = Flask(__name__)
 
+page = Template("""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {{ resources }}
+</head>
+<body>
+  <div id="myplot"></div>
+  <script>
+  fetch('/plot')
+    .then(function(response) { return response.json(); })
+    .then(function(item) { return Bokeh.embed.embed_item(item); })
+  </script>
+</body>
+""")
+
+colormap = {'setosa': 'red', 'versicolor': 'green', 'virginica': 'blue'}
+colors = [colormap[x] for x in flowers['species']]
+
+def make_plot(x, y):
+    p = figure(title = "Iris Morphology", sizing_mode="fixed", width=400, height=400)
+    p.xaxis.axis_label = x
+    p.yaxis.axis_label = y
+    p.circle(flowers[x], flowers[y], color=colors, fill_alpha=0.2, size=10)
+    return p
 
 app.config.from_object('config')
 idName = "ID"
@@ -264,21 +299,77 @@ def visualise_associations():
     #moving hv_generator to inside iframe (chordout())
     session['saved_ontology_id_list'] = ontology_id_list
     session['get_descendents'] = include_descendents
-    iframe = url_for('chordout')
-    return render_template("chord.html", iframe=iframe) 
-    
-    
+    # iframe = url_for('chordout')
+    if 'saved_ontology_id_list' in session:
+        saved_ontology_id_list = session['saved_ontology_id_list']
+        get_descendents = session['get_descendents']
+        #print("get_descendents for hv_generator is: ", get_descendents)
+        if get_descendents == "true":
+            # html = hv_generator(saved_ontology_id_list, True)
+            html = json.loads(hv_generator(saved_ontology_id_list, True))
+        else:
+            # html = hv_generator(saved_ontology_id_list, False)
+            html = json.loads(hv_generator(saved_ontology_id_list, False)) 
+        # print("got html: ", html)
+    # json_object = json.loads(html)
+    # return render_template(request  = request, 
+    #         template_name = url_for('chord'), 
+    #         json_object=json_object, 
+    #         resources = CDN.render() )
+
+    #     yield html
+    # html="hello"
+    # html="""
+    # item = JSON.parse(item_text);
+    # Bokeh.embed.embed_item(item, "myplot");
+    # """
+    # iframe=url_for('chordout')
+    return render_template("chord.html", iframe=html)
+    # return render_template("chord.html", iframe=iframe)
+
+@app.route('/plot')
+def plot():
+    if 'saved_ontology_id_list' in session:
+        saved_ontology_id_list = session['saved_ontology_id_list']
+        get_descendents = session['get_descendents']
+        #print("get_descendents for hv_generator is: ", get_descendents)
+        if get_descendents == "true":
+            # html = hv_generator(saved_ontology_id_list, True)
+            html = json.loads(hv_generator(saved_ontology_id_list, True))
+            return json.dumps(json_item(html, "myplot"))
+        else:
+            html = hv_generator(saved_ontology_id_list, False)
+            return json.dumps(json_item(html, "myplot"))
+    else:
+        return "no saved ontology id list"
+            # html = json.loads(hv_generator(saved_ontology_id_list, False)) 
+        # print("got html: ", html)
+        # yield html
+        # html = "hello"
+        # p = html
+        # print(p)
+        # # p = make_plot('petal_width', 'petal_length')
+        # return json.dumps(json_item(p, "myplot"))
+
+#todo: generate chordout.html as a stream, to insert into iframe
 @app.route('/chordout')
 def chordout():
+    # def inner():
     if 'saved_ontology_id_list' in session:
-      saved_ontology_id_list = session['saved_ontology_id_list']
-      get_descendents = session['get_descendents']
-      #print("get_descendents for hv_generator is: ", get_descendents)
-      if get_descendents == "true":
-        hv_generator(saved_ontology_id_list, True)
-      else:
-        hv_generator(saved_ontology_id_list, False) #todo: add get_descendants True/False
-    return render_template('/tmp/chordout.html')
+        saved_ontology_id_list = session['saved_ontology_id_list']
+        get_descendents = session['get_descendents']
+        #print("get_descendents for hv_generator is: ", get_descendents)
+        if get_descendents == "true":
+            # html = hv_generator(saved_ontology_id_list, True)
+            html = json.loads(hv_generator(saved_ontology_id_list, True))
+        else:
+            # html = hv_generator(saved_ontology_id_list, False)
+            html = json.loads(hv_generator(saved_ontology_id_list, False)) 
+    #     yield html
+    # return page.render(resources=CDN.render())
+    # return html
+    # return Response(stream_with_context(inner()))
+    return render_template('chordout2.html', html=html)
 
 @app.route('/visualise_similarities', methods=['POST'])
 def visualise_similarities():  

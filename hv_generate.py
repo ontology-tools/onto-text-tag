@@ -2,7 +2,12 @@ import pandas as pd
 import holoviews as hv
 from holoviews import opts, dim
 hv.extension('bokeh')
+hv.renderer('bokeh')
 hv.output(size=200)
+# from hv.extension.bokeh.embed import json_item
+from bokeh.embed import json_item
+from bokeh.embed import file_html
+# from hv.extension.bokeh.
 import pprint as pp
 import pyhornedowl
 import requests
@@ -79,4 +84,20 @@ def hv_generator(ontology_id_input, should_get_descendents):
         html_chord_error = open("templates/chordout.html", 'w')
         html_chord_error.write(html_error_message)
     else:
-        hv.save(chord, 'templates/chordout.html') 
+        renderer = hv.renderer('bokeh')
+        hvplot = renderer.get_plot(chord)
+        html = renderer.static_html(hvplot)
+        # html = hv.render(chord)
+        # print(html)
+        return json.dumps(html)
+        # return(hv.renderer('bokeh')(chord))
+        # return hv.renderer(chord, backend='bokeh')
+        # print(chord)
+        # html = chord
+        # json_data = json.dumps(json_item(chord))
+        # return json_data
+        # return hv.render(chord, backend='bokeh', mode='server')
+        # return json.dumps(html)
+        # return json.dumps(json_item(chord, 'chord')
+        # return(hv.renderer('bokeh').server_doc(chord))
+        # hv.save(chord, 'templates/chordout.html') 
