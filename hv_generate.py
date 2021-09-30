@@ -27,7 +27,7 @@ def hv_generator(ontology_id_input, should_get_descendents):
         ontology_id_list = get_all_descendents(ontology_id_input)
     else:
         ontology_id_list = ontology_id_input 
-    print("ontology_id_list is now: ", ontology_id_list)
+    # print("ontology_id_list is now: ", ontology_id_list)
         # print("get_descendents is: ", should_get_descendents)
     #todo: trying filtering by ontology_id_list before merge - works
     df2 = df2.drop(df2[~df2.ADDICTOID.isin(ontology_id_list)].index)
@@ -87,17 +87,5 @@ def hv_generator(ontology_id_input, should_get_descendents):
         renderer = hv.renderer('bokeh')
         hvplot = renderer.get_plot(chord)
         html = renderer.static_html(hvplot)
-        # html = hv.render(chord)
-        # print(html)
         return json.dumps(html)
-        # return(hv.renderer('bokeh')(chord))
-        # return hv.renderer(chord, backend='bokeh')
-        # print(chord)
-        # html = chord
-        # json_data = json.dumps(json_item(chord))
-        # return json_data
-        # return hv.render(chord, backend='bokeh', mode='server')
-        # return json.dumps(html)
-        # return json.dumps(json_item(chord, 'chord')
-        # return(hv.renderer('bokeh').server_doc(chord))
-        # hv.save(chord, 'templates/chordout.html') 
+        

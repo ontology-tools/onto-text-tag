@@ -291,81 +291,23 @@ def associations():
 @app.route('/visualise_associations', methods=['POST'])
 def visualise_associations():  
     ontology_id_list = json.loads(request.form.get('ontology_id_list')) 
-    # print("ontology_id_list is: ", ontology_id_list)
-    # include_descendents = "true"
     include_descendents = request.form.get("include_descendent_classes")
-    #print("checkbox says: ", include_descendents) #todo: why is this none here?
-
-    #moving hv_generator to inside iframe (chordout())
     session['saved_ontology_id_list'] = ontology_id_list
     session['get_descendents'] = include_descendents
     iframe = url_for('chordout')
-    # if 'saved_ontology_id_list' in session:
-    #     saved_ontology_id_list = session['saved_ontology_id_list']
-    #     get_descendents = session['get_descendents']
-    #     #print("get_descendents for hv_generator is: ", get_descendents)
-    #     if get_descendents == "true":
-    #         # html = hv_generator(saved_ontology_id_list, True)
-    #         html = json.loads(hv_generator(saved_ontology_id_list, True))
-    #     else:
-    #         # html = hv_generator(saved_ontology_id_list, False)
-    #         html = json.loads(hv_generator(saved_ontology_id_list, False)) 
-        # print("got html: ", html)
-    # json_object = json.loads(html)
-    # return render_template(request  = request, 
-    #         template_name = url_for('chord'), 
-    #         json_object=json_object, 
-    #         resources = CDN.render() )
-
-    #     yield html
-    # html="hello"
-    # html="""
-    # item = JSON.parse(item_text);
-    # Bokeh.embed.embed_item(item, "myplot");
-    # """
-    # iframe=url_for('chordout')
-    # return render_template("chord.html", iframe=html)
     return render_template("chord.html", iframe=iframe)
 
-@app.route('/plot')
-def plot():
-    if 'saved_ontology_id_list' in session:
-        saved_ontology_id_list = session['saved_ontology_id_list']
-        get_descendents = session['get_descendents']
-        #print("get_descendents for hv_generator is: ", get_descendents)
-        if get_descendents == "true":
-            # html = hv_generator(saved_ontology_id_list, True)
-            html = json.loads(hv_generator(saved_ontology_id_list, True))
-            return json.dumps(json_item(html, "myplot"))
-        else:
-            html = hv_generator(saved_ontology_id_list, False)
-            return json.dumps(json_item(html, "myplot"))
-    else:
-        return "no saved ontology id list"
-            # html = json.loads(hv_generator(saved_ontology_id_list, False)) 
-        # print("got html: ", html)
-        # yield html
-        # html = "hello"
-        # p = html
-        # print(p)
-        # # p = make_plot('petal_width', 'petal_length')
-        # return json.dumps(json_item(p, "myplot"))
 
-#todo: generate chordout.html as a stream, to insert into iframe
+#generate chord plot as html, to insert into iframe:
 @app.route('/chordout')
-def chordout():
-    
+def chordout():    
     if 'saved_ontology_id_list' in session:
         saved_ontology_id_list = session['saved_ontology_id_list']
         get_descendents = session['get_descendents']
-        #print("get_descendents for hv_generator is: ", get_descendents)
         if get_descendents == "true":
-            # html = hv_generator(saved_ontology_id_list, True)
             html = json.loads(hv_generator(saved_ontology_id_list, True))
         else:
-            # html = hv_generator(saved_ontology_id_list, False)
-            html = json.loads(hv_generator(saved_ontology_id_list, False)) 
-   
+            html = json.loads(hv_generator(saved_ontology_id_list, False))    
     return render_template('chordout2.html', html=html)
 
 @app.route('/visualise_similarities', methods=['POST'])
