@@ -355,18 +355,18 @@ def plot():
 @app.route('/chordout')
 def chordout():
     
-    # if 'saved_ontology_id_list' in session:
-    #     saved_ontology_id_list = session['saved_ontology_id_list']
-    #     get_descendents = session['get_descendents']
-    #     #print("get_descendents for hv_generator is: ", get_descendents)
-    #     if get_descendents == "true":
-    #         # html = hv_generator(saved_ontology_id_list, True)
-    #         html = json.loads(hv_generator(saved_ontology_id_list, True))
-    #     else:
-    #         # html = hv_generator(saved_ontology_id_list, False)
-    #         html = json.loads(hv_generator(saved_ontology_id_list, False)) 
+    if 'saved_ontology_id_list' in session:
+        saved_ontology_id_list = session['saved_ontology_id_list']
+        get_descendents = session['get_descendents']
+        #print("get_descendents for hv_generator is: ", get_descendents)
+        if get_descendents == "true":
+            # html = hv_generator(saved_ontology_id_list, True)
+            html = json.loads(hv_generator(saved_ontology_id_list, True))
+        else:
+            # html = hv_generator(saved_ontology_id_list, False)
+            html = json.loads(hv_generator(saved_ontology_id_list, False)) 
    
-    return render_template('chordout2.html')
+    return render_template('chordout2.html', html=html)
 
 @app.route('/visualise_similarities', methods=['POST'])
 def visualise_similarities():  
