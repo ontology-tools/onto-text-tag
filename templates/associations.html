@@ -246,6 +246,10 @@
       ontologyArray = [];
       textFieldVar = $("#textArea").val();
       console.log("got textFieldVar: ", textFieldVar);
+      if(textFieldVar.trim() == ""){
+        bootbox.alert("Please enter at least one Ontology ID");
+        return;
+      }
       var idResultsTextFieldVar = textFieldVar.split(",");
       for (result in idResultsTextFieldVar) {
         var ontologyName = idResultsTextFieldVar[result].split("|")
