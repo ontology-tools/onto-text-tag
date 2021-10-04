@@ -42,6 +42,9 @@ from bokeh.resources import CDN
 from bokeh.plotting import figure
 from bokeh.sampledata.iris import flowers
 
+import os
+
+development = False
 
 pp = pprint.PrettyPrinter(depth=4)
 
@@ -271,8 +274,10 @@ def get_ids(ontol_list):
 @app.route('/')
 @app.route('/home')
 def home():
+    if os.environ.get("FLASK_ENV")=='development':
+        development = True
     # return redirect(url_for('associations')) #todo: temporary testing redirect - remove this
-    return render_template('index.html')
+    return render_template('index.html', development = development)
 
 
 
@@ -329,6 +334,8 @@ def visualise_similarities():
 
 @app.route('/pubmed', methods=['POST', 'GET'])
 def pubmed():
+    if os.environ.get("FLASK_ENV")=='development':
+        development = True
     id = request.form.get('pubmed_id')
     global idName
     articleDetails = ""
@@ -355,13 +362,15 @@ def pubmed():
                     return r.text, r.status_code, r.headers.items()
         except Exception as err:  # 400 bad request handling, also if no internet connection
             print(err)
-    return render_template('index.html', error_msg=f"No abstract found for PubMed ID {id}")
+    return render_template('index.html', error_msg=f"No abstract found for PubMed ID {id}", development = development)
 
 
 # Text tagging app
 
 @ app.route('/tag', methods=['POST'])
 def tag():
+    if os.environ.get("FLASK_ENV")=='development':
+        development=True
     text = request.form['inputText']
     details = request.form.get('inputDetails')
     date = request.form.get('dateDetails')
@@ -416,7 +425,8 @@ def tag():
                            title=title,
                            authors=authors,
                            id=idName,
-                           tag_results=tag_results)
+                           tag_results=tag_results,
+                           development=development)
 
 # get id from label here:
 # @app.route('/get_ids', methods=['GET', 'POST'])

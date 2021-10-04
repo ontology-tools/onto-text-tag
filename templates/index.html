@@ -23,6 +23,7 @@
 {% endif %}
 
 {% if not text %}
+{% if development %}
 <div class="row mb-3">
   <div class="col-md-12">
     <div class="float-right">
@@ -37,6 +38,7 @@
     </div>
   </div>
 </div>
+{% endif %}
 
 <!-- PubMed ID form input -->
 <form id="submitText" action="{{ url_for('tag') }}" method="post">
