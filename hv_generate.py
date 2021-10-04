@@ -81,8 +81,7 @@ def hv_generator(ontology_id_input, should_get_descendents):
     if dcp.empty:
         print('empty dataframe, should create an error message chordout.html here')
         html_error_message = "<!doctype html><div><h4>ERROR CREATING TABLE - no associations found, or possibly some of the ID's were incorrect?</h4></div></html>"
-        html_chord_error = open("templates/chordout.html", 'w')
-        html_chord_error.write(html_error_message)
+        return(json.dumps(html_error_message))
     else:
         renderer = hv.renderer('bokeh')
         hvplot = renderer.get_plot(chord)
