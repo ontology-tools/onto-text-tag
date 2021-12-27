@@ -81,9 +81,10 @@ class MultiExtractorComponent(object):
                 termshortid = ontol.get_id_for_iri(termid)
                 label = ontol.get_annotation(termid, RDFSLABEL)
                 definition = ontol.get_annotation(termid, DEFINITION)
-                term_entry = {'id': termid if termshortid is None else termshortid,
-                              'name': label.strip(),
-                              'definition': definition}
+                if label:
+                    term_entry = {'id': termid if termshortid is None else termshortid,
+                                'name': label.strip(),
+                                'definition': definition}
                 if label is not None and label.strip().lower() not in stopwords:
                     self.terms[label.strip().lower()] = term_entry
                     patterns.append(nlp.make_doc(label.strip().lower()))

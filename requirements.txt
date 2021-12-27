@@ -10,4 +10,5 @@ pandas
 requests
 holoviews
 bokeh
+git+https://github.com/OntoGene/OGER.git
 

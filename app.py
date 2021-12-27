@@ -44,6 +44,13 @@ from bokeh.sampledata.iris import flowers
 
 import os
 
+
+#test OGER:
+import oger
+from oger.ctrl.router import Router, PipelineServer
+conf = Router(termlist_path='static/test_terms.tsv')
+pl = PipelineServer(conf)
+
 development = False
 
 pp = pprint.PrettyPrinter(depth=4)
@@ -335,6 +342,15 @@ def visualise_similarities():
 
 @app.route('/pubmed', methods=['POST', 'GET'])
 def pubmed():
+    #test OGER:
+    coll = pl.load_one(['29148565'], fmt='pubmed')
+    print(coll[0][0].text)
+    pl.process(coll) #todo: error here
+    # entity = next(coll[0].iter_entities())
+    # print(entity.info)
+    for entity in coll[0].iter_entities():
+        print(entity.start, entity.text, entity.end)
+
     if os.environ.get("FLASK_ENV")=='development':
         development = True
     id = request.form.get('pubmed_id')
