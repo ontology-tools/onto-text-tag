@@ -381,18 +381,18 @@ def tag():
         development=True
 
     #test OGER:
-    coll = pl.load_one(['29148565'], fmt='pubmed')
-    print(coll[0][0].text) # title
-    pl.process(coll) 
+    # coll = pl.load_one(['29148565'], fmt='pubmed')
+    # print(coll[0][0].text) # title
+    # pl.process(coll) 
     # entity = next(coll[0].iter_entities())
     # print(entity.info)
-    for entity in coll[0].iter_entities():
-        # print("full entity: ", entity)
+    # for entity in coll[0].iter_entities():
+    #     # print("full entity: ", entity)
 
-        print("entity: ", entity.start, entity.text, entity.end, entity.info, " , ", entity.text)
+    #     print("entity: ", entity.start, entity.text, entity.end, entity.info, " , ", entity.text)
 
     text = request.form['inputText']
-    details = request.form.get('inputDetails')
+    details = request.form.get('inputDetails') #pmid
     date = request.form.get('dateDetails')
     title = request.form.get('titleDetails')
     authors = request.form.get('authorsDetails')
@@ -410,6 +410,13 @@ def tag():
 
     # replacing nlp with OGER:
     # fields list for entity is here: https://github.com/OntoGene/OGER/blob/f23cf9bec70ba51f85605f26f3de2df72f7c4d5a/oger/doc/document.py
+    coll_pmid = []    
+    coll_pmid.append(idName)
+    print("coll_pmid = ", coll_pmid)
+    coll = pl.load_one(coll_pmid, fmt='pubmed')
+    print(coll[0][0].text) # title
+    pl.process(coll)
+    
     for entity in coll[0].iter_entities():
         span_text = entity.text 
         ontol_id = entity.cid #correct
