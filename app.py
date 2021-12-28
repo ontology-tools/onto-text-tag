@@ -45,7 +45,7 @@ from bokeh.sampledata.iris import flowers
 import os
 
 
-#test OGER:
+#OGER:
 import oger
 from oger.ctrl.router import Router, PipelineServer
 conf = Router(termlist_path='static/test_terms.tsv')
@@ -342,15 +342,6 @@ def visualise_similarities():
 
 @app.route('/pubmed', methods=['POST', 'GET'])
 def pubmed():
-    #test OGER:
-    coll = pl.load_one(['29148565'], fmt='pubmed')
-    print(coll[0][0].text) # title
-    pl.process(coll) 
-    # entity = next(coll[0].iter_entities())
-    # print(entity.info)
-    for entity in coll[0].iter_entities():
-        print(entity.start, entity.text, entity.end)
-
     if os.environ.get("FLASK_ENV")=='development':
         development = True
     id = request.form.get('pubmed_id')
@@ -388,6 +379,18 @@ def pubmed():
 def tag():
     if os.environ.get("FLASK_ENV")=='development':
         development=True
+
+    #test OGER:
+    coll = pl.load_one(['29148565'], fmt='pubmed')
+    print(coll[0][0].text) # title
+    pl.process(coll) 
+    # entity = next(coll[0].iter_entities())
+    # print(entity.info)
+    for entity in coll[0].iter_entities():
+        # print("full entity: ", entity)
+
+        print("entity: ", entity.start, entity.text, entity.end, entity.info, " , ", entity.text)
+
     text = request.form['inputText']
     details = request.form.get('inputDetails')
     date = request.form.get('dateDetails')
@@ -405,33 +408,52 @@ def tag():
     # process the text
     tag_results = []
 
-    doc3 = nlp(text)
-    # get ontology IDs identified
-    for token in doc3:
-        if token._.is_ontol_term:
-            # print("token details: ", token._.ontol_id, token.text, token.idx)
-            term=onto_extractor3.get_term(token._.ontol_id)
-            # print("ontol_id is: ", token._.ontol_id)
-            # print("term is: ", term)
-            if term:
-                ontol_label = term['name']
-                # print("ontol_label: ", ontol_label)
-                ontol_def = str(term['definition'])
-                # print("ontol_def: ", ontol_def)
-                ontol_namespace = term['id'][0:term['id'].index(":")]
-                # print("ontol_namespace: ", ontol_namespace)
-            else:
-                ontol_label = token.idx
-                ontol_def = token.text
-                ontol_namespace = ""
-                # print("ontol_namespace not found")
-            tag_results.append({"ontol_id": token._.ontol_id,
-                                "span_text": token.text,
+    # replacing nlp with OGER:
+    # fields list for entity is here: https://github.com/OntoGene/OGER/blob/f23cf9bec70ba51f85605f26f3de2df72f7c4d5a/oger/doc/document.py
+    for entity in coll[0].iter_entities():
+        span_text = entity.text 
+        ontol_id = entity.db
+        ontol_label = entity.cui
+        # print("ontol_label: ", ontol_label)
+        ontol_def = entity.cid
+        # print("ontol_def: ", ontol_def)
+        ontol_namespace = entity.db
+        # print("ontol_namespace: ", ontol_namespace)
+        tag_results.append({"ontol_id": ontol_id,
+                                "span_text": span_text,
                                 "ontol_label": ontol_label,
                                 "ontol_def": ontol_def,
                                 "ontol_namespace": ontol_namespace,
-                                "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
-                                "match_index": token.idx})
+                                "ontol_link": "http://addictovocab.org/"+ontol_id,
+                                "match_index": ontol_id})
+
+    # doc3 = nlp(text)
+    # # get ontology IDs identified
+    # for token in doc3:
+    #     if token._.is_ontol_term:
+    #         # print("token details: ", token._.ontol_id, token.text, token.idx)
+    #         term=onto_extractor3.get_term(token._.ontol_id)
+    #         # print("ontol_id is: ", token._.ontol_id)
+    #         # print("term is: ", term)
+    #         if term:
+    #             ontol_label = term['name']
+    #             # print("ontol_label: ", ontol_label)
+    #             ontol_def = str(term['definition'])
+    #             # print("ontol_def: ", ontol_def)
+    #             ontol_namespace = term['id'][0:term['id'].index(":")]
+    #             # print("ontol_namespace: ", ontol_namespace)
+    #         else:
+    #             ontol_label = token.idx
+    #             ontol_def = token.text
+    #             ontol_namespace = ""
+    #             # print("ontol_namespace not found")
+    #         tag_results.append({"ontol_id": token._.ontol_id,
+    #                             "span_text": token.text,
+    #                             "ontol_label": ontol_label,
+    #                             "ontol_def": ontol_def,
+    #                             "ontol_namespace": ontol_namespace,
+    #                             "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
+    #                             "match_index": token.idx})
 
     # print(f"Got tag results {tag_results}")
 
