@@ -6,11 +6,6 @@ CUI-less	ChEBI	CHEBI:18723	nicotine	nicotine	chemical
 CUI-less	ChEBI	CHEBI:18723	(R,S)-nicotine	nicotine	chemical
 CUI-less	ChEBI	CHEBI:18723	Nikotin	nicotine	chemical
 CUI-less	ChEBI	CHEBI:18723	Nicotin	nicotine	chemical
-CUI-less	ChEBI	CHEBI:17688	(S)-(-)-nicotine	(S)-nicotine	chemical
-CUI-less	ChEBI	CHEBI:17688	(S)-nicotine	(S)-nicotine	chemical
-CUI-less	ChEBI	CHEBI:17688	3-(2-(N-methylpyrrolidinyl))pyridine	(S)-nicotine	chemical
-CUI-less	ChEBI	CHEBI:17688	(-)-nicotine	(S)-nicotine	chemical
-CUI-less	ChEBI	CHEBI:17688	L(-)-nicotine	(S)-nicotine	chemical
 C0086707	MeSH desc (Organisms)	D014026	Nicotianas	Tobacco	organism
 C0740009	MeSH desc (Organisms)	D014026	Nicotiana tabacums	Tobacco	organism
 C0086707	MeSH desc (Organisms)	D014026	Nicotiana	Tobacco	organism
@@ -19,4 +14,3 @@ C0740009	MeSH desc (Organisms)	D014026	tabacum, Nicotiana	Tobacco	organism
 C0086707	MeSH desc (Organisms)	D014026	Tobacco	Tobacco	organism
 C0740009	MeSH desc (Organisms)	D014026	Nicotiana tabacum	Tobacco	organism
 OWN-1	ADDICTO	ADDICTO:0000523	Adolescents	Adolescents	young person
-hmmm	NONENO	ADDICTO:0000001	random	rnd	rnd

@@ -411,10 +411,10 @@ def tag():
     # replacing nlp with OGER:
     # fields list for entity is here: https://github.com/OntoGene/OGER/blob/f23cf9bec70ba51f85605f26f3de2df72f7c4d5a/oger/doc/document.py
     coll_pmid = []    
-    coll_pmid.append(idName)
-    print("coll_pmid = ", coll_pmid)
+    coll_pmid.append(idName) #idName is the pubmed id
+    # print("coll_pmid = ", coll_pmid)
     coll = pl.load_one(coll_pmid, fmt='pubmed')
-    print(coll[0][0].text) # title
+    # print(coll[0][0].text) # title
     pl.process(coll)
     
     for entity in coll[0].iter_entities():
