@@ -344,8 +344,8 @@ def visualise_similarities():
 def pubmed():
     #test OGER:
     coll = pl.load_one(['29148565'], fmt='pubmed')
-    print(coll[0][0].text)
-    pl.process(coll) #todo: error here
+    print(coll[0][0].text) # title
+    pl.process(coll) 
     # entity = next(coll[0].iter_entities())
     # print(entity.info)
     for entity in coll[0].iter_entities():
