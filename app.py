@@ -412,10 +412,10 @@ def tag():
     # fields list for entity is here: https://github.com/OntoGene/OGER/blob/f23cf9bec70ba51f85605f26f3de2df72f7c4d5a/oger/doc/document.py
     for entity in coll[0].iter_entities():
         span_text = entity.text 
-        ontol_id = entity.db
-        ontol_label = entity.cui
+        ontol_id = entity.cid #correct
+        ontol_label = entity.pref
         # print("ontol_label: ", ontol_label)
-        ontol_def = entity.cid
+        ontol_def = entity.type
         # print("ontol_def: ", ontol_def)
         ontol_namespace = entity.db
         # print("ontol_namespace: ", ontol_namespace)
