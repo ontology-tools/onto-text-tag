@@ -422,14 +422,15 @@ def tag():
                 # print(l['id'])
                 term=onto_extractor3.get_term(l['id'])
                 if term:
-                    mydict.append(term)
-                    # plur=term
+                    # order: 'a', 'ont', 'id', 'alt_name', 'name', 'definition'
+                    sing = {'a': '', 'ont': 'todo', 'id': term['id'], 'alt_name': term['name'], 'name': term['name'], 'definition': term['definition']}
+                    mydict.append(sing)
+                    
                     #plurals: 
                     plural = engine.plural(term['name'].strip())
-                    print("got plural: ", plural)
-                    plur = {'id': term['id'], 'name': plural, 'definition': term['definition']}
-                    
-                    # plur['name'] = plural
+                    # print("got plural: ", plural)
+                    plur = {'a': '', 'ont': 'todo', 'id': term['id'], 'alt_name': plural, 'name': term['name'], 'definition': term['definition']}
+            
                     mydict.append(plur)
 
                 
@@ -461,7 +462,7 @@ def tag():
                 # mydict.append(l)
         
         filename = 'static/test_terms_test.tsv'
-        fields = ['id', 'name', 'definition'] 
+        fields = ['a', 'ont', 'id', 'alt_name', 'name', 'definition'] 
         with open(filename, 'w') as tsvfile: 
             # creating a csv dict writer object 
             writer = csv.DictWriter(tsvfile, delimiter='\t', fieldnames=fields) 
