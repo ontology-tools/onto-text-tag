@@ -43,13 +43,15 @@ from bokeh.plotting import figure
 from bokeh.sampledata.iris import flowers
 
 import os
-
+import csv #for writing test_terms.csv (once only)
 
 #OGER:
 import oger
 from oger.ctrl.router import Router, PipelineServer
 conf = Router(termlist_path='static/test_terms.tsv')
 pl = PipelineServer(conf)
+
+import inflect
 
 development = False
 
@@ -407,60 +409,135 @@ def tag():
 
     # process the text
     tag_results = []
-
-    # replacing nlp with OGER:
-    # fields list for entity is here: https://github.com/OntoGene/OGER/blob/f23cf9bec70ba51f85605f26f3de2df72f7c4d5a/oger/doc/document.py
-    coll_pmid = []    
-    coll_pmid.append(idName) #idName is the pubmed id
-    # print("coll_pmid = ", coll_pmid)
-    coll = pl.load_one(coll_pmid, fmt='pubmed')
-    # print(coll[0][0].text) # title
-    pl.process(coll)
     
-    for entity in coll[0].iter_entities():
-        span_text = entity.text 
-        ontol_id = entity.cid #correct
-        ontol_label = entity.pref
-        # print("ontol_label: ", ontol_label)
-        ontol_def = entity.type
-        # print("ontol_def: ", ontol_def)
-        ontol_namespace = entity.db
-        # print("ontol_namespace: ", ontol_namespace)
-        tag_results.append({"ontol_id": ontol_id,
-                                "span_text": span_text,
-                                "ontol_label": ontol_label,
-                                "ontol_def": ontol_def,
-                                "ontol_namespace": ontol_namespace,
-                                "ontol_link": "http://addictovocab.org/"+ontol_id,
-                                "match_index": ontol_id})
+    use_oger = True
+    engine = inflect.engine()
+    if use_oger:
+        #test build test_terms.tsv from onto_extractor3:
+        #todo: still no plurals?
+        mydict = []
+        for f in onto_extractor3.terms:
+            l = onto_extractor3.get_label(f)
+            if l is not None:
+                # print(l['id'])
+                term=onto_extractor3.get_term(l['id'])
+                if term:
+                    mydict.append(term)
+                    # plur=term
+                    #plurals: 
+                    plural = engine.plural(term['name'].strip())
+                    print("got plural: ", plural)
+                    plur = {'id': term['id'], 'name': plural, 'definition': term['definition']}
+                    
+                    # plur['name'] = plural
+                    mydict.append(plur)
 
-    # doc3 = nlp(text)
-    # # get ontology IDs identified
-    # for token in doc3:
-    #     if token._.is_ontol_term:
-    #         # print("token details: ", token._.ontol_id, token.text, token.idx)
-    #         term=onto_extractor3.get_term(token._.ontol_id)
-    #         # print("ontol_id is: ", token._.ontol_id)
-    #         # print("term is: ", term)
-    #         if term:
-    #             ontol_label = term['name']
-    #             # print("ontol_label: ", ontol_label)
-    #             ontol_def = str(term['definition'])
-    #             # print("ontol_def: ", ontol_def)
-    #             ontol_namespace = term['id'][0:term['id'].index(":")]
-    #             # print("ontol_namespace: ", ontol_namespace)
-    #         else:
-    #             ontol_label = token.idx
-    #             ontol_def = token.text
-    #             ontol_namespace = ""
-    #             # print("ontol_namespace not found")
-    #         tag_results.append({"ontol_id": token._.ontol_id,
-    #                             "span_text": token.text,
-    #                             "ontol_label": ontol_label,
-    #                             "ontol_def": ontol_def,
-    #                             "ontol_namespace": ontol_namespace,
-    #                             "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
-    #                             "match_index": token.idx})
+                
+
+                # self.terms[plural.lower()] = term_entry
+                # print("ontol_id is: ", token._.ontol_id)
+                # print("term is: ", term)
+                
+                #     ontol_label = term['name']
+                #     # print("ontol_label: ", ontol_label)
+                #     ontol_def = str(term['definition'])
+                #     # print("ontol_def: ", ontol_def)
+                #     ontol_namespace = term['id'][0:term['id'].index(":")]
+                #     # print("ontol_namespace: ", ontol_namespace)
+                # else:
+                #     ontol_label = token.idx
+                #     ontol_def = token.text
+                #     ontol_namespace = ""
+                #     # print("ontol_namespace not found")
+                # tag_results.append({"ontol_id": token._.ontol_id,
+                #                     "span_text": token.text,
+                #                     "ontol_label": ontol_label,
+                #                     "ontol_def": ontol_def,
+                #                     "ontol_namespace": ontol_namespace,
+                #                     "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
+                #                     "match_index": token.idx})
+
+                #todo: re-order l
+                # mydict.append(l)
+        
+        filename = 'static/test_terms_test.tsv'
+        fields = ['id', 'name', 'definition'] 
+        with open(filename, 'w') as tsvfile: 
+            # creating a csv dict writer object 
+            writer = csv.DictWriter(tsvfile, delimiter='\t', fieldnames=fields) 
+                
+            # # writing headers (field names) 
+            # writer.writeheader() 
+                
+            # writing data rows 
+            writer.writerows(mydict) 
+        
+
+
+
+
+
+
+
+
+        # replacing nlp with OGER:
+        # fields list for entity is here: https://github.com/OntoGene/OGER/blob/f23cf9bec70ba51f85605f26f3de2df72f7c4d5a/oger/doc/document.py
+        
+        coll_pmid = []    
+        coll_pmid.append(idName) #idName is the pubmed id
+        # print("coll_pmid = ", coll_pmid)
+        coll = pl.load_one(coll_pmid, fmt='pubmed')
+        
+            # coll = pl.load_one(text, 'txt') #todo: Text field option not working currently
+        # print(coll[0][0].text) # title
+        pl.process(coll)
+        
+        for entity in coll[0].iter_entities():
+            span_text = entity.text 
+            ontol_id = entity.cid #correct
+            ontol_label = entity.pref
+            # print("ontol_label: ", ontol_label)
+            ontol_def = entity.type
+            # print("ontol_def: ", ontol_def)
+            ontol_namespace = entity.db
+            # print("ontol_namespace: ", ontol_namespace)
+            tag_results.append({"ontol_id": ontol_id,
+                                    "span_text": span_text,
+                                    "ontol_label": ontol_label,
+                                    "ontol_def": ontol_def,
+                                    "ontol_namespace": ontol_namespace,
+                                    "ontol_link": "http://addictovocab.org/"+ontol_id,
+                                    "match_index": ontol_id})
+
+    else: #nlp/spacy
+        doc3 = nlp(text)
+        # get ontology IDs identified
+        for token in doc3:
+            print("token: ", token)
+            if token._.is_ontol_term:
+                # print("token details: ", token._.ontol_id, token.text, token.idx)
+                term=onto_extractor3.get_term(token._.ontol_id)
+                # print("ontol_id is: ", token._.ontol_id)
+                # print("term is: ", term)
+                if term:
+                    ontol_label = term['name']
+                    # print("ontol_label: ", ontol_label)
+                    ontol_def = str(term['definition'])
+                    # print("ontol_def: ", ontol_def)
+                    ontol_namespace = term['id'][0:term['id'].index(":")]
+                    # print("ontol_namespace: ", ontol_namespace)
+                else:
+                    ontol_label = token.idx
+                    ontol_def = token.text
+                    ontol_namespace = ""
+                    # print("ontol_namespace not found")
+                tag_results.append({"ontol_id": token._.ontol_id,
+                                    "span_text": token.text,
+                                    "ontol_label": ontol_label,
+                                    "ontol_def": ontol_def,
+                                    "ontol_namespace": ontol_namespace,
+                                    "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
+                                    "match_index": token.idx})
 
     # print(f"Got tag results {tag_results}")
 

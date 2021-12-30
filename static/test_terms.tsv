@@ -13,4 +13,5 @@ C0086707	MeSH desc (Organisms)	D014026	Tobaccos	Tobacco	organism
 C0740009	MeSH desc (Organisms)	D014026	tabacum, Nicotiana	Tobacco	organism
 C0086707	MeSH desc (Organisms)	D014026	Tobacco	Tobacco	organism
 C0740009	MeSH desc (Organisms)	D014026	Nicotiana tabacum	Tobacco	organism
-OWN-1	ADDICTO	ADDICTO:0000523	Adolescents	Adolescents	young person
+OWN-1	ADDICTO	ADDICTO:0000523	adolescent	adolescent	young person
+OWN-1	ADDICTO	ADDICTO:0000523	adolescents	adolescents	young person

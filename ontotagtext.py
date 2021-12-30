@@ -103,7 +103,7 @@ class MultiExtractorComponent(object):
                         except:
                             print("Problem getting plural of ",s)
                             continue
-
+        
         # initialize matcher and add patterns
         self.matcher = PhraseMatcher(nlp.vocab, attr='LOWER')        
         self.matcher.add(self.all_labels, None, *patterns)
@@ -142,6 +142,13 @@ class MultiExtractorComponent(object):
     def get_term(self, term_id): 
         if term_id in [ v['id'] for v in self.terms.values()]: 
             keys = [k for k, v in self.terms.items() if v['id'] == term_id]
+            return self.terms[keys[0]]
+        else:
+            return None             
+
+    def get_label(self, label): 
+        if label in [ v['name'] for v in self.terms.values()]: 
+            keys = [k for k, v in self.terms.items() if v['name'] == label]
             return self.terms[keys[0]]
         else:
             return None
