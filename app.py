@@ -432,7 +432,8 @@ def tag():
                     plur = {'a': '', 'ont': 'todo', 'id': term['id'], 'alt_name': plural, 'name': term['name'], 'definition': term['definition']}
             
                     mydict.append(plur)
-
+                    
+                    #todo: still need to add synonyms and plurals of synonyms here
                 
 
                 # self.terms[plural.lower()] = term_entry
