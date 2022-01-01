@@ -411,8 +411,14 @@ def tag():
     tag_results = []
     
     use_oger = True
+
     engine = inflect.engine()
     if use_oger:
+        # stop words, don't try to match these
+        stopwords = nlp.Defaults.stop_words
+        stopwords.add("ands")
+        stopwords.add("ends")
+        stopwords.add("ci")
         #test build test_terms.tsv from onto_extractor3:
         #todo: still no plurals?
         mydict = []
@@ -434,7 +440,23 @@ def tag():
                     mydict.append(plur)
                     
                     #todo: still need to add synonyms and plurals of synonyms here
-                
+                    termid = term['id']
+                    for ontol in onto_extractor3.ontols:
+                    # ontol = onto_extractor3.ontols[0] #todo: loop over all?                     
+                        SYN = "http://purl.obolibrary.org/obo/IAO_0000118"
+                        synonyms = ontol.get_annotations(termid, SYN)                    
+
+                        for s in synonyms:
+                            if s.strip().lower() not in stopwords:                            
+                                syn1 = {'a': '', 'ont': 'todo', 'id': term['id'], 'alt_name': s, 'name': term['name'], 'definition': term['definition']}
+                                mydict.append(syn1)
+                                try:
+                                    plural = engine.plural(s.strip())
+                                    plur = {'a': '', 'ont': 'todo', 'id': term['id'], 'alt_name': plural, 'name': term['name'], 'definition': term['definition']}
+                                    mydict.append(plur)
+                                except:
+                                    print("Problem getting plural of ",s)
+                                    continue
 
                 # self.terms[plural.lower()] = term_entry
                 # print("ontol_id is: ", token._.ontol_id)
