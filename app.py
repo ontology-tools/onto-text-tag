@@ -428,31 +428,34 @@ def tag():
                 # print(l['id'])
                 term=onto_extractor3.get_term(l['id'])
                 if term:
+                    #todo: change 'ont' to something that makes sense (based on 'id'?)
+                    ont = term['id'][0:term['id'].index(":")]
                     # order: 'a', 'ont', 'id', 'alt_name', 'name', 'definition'
-                    sing = {'a': '', 'ont': 'todo', 'id': term['id'], 'alt_name': term['name'], 'name': term['name'], 'definition': term['definition']}
+                    sing = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': term['name'], 'name': term['name'], 'definition': term['definition']}
                     mydict.append(sing)
                     
                     #plurals: 
                     plural = engine.plural(term['name'].strip())
                     # print("got plural: ", plural)
-                    plur = {'a': '', 'ont': 'todo', 'id': term['id'], 'alt_name': plural, 'name': term['name'], 'definition': term['definition']}
+                    plur = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': plural, 'name': term['name'], 'definition': term['definition']}
             
                     mydict.append(plur)
                     
-                    #todo: still need to add synonyms and plurals of synonyms here
+                    #adding synonyms and plurals of synonyms here:
                     termid = term['id']
                     for ontol in onto_extractor3.ontols:
+                        # print("checking ontol: ", ontol)
                     # ontol = onto_extractor3.ontols[0] #todo: loop over all?                     
                         SYN = "http://purl.obolibrary.org/obo/IAO_0000118"
                         synonyms = ontol.get_annotations(termid, SYN)                    
 
                         for s in synonyms:
                             if s.strip().lower() not in stopwords:                            
-                                syn1 = {'a': '', 'ont': 'todo', 'id': term['id'], 'alt_name': s, 'name': term['name'], 'definition': term['definition']}
+                                syn1 = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': s, 'name': term['name'], 'definition': term['definition']}
                                 mydict.append(syn1)
                                 try:
                                     plural = engine.plural(s.strip())
-                                    plur = {'a': '', 'ont': 'todo', 'id': term['id'], 'alt_name': plural, 'name': term['name'], 'definition': term['definition']}
+                                    plur = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': plural, 'name': term['name'], 'definition': term['definition']}
                                     mydict.append(plur)
                                 except:
                                     print("Problem getting plural of ",s)
@@ -524,7 +527,7 @@ def tag():
             ontol_def = entity.type
             # print("ontol_def: ", ontol_def)
             ontol_namespace = entity.db
-            # print("ontol_namespace: ", ontol_namespace)
+            print("ontol_namespace: ", ontol_namespace)
             tag_results.append({"ontol_id": ontol_id,
                                     "span_text": span_text,
                                     "ontol_label": ontol_label,
@@ -537,7 +540,7 @@ def tag():
         doc3 = nlp(text)
         # get ontology IDs identified
         for token in doc3:
-            print("token: ", token)
+            # print("token: ", token)
             if token._.is_ontol_term:
                 # print("token details: ", token._.ontol_id, token.text, token.idx)
                 term=onto_extractor3.get_term(token._.ontol_id)
