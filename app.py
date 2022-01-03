@@ -413,82 +413,86 @@ def tag():
     
     use_oger = True
 
+    build_terms = False
+
     engine = inflect.engine()
+
     if use_oger:
-        # # stop words, don't try to match these
-        # stopwords = nlp.Defaults.stop_words
-        # stopwords.add("ands")
-        # stopwords.add("ends")
-        # stopwords.add("ci")
-        # #test build test_terms.tsv from onto_extractor3:
-        # #todo: still no plurals?
-        # mydict = []
-        # for f in onto_extractor3.terms:
-        #     l = onto_extractor3.get_label(f)
-        #     if l is not None:
-        #         term=onto_extractor3.get_term(l['id'].strip())
-        #         if term:
-        #             # print("got term: ", term)
-        #             #todo: change 'ont' to something that makes sense (based on 'id'?)
-        #             ont = term['id'][0:term['id'].index(":")]
-        #             if ont == "BCIO":
-        #                 continue
-        #             else:
-        #                 # print("got ont: ", ont)
-        #                 # if ont == "BCIO":
-        #                     # print("got BCIO: ", ont)
-        #                 # order: 'a', 'ont', 'id', 'alt_name', 'name', 'definition'
-        #                 sing = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': term['name'], 'name': term['name'], 'definition': term['definition']}
-        #                 mydict.append(sing)
-                        
-        #                 #plurals:                    
-        #                 try:
-        #                     plural = engine.plural(term['name'].strip())
-        #                     # print("got plural: ", plural)
-        #                     plur = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': plural, 'name': term['name'], 'definition': term['definition']}
-        #                     mydict.append(plur)
-        #                 except: 
-        #                     print("Problem getting plural of ", term['name'].strip())
-        #                     continue
+        if build_terms:
+            # stop words, don't try to match these
+            stopwords = nlp.Defaults.stop_words
+            stopwords.add("ands")
+            stopwords.add("ends")
+            stopwords.add("ci")
+            #test build test_terms.tsv from onto_extractor3:
+            #todo: still no plurals?
+            mydict = []
+            for f in onto_extractor3.terms:
+                l = onto_extractor3.get_label(f)
+                if l is not None:
+                    term=onto_extractor3.get_term(l['id'].strip())
+                    if term:
+                        # print("got term: ", term)
+                        #todo: change 'ont' to something that makes sense (based on 'id'?)
+                        ont = term['id'][0:term['id'].index(":")]
+                        if term['id'] == "BCIO:010055":
+                            continue
+                        else:
+                            # print("got ont: ", ont)
+                            # if ont == "BCIO":
+                                # print("got BCIO: ", ont)
+                            # order: 'a', 'ont', 'id', 'alt_name', 'name', 'definition'
+                            sing = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': term['name'], 'name': term['name'], 'definition': term['definition']}
+                            mydict.append(sing)
+                            
+                            #plurals:                    
+                            try:
+                                plural = engine.plural(term['name'].strip())
+                                # print("got plural: ", plural)
+                                plur = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': plural, 'name': term['name'], 'definition': term['definition']}
+                                mydict.append(plur)
+                            except: 
+                                print("Problem getting plural of ", term['name'].strip())
+                                continue
 
-                        
-        #                 #adding synonyms and plurals of synonyms here:
-        #                 termid = term['id']
-        #                 for ontol in onto_extractor3.ontols:
-        #                     # print("checking ontol: ", ontol)
-        #                 # ontol = onto_extractor3.ontols[0] #todo: loop over all?                     
-        #                     SYN = "http://purl.obolibrary.org/obo/IAO_0000118"
-        #                     synonyms = ontol.get_annotations(termid, SYN)                    
+                            
+                            #adding synonyms and plurals of synonyms here:
+                            termid = term['id']
+                            for ontol in onto_extractor3.ontols:
+                                # print("checking ontol: ", ontol)
+                            # ontol = onto_extractor3.ontols[0] #todo: loop over all?                     
+                                SYN = "http://purl.obolibrary.org/obo/IAO_0000118"
+                                synonyms = ontol.get_annotations(termid, SYN)                    
 
-        #                     for s in synonyms:
-        #                         if s.strip().lower() not in stopwords:                            
-        #                             syn1 = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': s, 'name': term['name'], 'definition': term['definition']}
-        #                             mydict.append(syn1)
-        #                             try:
-        #                                 plural2 = engine.plural(s.strip())
-        #                                 plur2 = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': plural2, 'name': term['name'], 'definition': term['definition']}
-        #                                 mydict.append(plur2)
-        #                             except:
-        #                                 print("Problem getting plural of ",s)
-        #                                 continue
+                                for s in synonyms:
+                                    if s.strip().lower() not in stopwords:                            
+                                        syn1 = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': s, 'name': term['name'], 'definition': term['definition']}
+                                        mydict.append(syn1)
+                                        try:
+                                            plural2 = engine.plural(s.strip())
+                                            plur2 = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': plural2, 'name': term['name'], 'definition': term['definition']}
+                                            mydict.append(plur2)
+                                        except:
+                                            print("Problem getting plural of ",s)
+                                            continue
 
-        #             # else:
-        #             #     continue            
+                        # else:
+                        #     continue            
 
                 
         
-        # filename = 'static/test_terms_test.tsv'
-        # fields = ['a', 'ont', 'id', 'alt_name', 'name', 'definition'] 
-        # with open(filename, 'w') as tsvfile: 
-        #     # creating a csv dict writer object 
-        #     writer = csv.DictWriter(tsvfile, delimiter='\t', fieldnames=fields) 
-                
-        #     # # writing headers (field names) 
-        #     # writer.writeheader() 
-                
-        #     # writing data rows 
-        #     writer.writerows(mydict) 
-        # print("done creating test_terms_test.tsv")
+            filename = 'static/test_terms_test.tsv'
+            fields = ['a', 'ont', 'id', 'alt_name', 'name', 'definition'] 
+            with open(filename, 'w') as tsvfile: 
+                # creating a csv dict writer object 
+                writer = csv.DictWriter(tsvfile, delimiter='\t', fieldnames=fields) 
+                    
+                # # writing headers (field names) 
+                # writer.writeheader() 
+                    
+                # writing data rows 
+                writer.writerows(mydict) 
+            print("done creating test_terms_test.tsv")
         
 
 
