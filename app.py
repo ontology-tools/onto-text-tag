@@ -115,10 +115,15 @@ ontoDict = {
             "ontology": ontol2
         },
         {
-            "label": "AddictO",
-             "name": "AddictO",
-            "ontology": ontol1
+            "label": "BCIO",
+            "name": "BCIO",
+            "ontology": ontol2
         },
+        # {
+        #     "label": "AddictO",
+        #      "name": "AddictO",
+        #     "ontology": ontol1
+        # },
     ]
 }
     
@@ -425,11 +430,14 @@ def tag():
         for f in onto_extractor3.terms:
             l = onto_extractor3.get_label(f)
             if l is not None:
-                # print(l['id'])
-                term=onto_extractor3.get_term(l['id'])
+                term=onto_extractor3.get_term(l['id'].strip())
                 if term:
+                    # print("got term: ", term)
                     #todo: change 'ont' to something that makes sense (based on 'id'?)
                     ont = term['id'][0:term['id'].index(":")]
+                    # print("got ont: ", ont)
+                    if ont == "BCIO":
+                        print("got BCIO: ", ont)
                     # order: 'a', 'ont', 'id', 'alt_name', 'name', 'definition'
                     sing = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': term['name'], 'name': term['name'], 'definition': term['definition']}
                     mydict.append(sing)
@@ -454,9 +462,9 @@ def tag():
                                 syn1 = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': s, 'name': term['name'], 'definition': term['definition']}
                                 mydict.append(syn1)
                                 try:
-                                    plural = engine.plural(s.strip())
-                                    plur = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': plural, 'name': term['name'], 'definition': term['definition']}
-                                    mydict.append(plur)
+                                    plural2 = engine.plural(s.strip())
+                                    plur2 = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': plural2, 'name': term['name'], 'definition': term['definition']}
+                                    mydict.append(plur2)
                                 except:
                                     print("Problem getting plural of ",s)
                                     continue
@@ -527,7 +535,7 @@ def tag():
             ontol_def = entity.type
             # print("ontol_def: ", ontol_def)
             ontol_namespace = entity.db
-            print("ontol_namespace: ", ontol_namespace)
+            # print("ontol_namespace: ", ontol_namespace)
             tag_results.append({"ontol_id": ontol_id,
                                     "span_text": span_text,
                                     "ontol_label": ontol_label,

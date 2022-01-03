@@ -61,7 +61,7 @@ class MultiExtractorComponent(object):
                 if (key == "ontology"):
                     self.ontols.append(value)
 
-        print("all_labels = ", self.all_labels)
+        # print("all_labels = ", self.all_labels)
         
         # for making plural forms of labels for text matching
         engine = inflect.engine()
@@ -79,10 +79,14 @@ class MultiExtractorComponent(object):
             # print("checking ontol: ", ontol)
             for termid in ontol.get_classes():
                 # print("k is: ", k)
-                termshortid = ontol.get_id_for_iri(termid)
+                termshortid = ontol.get_id_for_iri(termid)            
                 label = ontol.get_annotation(termid, RDFSLABEL)
                 definition = ontol.get_annotation(termid, DEFINITION)
-                if label:
+                if label: 
+                    if label.strip().lower() == "bupropion":
+                            print("got bupropion")
+                    if label.strip().lower() == "intervention":
+                            print("got intervention")                   
                     term_entry = {'id': termid if termshortid is None else termshortid,
                                 'name': label.strip(),
                                 'definition': definition}
@@ -95,6 +99,10 @@ class MultiExtractorComponent(object):
                 synonyms = ontol.get_annotations(termid, SYN)
                 for s in synonyms:
                     if s.strip().lower() not in stopwords:
+                        if s.strip().lower() == "tobacco":
+                            print("got tobacco")
+                        if s.strip().lower() == "intervention":
+                            print("got intervention")
                         self.terms[s.strip().lower()] = term_entry
                         patterns.append(nlp.make_doc(s.strip().lower()))
                         try:
@@ -141,7 +149,7 @@ class MultiExtractorComponent(object):
         return any([t._.get("is_ontol_term") for t in tokens])
 
     def get_term(self, term_id): 
-        if term_id in [ v['id'] for v in self.terms.values()]: 
+        if term_id.strip() in [ v['id'] for v in self.terms.values()]: 
             keys = [k for k, v in self.terms.items() if v['id'] == term_id]
             return self.terms[keys[0]]
         else:
@@ -149,7 +157,7 @@ class MultiExtractorComponent(object):
 
     def get_label(self, label): 
         if label in [ v['name'] for v in self.terms.values()]: 
-            keys = [k for k, v in self.terms.items() if v['name'] == label]
+            keys = [k for k, v in self.terms.items() if v['name'].strip().lower() == label.strip().lower()]
             return self.terms[keys[0]]
         else:
             return None
