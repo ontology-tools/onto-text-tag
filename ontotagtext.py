@@ -60,7 +60,9 @@ class MultiExtractorComponent(object):
                     self.all_labels = self.all_labels + value
                 if (key == "ontology"):
                     self.ontols.append(value)
-
+        # print("self.ontols: ", self.ontols)
+        # for x in self.ontols: 
+        #     print("got x: ", x)
         # print("all_labels = ", self.all_labels)
         
         # for making plural forms of labels for text matching
@@ -75,18 +77,20 @@ class MultiExtractorComponent(object):
         # print(f"Importing {nr_terms} terms")
 
         #build unified table of all ID, IRI, Label and Synonyms:
-        for k, ontol in [self.ontols]: #should be all ontols in 
-            # print("checking ontol: ", ontol)
+        # for k, ontol in [self.ontols]: #should be all ontols in 
+        for ontol in self.ontols: #should be all ontols in 
+            print("checking ontol: ", ontol)
             for termid in ontol.get_classes():
                 # print("k is: ", k)
-                termshortid = ontol.get_id_for_iri(termid)            
+                termshortid = ontol.get_id_for_iri(termid)    
+                        
                 label = ontol.get_annotation(termid, RDFSLABEL)
                 definition = ontol.get_annotation(termid, DEFINITION)
                 if label: 
-                    if label.strip().lower() == "bupropion":
-                            print("got bupropion")
-                    if label.strip().lower() == "intervention":
-                            print("got intervention")                   
+                    # if label.strip().lower() == "bupropion":
+                    #         print("got bupropion")
+                    # if label.strip().lower() == "intervention":
+                    #         print("got intervention")                   
                     term_entry = {'id': termid if termshortid is None else termshortid,
                                 'name': label.strip(),
                                 'definition': definition}
@@ -99,10 +103,10 @@ class MultiExtractorComponent(object):
                 synonyms = ontol.get_annotations(termid, SYN)
                 for s in synonyms:
                     if s.strip().lower() not in stopwords:
-                        if s.strip().lower() == "tobacco":
-                            print("got tobacco")
-                        if s.strip().lower() == "intervention":
-                            print("got intervention")
+                        # if s.strip().lower() == "tobacco":
+                        #     print("got tobacco")
+                        # if s.strip().lower() == "intervention":
+                        #     print("got intervention")
                         self.terms[s.strip().lower()] = term_entry
                         patterns.append(nlp.make_doc(s.strip().lower()))
                         try:
