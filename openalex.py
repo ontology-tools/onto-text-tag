@@ -2,8 +2,22 @@
 
 import requests
 import json
+import collections
 
+def unpack_inverted_index(input):
+    all_dict = {}
+    for ind in input:
+        for i in range(len(input[ind])):
+            key = input[ind][i]
+            all_dict[key] = ind
+    sorted_dict = collections.OrderedDict(sorted(all_dict.items()))
 
+    full_string = ""
+    for item in sorted_dict.values():
+        full_string += item + " "
+
+    # print(full_string)
+    return full_string
 
 def get_one_with_id(id):
     location = f"https://api.openalex.org/works/" + str(id)+ ","    
@@ -30,12 +44,18 @@ def get_one_with_id(id):
         print("all_authors: ", all_authors)
         
         #abstracts:
+        abstracts = {}
         if 'abstract_inverted_index' in alexjson:                 
             if alexjson['abstract_inverted_index'] == None:
                 pass
             else:
-                print("abstract_inverted_index is: ", alexjson['abstract_inverted_index'])
-                return "got an abstract_inverted_index finally!"
+                # print("abstract_inverted_index is: ", alexjson['abstract_inverted_index'])
+                abstracts = alexjson['abstract_inverted_index']   
+                full_string = unpack_inverted_index(abstracts)
+                print("full abstract: ", full_string)
+
+
+
 
 
 def get_publications(page, end, alex_id_list):
