@@ -351,13 +351,14 @@ def pubmed():
     global idName
     articleDetails = ""
     idName = ""
-    #print(f"Pubmed id {id}")
+    print(f"Pubmed id {id}")
     if id:
-        #print(f"Got it {id}")
+        print(f"Got it {id}")
         idName = f"{id}"
         try:
             results = fetch_details([id])
             for result in results:
+                print("got result: ", result)
                 resultDetail = results[result]
                 abstractText = get_abstract_text(resultDetail)
                 # print(f"Got abstract text {abstractText}")
