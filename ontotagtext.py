@@ -79,7 +79,7 @@ class MultiExtractorComponent(object):
         #build unified table of all ID, IRI, Label and Synonyms:
         # for k, ontol in [self.ontols]: #should be all ontols in 
         for ontol in self.ontols: #should be all ontols in 
-            print("checking ontol: ", ontol)
+            # print("checking ontol: ", ontol)
             for termid in ontol.get_classes():
                 # print("k is: ", k)
                 termshortid = ontol.get_id_for_iri(termid)    

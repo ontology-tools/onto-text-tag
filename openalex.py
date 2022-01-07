@@ -20,6 +20,7 @@ def unpack_inverted_index(input):
     return full_string
 
 def get_one_with_id(id):
+    full_string = ""
     location = f"https://api.openalex.org/works/" + str(id)+ ","    
     #header is for the "polite pool": https://docs.openalex.org/api#the-polite-pool
     headers = {
@@ -53,6 +54,8 @@ def get_one_with_id(id):
                 abstracts = alexjson['abstract_inverted_index']   
                 full_string = unpack_inverted_index(abstracts)
                 print("full abstract: ", full_string)
+    #just the string for test: 
+    return full_string
 
 
 
@@ -88,20 +91,24 @@ def get_publications(page, end, alex_id_list):
     else:
         print("no response?")
 
+def get_alex():
+    # test getting data from alex api: 
+    alex_id_list = []
+    alex_id_url_list = get_publications(1, 1, [])
+    # print("alex_id_list is: ", alex_id_list)
+    #get alex after last "/" in url:
+    for alex in alex_id_url_list:
+        a = alex.rsplit("/")
+        # print("a: ", a[-1])
+        alex_id_list.append(a[-1])
+    print("done")
 
-# test getting data from alex api: 
-alex_id_list = []
-alex_id_url_list = get_publications(1, 1, [])
-# print("alex_id_list is: ", alex_id_list)
-#get alex after last "/" in url:
-for alex in alex_id_url_list:
-    a = alex.rsplit("/")
-    # print("a: ", a[-1])
-    alex_id_list.append(a[-1])
-print("done")
+    one = get_one_with_id(alex_id_list[0]) #test only one
+    print("got one: ", one)
 
-one = get_one_with_id(alex_id_list[0]) #test only one
-print("got one: ", one)
+    # one = get_one_with_id("W2741809807")
+    # print("got one: ", one)
+    return one
 
-# one = get_one_with_id("W2741809807")
-# print("got one: ", one)
+#test get_alex(): 
+# get_alex()

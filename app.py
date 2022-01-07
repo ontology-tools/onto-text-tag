@@ -53,6 +53,9 @@ pl = PipelineServer(conf)
 
 import inflect
 
+
+from openalex import *
+
 development = False
 
 pp = pprint.PrettyPrinter(depth=4)
@@ -395,7 +398,9 @@ def tag():
 
     #     print("entity: ", entity.start, entity.text, entity.end, entity.info, " , ", entity.text)
 
-    text = request.form['inputText']
+    # text = request.form['inputText']
+    #OpenAlex test: 
+    text = get_alex()
     details = request.form.get('inputDetails') #pmid
     date = request.form.get('dateDetails')
     title = request.form.get('titleDetails')
@@ -412,7 +417,7 @@ def tag():
     # process the text
     tag_results = []
     
-    use_oger = True
+    use_oger = False
 
     build_terms = False
 
