@@ -68,7 +68,9 @@ def get_publications(page, end, alex_id_list):
         return (alex_id_list)
     
     #todo: per-page doesn't seem to do anything? per_page also same... default 25 per page
-    location = f"https://api.openalex.org/works?page=" + str(page) + "?per-page=50?filter=publication_year:2021"
+    # location = f"https://api.openalex.org/works?page=" + str(page) + "?per-page=50?filter=publication_year:2021"
+    location = f"https://api.openalex.org/works?filter=publication_year:2021&page=" + str(page) + "&per-page=50" #todo: test if this is the correct format
+
     headers = {
         'User-Agent': 'Python-requests/2.25.1',
         'mailto': 'tom@devsoft.co.za'  
@@ -112,3 +114,37 @@ def get_alex():
 
 #test get_alex(): 
 # get_alex()
+
+def alexquery(query, years):
+    # location = f"https://api.openalex.org/works?filter=title.search:cubist&page=2&per-page=50" #working
+
+    #test get paginated list of records > 10 000 - so page > 200. Doesn't return anything. 
+    location = f"https://api.openalex.org/works?filter=publication_year:2021&page=199&per-page=50" #working query, nothing over page 200
+
+    # location = f"https://api.openalex.org/works?filter=title.search:addiction,smoking,vaping,behaviour&filter=publication_year:2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021" #not working
+    
+    # location = f"https://api.openalex.org/works?page=" + str(page) + "?per-page=50?filter=publication_year:2021" #per-page doesn't seem to do anything? per_page also same... default 25 per page
+    headers = {
+        'User-Agent': 'Python-requests/2.25.1',
+        'mailto': 'tom@devsoft.co.za'  
+    }
+    # print("Fetching api json data from query: ", location)
+    
+    response = requests.get(location, headers=headers)
+    alexjson = response.json() if response and response.status_code == 200 else None
+    # print("alexjson: ", alexjson)
+    if alexjson:
+        print("meta: ", alexjson['meta'])
+        num_results = alexjson['meta']['count']
+        num_pages = alexjson['meta']['count']/25
+        print("page: ", alexjson['meta']['page'], " of ", num_pages, ' in ', num_results, ' results.')
+        test_id_list = []
+        for result in alexjson['results']:
+            if 'ids' in result:
+                if 'openalex' in result['ids']:
+                    a = result['ids']['openalex'].rsplit("/")
+                    test_id_list.append(a[-1])
+        print("test_id_list: ", test_id_list)
+
+#test alexquery():
+alexquery("addiction", "2011")
