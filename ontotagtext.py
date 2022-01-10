@@ -153,14 +153,14 @@ class MultiExtractorComponent(object):
         return any([t._.get("is_ontol_term") for t in tokens])
 
     def get_term(self, term_id): 
-        if term_id.strip() in [ v['id'] for v in self.terms.values()]: 
-            keys = [k for k, v in self.terms.items() if v['id'] == term_id]
+        if term_id in [ v['id'] for v in self.terms.values()]: 
+            keys = [k for k, v in self.terms.items() if v['id'].strip() == term_id.strip()]
             return self.terms[keys[0]]
         else:
             return None             
 
     def get_label(self, label): 
-        if label.lower() in [ v['name'].lower() for v in self.terms.values()]: 
+        if label.strip().lower() in [ v['name'].strip().lower() for v in self.terms.values()]: 
             keys = [k for k, v in self.terms.items() if v['name'].strip().lower() == label.strip().lower()]
             return self.terms[keys[0]]
         else:

@@ -413,7 +413,7 @@ def tag():
     
     use_oger = True
 
-    build_terms = False
+    build_terms = True
 
     engine = inflect.engine()
 
@@ -438,10 +438,10 @@ def tag():
                         if term['id'] == "BCIO:010055":
                             continue
                         else:
-                            # if term['id'] == "BCIO:037000":
-                            #     print("FOUND INTERVENTION ID")
-                            # if term['name'].strip().lower() == "intervention":
-                            #     print("FOUND INTERVENTION")
+                            # if term['id'] == "ADDICTO:0000303":
+                            #     print("FOUND Tobacco ID")
+                            # if term['name'].strip().lower() == "tobacco":
+                            #     print("FOUND TOBACCO")
                             # print("got ont: ", ont)
                             # if ont == "BCIO":
                                 # print("got BCIO: ", ont)
@@ -542,8 +542,8 @@ def tag():
                 # print("term is: ", term)
                 if term:
                     ontol_label = term['name']
-                    # if ontol_label == "intervention":
-                    #     print("GOT INTERVENTION FROM SPACY")
+                    # if ontol_label == "tobacco":
+                    #     print("GOT TOBACCO FROM SPACY")
                     # print("ontol_label: ", ontol_label)
                     ontol_def = str(term['definition'])
                     # print("ontol_def: ", ontol_def)
