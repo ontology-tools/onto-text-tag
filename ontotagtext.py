@@ -160,7 +160,7 @@ class MultiExtractorComponent(object):
             return None             
 
     def get_label(self, label): 
-        if label in [ v['name'] for v in self.terms.values()]: 
+        if label.lower() in [ v['name'].lower() for v in self.terms.values()]: 
             keys = [k for k, v in self.terms.items() if v['name'].strip().lower() == label.strip().lower()]
             return self.terms[keys[0]]
         else:

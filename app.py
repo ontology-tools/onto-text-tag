@@ -430,7 +430,7 @@ def tag():
             for f in onto_extractor3.terms:
                 l = onto_extractor3.get_label(f)
                 if l is not None:
-                    term=onto_extractor3.get_term(l['id'].strip())
+                    term=onto_extractor3.get_term(l['id'])
                     if term:
                         # print("got term: ", term)
                         #todo: change 'ont' to something that makes sense (based on 'id'?)
@@ -438,6 +438,10 @@ def tag():
                         if term['id'] == "BCIO:010055":
                             continue
                         else:
+                            # if term['id'] == "BCIO:037000":
+                            #     print("FOUND INTERVENTION ID")
+                            # if term['name'].strip().lower() == "intervention":
+                            #     print("FOUND INTERVENTION")
                             # print("got ont: ", ont)
                             # if ont == "BCIO":
                                 # print("got BCIO: ", ont)
@@ -478,7 +482,8 @@ def tag():
 
                         # else:
                         #     continue            
-
+                    else:
+                        print("No term for label: ", l)
                 
         
             filename = 'static/test_terms_test.tsv'
@@ -494,13 +499,6 @@ def tag():
                 writer.writerows(mydict) 
             print("done creating test_terms_test.tsv")
         
-
-
-
-
-
-
-
 
         # replacing nlp with OGER:
         # fields list for entity is here: https://github.com/OntoGene/OGER/blob/f23cf9bec70ba51f85605f26f3de2df72f7c4d5a/oger/doc/document.py
@@ -544,15 +542,18 @@ def tag():
                 # print("term is: ", term)
                 if term:
                     ontol_label = term['name']
+                    # if ontol_label == "intervention":
+                    #     print("GOT INTERVENTION FROM SPACY")
                     # print("ontol_label: ", ontol_label)
                     ontol_def = str(term['definition'])
                     # print("ontol_def: ", ontol_def)
                     ontol_namespace = term['id'][0:term['id'].index(":")]
                     # print("ontol_namespace: ", ontol_namespace)
-                else:
-                    ontol_label = token.idx
-                    ontol_def = token.text
-                    ontol_namespace = ""
+                # else:
+                #     print("no term for ", token.idx)
+                #     ontol_label = token.idx
+                #     ontol_def = token.text
+                #     ontol_namespace = ""
                     # print("ontol_namespace not found")
                 tag_results.append({"ontol_id": token._.ontol_id,
                                     "span_text": token.text,
