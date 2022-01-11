@@ -102,6 +102,7 @@ class MultiExtractorComponent(object):
                     patterns.append(nlp.make_doc(plural.lower()))
                 synonyms = ontol.get_annotations(termid, SYN)
                 for s in synonyms:
+                    # print("adding SYNONYM in ontotagtext: ", s)
                     if s.strip().lower() not in stopwords:
                         # if s.strip().lower() == "tobacco":
                         #     print("got tobacco")

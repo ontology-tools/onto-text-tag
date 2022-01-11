@@ -413,7 +413,7 @@ def tag():
     
     use_oger = True
 
-    build_terms = True
+    build_terms = False
 
     engine = inflect.engine()
 
@@ -460,42 +460,79 @@ def tag():
                                 continue
 
                             
-                            #adding synonyms and plurals of synonyms here:
-                            termid = term['id']
-                            for ontol in onto_extractor3.ontols:
-                                # print("checking ontol: ", ontol)
-                            # ontol = onto_extractor3.ontols[0] #todo: loop over all?                     
-                                SYN = "http://purl.obolibrary.org/obo/IAO_0000118"
-                                synonyms = ontol.get_annotations(termid, SYN)                    
+                            # #adding synonyms and plurals of synonyms here:
+                            # #todo: need to update below and find "smoking cessation"
+                            # # termid below is only for found id's, not synonyms.. 
+                            # termid = term['id']
+                            # termlabel = term['name']
+                            # # for ontol in self.ontols: 
+                            # for ontol in onto_extractor3.ontols:
+                            #     # print("checking ontol: ", ontol)
+                            # # ontol = onto_extractor3.ontols[0] #todo: loop over all?                     
+                            #     SYN = "http://purl.obolibrary.org/obo/IAO_0000118"
+                            #     synonyms = ontol.get_annotations(termlabel, SYN)                    
 
-                                for s in synonyms:
-                                    if s.strip().lower() not in stopwords:                            
-                                        syn1 = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': s, 'name': term['name'], 'definition': term['definition']}
-                                        mydict.append(syn1)
-                                        try:
-                                            plural2 = engine.plural(s.strip())
-                                            plur2 = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': plural2, 'name': term['name'], 'definition': term['definition']}
-                                            mydict.append(plur2)
-                                        except:
-                                            print("Problem getting plural of ",s)
-                                            continue
+                            #     for s in synonyms:
+                            #         print("adding SYNONYM: ", s)
+                            #         # if termid == "ADDICTO:0000649":
+                            #         #     print("adding ", s)
+                            #         if s.strip().lower() not in stopwords:                            
+                            #             syn1 = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': s, 'name': term['name'], 'definition': term['definition']}
+                            #             mydict.append(syn1)
+                            #             try:
+                            #                 plural2 = engine.plural(s.strip())
+                            #                 plur2 = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': plural2, 'name': term['name'], 'definition': term['definition']}
+                            #                 mydict.append(plur2)
+                            #             except:
+                            #                 print("Problem getting plural of ",s)
+                            #                 pass
 
                         # else:
                         #     continue            
                     else:
                         print("No term for label: ", l)
-                
+            # use mydict id to check for synonyms and plurals of synonyms:    
+            
+            for ontol in onto_extractor3.ontols:
+                for termid in ontol.get_classes():
+                    # print("checking ontol: ", ontol)
+                    # ontol = onto_extractor3.ontols[0] #todo: loop over all?                     
+                    SYN = "http://purl.obolibrary.org/obo/IAO_0000118"
+                    DEFINITION = "http://purl.obolibrary.org/obo/IAO_0000115"
+                    synonyms = ontol.get_annotations(termid, SYN)
+                    label = ontol.get_annotation(termid, RDFSLABEL)
+                    definition = ontol.get_annotation(termid, DEFINITION)
+                    termshortid = ontol.get_id_for_iri(termid)
+                    if termshortid: 
+                        # termshortid from last /:
+                        ontol_namespace = termshortid[termshortid.rfind("/")+1:].strip()
+                        #ontol_namespace string until :
+                        ontol_namespace = ontol_namespace[0:ontol_namespace.index(":")]
+                        # ontol_namespace = termshortid[0:termshortid.index(":")]
+                    else:
+                        ontol_namespace = "" #termshortid[0:termshortid.index(":")]
+                    
+                    for s in synonyms:
+                        print("adding SYNONYM: ", s)
+                        print("got ontol_namespace: ", ontol_namespace)
+                        # if termid == "ADDICTO:0000649":
+                        #     print("adding ", s)
+                        if s.strip().lower() not in stopwords:                            
+                            syn1 = {'a': '', 'ont': ontol_namespace, 'id': termshortid, 'alt_name': s, 'name': label, 'definition': definition}
+                            mydict.append(syn1)
+                            try:
+                                plural2 = engine.plural(s.strip())
+                                plur2 = {'a': '', 'ont': ontol_namespace, 'id': termshortid, 'alt_name': plural2, 'name': label, 'definition': definition}
+                                mydict.append(plur2)
+                            except:
+                                print("Problem getting plural of ",s)
+                                pass
         
             filename = 'static/test_terms_test.tsv'
             fields = ['a', 'ont', 'id', 'alt_name', 'name', 'definition'] 
             with open(filename, 'w') as tsvfile: 
                 # creating a csv dict writer object 
                 writer = csv.DictWriter(tsvfile, delimiter='\t', fieldnames=fields) 
-                    
-                # # writing headers (field names) 
-                # writer.writeheader() 
-                    
-                # writing data rows 
                 writer.writerows(mydict) 
             print("done creating test_terms_test.tsv")
         
@@ -514,13 +551,13 @@ def tag():
         pl.process(coll)
         
         for entity in coll[0].iter_entities():
-            span_text = entity.text 
-            ontol_id = entity.cid #correct
-            ontol_label = entity.pref
+            span_text = entity.text.strip()
+            ontol_id = entity.cid.strip() #correct
+            ontol_label = entity.pref.strip()
             # print("ontol_label: ", ontol_label)
-            ontol_def = entity.type
+            ontol_def = entity.type.strip()
             # print("ontol_def: ", ontol_def)
-            ontol_namespace = entity.db
+            ontol_namespace = entity.db.strip()
             # print("ontol_namespace: ", ontol_namespace)
             tag_results.append({"ontol_id": ontol_id,
                                     "span_text": span_text,
@@ -530,31 +567,48 @@ def tag():
                                     "ontol_link": "http://addictovocab.org/"+ontol_id,
                                     "match_index": ontol_id})
 
+    # else: # generate test_terms_test from nlp:
+    #     mydict = []
+    #     doc3 = nlp(text)
+    #     # get ontology IDs identified
+    #     for token in doc3:
+    #         # print("token: ", token)
+    #         if token._.is_ontol_term:
+    #             # print("token details: ", token._.ontol_id, token.text, token.idx)
+    #             term=onto_extractor3.get_term(token._.ontol_id)
+    #             ont = term['id'][0:term['id'].index(":")]
+    #             # print("ontol_id is: ", token._.ontol_id)
+    #             # print("term is: ", term)
+    #             if term:
+    #                 ontol_label = term['name']
+    #                 # if ontol_label == "tobacco":
+    #                 #     print("GOT TOBACCO FROM SPACY")
+    #                 # print("ontol_label: ", ontol_label)
+    #                 ontol_def = str(term['definition'])
+    #                 # print("ontol_def: ", ontol_def)
+    #                 ontol_namespace = term['id'][0:term['id'].index(":")]
+    #                 sing = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': term['name'], 'name': term['name'], 'definition': term['definition']}
+    #                 mydict.append(sing)
+    #     filename = 'static/test_terms_test.tsv'
+    #     fields = ['a', 'ont', 'id', 'alt_name', 'name', 'definition'] 
+    #     with open(filename, 'w') as tsvfile: 
+    #         # creating a csv dict writer object 
+    #         writer = csv.DictWriter(tsvfile, delimiter='\t', fieldnames=fields) 
+    #         writer.writerows(mydict) 
+    #     print("done creating test_terms_test.tsv")
+
+
     else: #nlp/spacy
         doc3 = nlp(text)
         # get ontology IDs identified
         for token in doc3:
-            # print("token: ", token)
             if token._.is_ontol_term:
-                # print("token details: ", token._.ontol_id, token.text, token.idx)
                 term=onto_extractor3.get_term(token._.ontol_id)
-                # print("ontol_id is: ", token._.ontol_id)
-                # print("term is: ", term)
                 if term:
                     ontol_label = term['name']
-                    # if ontol_label == "tobacco":
-                    #     print("GOT TOBACCO FROM SPACY")
-                    # print("ontol_label: ", ontol_label)
-                    ontol_def = str(term['definition'])
-                    # print("ontol_def: ", ontol_def)
+                    ontol_def = str(term['definition'])                    
                     ontol_namespace = term['id'][0:term['id'].index(":")]
-                    # print("ontol_namespace: ", ontol_namespace)
-                # else:
-                #     print("no term for ", token.idx)
-                #     ontol_label = token.idx
-                #     ontol_def = token.text
-                #     ontol_namespace = ""
-                    # print("ontol_namespace not found")
+    
                 tag_results.append({"ontol_id": token._.ontol_id,
                                     "span_text": token.text,
                                     "ontol_label": ontol_label,
