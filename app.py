@@ -45,6 +45,9 @@ from bokeh.sampledata.iris import flowers
 import os
 import csv #for writing test_terms.csv (once only)
 
+#Memory profiler: 
+from memory_profiler import profile
+from timeit import default_timer as timer
 #OGER:
 import oger
 from oger.ctrl.router import Router, PipelineServer
@@ -337,12 +340,6 @@ def visualise_similarities():
     # return ( json.dumps({"message":"Success"}), 200 )
     return render_template('similarity.html')
 
-#todo: below no longer needed?
-# @app.route('/similarity')
-# def similarity():    
-#     # iframe = url_for('chordout')
-#     return render_template("similarity.html") #, iframe=iframe) 
-
 @app.route('/pubmed', methods=['POST', 'GET'])
 def pubmed():
     if os.environ.get("FLASK_ENV")=='development':
@@ -379,20 +376,11 @@ def pubmed():
 # Text tagging app
 
 @ app.route('/tag', methods=['POST'])
+# @profile
 def tag():
+    start = timer()
     if os.environ.get("FLASK_ENV")=='development':
         development=True
-
-    #test OGER:
-    # coll = pl.load_one(['29148565'], fmt='pubmed')
-    # print(coll[0][0].text) # title
-    # pl.process(coll) 
-    # entity = next(coll[0].iter_entities())
-    # print(entity.info)
-    # for entity in coll[0].iter_entities():
-    #     # print("full entity: ", entity)
-
-    #     print("entity: ", entity.start, entity.text, entity.end, entity.info, " , ", entity.text)
 
     text = request.form['inputText']
     details = request.form.get('inputDetails') #pmid
@@ -411,7 +399,7 @@ def tag():
     # process the text
     tag_results = []
     
-    use_oger = True
+    use_oger = False
 
     build_terms = False
 
@@ -424,27 +412,17 @@ def tag():
             stopwords.add("ands")
             stopwords.add("ends")
             stopwords.add("ci")
-            #test build test_terms.tsv from onto_extractor3:
-            #todo: still no plurals?
+            #test build test_terms_test.tsv from onto_extractor3:
             mydict = []
             for f in onto_extractor3.terms:
                 l = onto_extractor3.get_label(f)
                 if l is not None:
                     term=onto_extractor3.get_term(l['id'])
-                    if term:
-                        # print("got term: ", term)
-                        #todo: change 'ont' to something that makes sense (based on 'id'?)
+                    if term:                        
                         ont = term['id'][0:term['id'].index(":")]
                         if term['id'] == "BCIO:010055":
                             continue
                         else:
-                            # if term['id'] == "ADDICTO:0000303":
-                            #     print("FOUND Tobacco ID")
-                            # if term['name'].strip().lower() == "tobacco":
-                            #     print("FOUND TOBACCO")
-                            # print("got ont: ", ont)
-                            # if ont == "BCIO":
-                                # print("got BCIO: ", ont)
                             # order: 'a', 'ont', 'id', 'alt_name', 'name', 'definition'
                             sing = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': term['name'], 'name': term['name'], 'definition': term['definition']}
                             mydict.append(sing)
@@ -452,51 +430,17 @@ def tag():
                             #plurals:                    
                             try:
                                 plural = engine.plural(term['name'].strip())
-                                # print("got plural: ", plural)
                                 plur = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': plural, 'name': term['name'], 'definition': term['definition']}
                                 mydict.append(plur)
                             except: 
                                 print("Problem getting plural of ", term['name'].strip())
-                                continue
-
-                            
-                            # #adding synonyms and plurals of synonyms here:
-                            # #todo: need to update below and find "smoking cessation"
-                            # # termid below is only for found id's, not synonyms.. 
-                            # termid = term['id']
-                            # termlabel = term['name']
-                            # # for ontol in self.ontols: 
-                            # for ontol in onto_extractor3.ontols:
-                            #     # print("checking ontol: ", ontol)
-                            # # ontol = onto_extractor3.ontols[0] #todo: loop over all?                     
-                            #     SYN = "http://purl.obolibrary.org/obo/IAO_0000118"
-                            #     synonyms = ontol.get_annotations(termlabel, SYN)                    
-
-                            #     for s in synonyms:
-                            #         print("adding SYNONYM: ", s)
-                            #         # if termid == "ADDICTO:0000649":
-                            #         #     print("adding ", s)
-                            #         if s.strip().lower() not in stopwords:                            
-                            #             syn1 = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': s, 'name': term['name'], 'definition': term['definition']}
-                            #             mydict.append(syn1)
-                            #             try:
-                            #                 plural2 = engine.plural(s.strip())
-                            #                 plur2 = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': plural2, 'name': term['name'], 'definition': term['definition']}
-                            #                 mydict.append(plur2)
-                            #             except:
-                            #                 print("Problem getting plural of ",s)
-                            #                 pass
-
-                        # else:
-                        #     continue            
+                                continue        
                     else:
                         print("No term for label: ", l)
             # use mydict id to check for synonyms and plurals of synonyms:    
             
             for ontol in onto_extractor3.ontols:
-                for termid in ontol.get_classes():
-                    # print("checking ontol: ", ontol)
-                    # ontol = onto_extractor3.ontols[0] #todo: loop over all?                     
+                for termid in ontol.get_classes():                   
                     SYN = "http://purl.obolibrary.org/obo/IAO_0000118"
                     DEFINITION = "http://purl.obolibrary.org/obo/IAO_0000115"
                     synonyms = ontol.get_annotations(termid, SYN)
@@ -508,15 +452,12 @@ def tag():
                         ontol_namespace = termshortid[termshortid.rfind("/")+1:].strip()
                         #ontol_namespace string until :
                         ontol_namespace = ontol_namespace[0:ontol_namespace.index(":")]
-                        # ontol_namespace = termshortid[0:termshortid.index(":")]
                     else:
-                        ontol_namespace = "" #termshortid[0:termshortid.index(":")]
+                        ontol_namespace = "" 
                     
                     for s in synonyms:
                         print("adding SYNONYM: ", s)
                         print("got ontol_namespace: ", ontol_namespace)
-                        # if termid == "ADDICTO:0000649":
-                        #     print("adding ", s)
                         if s.strip().lower() not in stopwords:                            
                             syn1 = {'a': '', 'ont': ontol_namespace, 'id': termshortid, 'alt_name': s, 'name': label, 'definition': definition}
                             mydict.append(syn1)
@@ -545,20 +486,14 @@ def tag():
         
         # print("coll_pmid = ", coll_pmid)
         coll = pl.load_one(coll_pmid, fmt='pubmed')
-        
-            # coll = pl.load_one(text, 'txt') #todo: Text field option not working currently
-        # print(coll[0][0].text) # title
         pl.process(coll)
         
         for entity in coll[0].iter_entities():
             span_text = entity.text.strip()
             ontol_id = entity.cid.strip() #correct
             ontol_label = entity.pref.strip()
-            # print("ontol_label: ", ontol_label)
             ontol_def = entity.type.strip()
-            # print("ontol_def: ", ontol_def)
             ontol_namespace = entity.db.strip()
-            # print("ontol_namespace: ", ontol_namespace)
             tag_results.append({"ontol_id": ontol_id,
                                     "span_text": span_text,
                                     "ontol_label": ontol_label,
@@ -566,37 +501,6 @@ def tag():
                                     "ontol_namespace": ontol_namespace,
                                     "ontol_link": "http://addictovocab.org/"+ontol_id,
                                     "match_index": ontol_id})
-
-    # else: # generate test_terms_test from nlp:
-    #     mydict = []
-    #     doc3 = nlp(text)
-    #     # get ontology IDs identified
-    #     for token in doc3:
-    #         # print("token: ", token)
-    #         if token._.is_ontol_term:
-    #             # print("token details: ", token._.ontol_id, token.text, token.idx)
-    #             term=onto_extractor3.get_term(token._.ontol_id)
-    #             ont = term['id'][0:term['id'].index(":")]
-    #             # print("ontol_id is: ", token._.ontol_id)
-    #             # print("term is: ", term)
-    #             if term:
-    #                 ontol_label = term['name']
-    #                 # if ontol_label == "tobacco":
-    #                 #     print("GOT TOBACCO FROM SPACY")
-    #                 # print("ontol_label: ", ontol_label)
-    #                 ontol_def = str(term['definition'])
-    #                 # print("ontol_def: ", ontol_def)
-    #                 ontol_namespace = term['id'][0:term['id'].index(":")]
-    #                 sing = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': term['name'], 'name': term['name'], 'definition': term['definition']}
-    #                 mydict.append(sing)
-    #     filename = 'static/test_terms_test.tsv'
-    #     fields = ['a', 'ont', 'id', 'alt_name', 'name', 'definition'] 
-    #     with open(filename, 'w') as tsvfile: 
-    #         # creating a csv dict writer object 
-    #         writer = csv.DictWriter(tsvfile, delimiter='\t', fieldnames=fields) 
-    #         writer.writerows(mydict) 
-    #     print("done creating test_terms_test.tsv")
-
 
     else: #nlp/spacy
         doc3 = nlp(text)
@@ -617,8 +521,8 @@ def tag():
                                     "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
                                     "match_index": token.idx})
 
-    # print(f"Got tag results {tag_results}")
-
+    elapsed_time = timer() - start
+    print(f"Elapsed time: {elapsed_time}")
     return render_template('index.html',
                            text=text,
                            details=details,
@@ -628,14 +532,6 @@ def tag():
                            id=idName,
                            tag_results=tag_results,
                            development=development)
-
-# get id from label here:
-# @app.route('/get_ids', methods=['GET', 'POST'])
-# def get_ids():
-#     ontology_id = request.form.get('ontology_id') #get ontology_label?
-#     print("got ontology_id: ", ontology_id)
-#     return ( json.dumps({"message":"Success",
-#                              "response": ontology_id}), 200 )
 
 if __name__ == "__main__":
     app.run()
