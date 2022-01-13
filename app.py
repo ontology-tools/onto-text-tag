@@ -372,13 +372,34 @@ def pubmed():
             print(err)
     return render_template('index.html', error_msg=f"No abstract found for PubMed ID {id}", development = development)
 
-
+#for spacy vs OGER test
+def get_ontology_id_list_from_file():
+    #todo: unique ontology id list from column 1 in ontotermentions.csv file:   
+    ontology_id_list = []
+    with open('/home/tom/Documents/ontotermentions_tester.csv', 'r') as csvfile:
+        reader = csv.reader(csvfile, delimiter=',')
+        for iter, row in enumerate(reader):
+            if iter > 100:
+                break            
+            ontology_id_list.append(row[1])    
+    return ontology_id_list
 # Text tagging app
 
 @ app.route('/tag', methods=['POST'])
 # @profile
 def tag():
-    start = timer()
+    #build list of unique ontology ids from column 2 of ontotermentions.csv file 
+    # ontology_id_list_from_file = get_ontology_id_list_from_file()
+    # start = timer()
+    # test_tag(True, ontology_id_list_from_file)
+    # elapsed_time = timer() - start
+    # print(f"Elapsed time OGER: {elapsed_time}")
+
+    # start = timer()
+    # test_tag(False, ontology_id_list_from_file)
+    # elapsed_time = timer() - start
+    # print(f"Elapsed time SPACY: {elapsed_time}")
+    
     if os.environ.get("FLASK_ENV")=='development':
         development=True
 
@@ -399,13 +420,13 @@ def tag():
     # process the text
     tag_results = []
     
-    use_oger = False
+    use_oger = True
 
     build_terms = False
 
     engine = inflect.engine()
 
-    if use_oger:
+    if use_oger:        
         if build_terms:
             # stop words, don't try to match these
             stopwords = nlp.Defaults.stop_words
@@ -521,8 +542,8 @@ def tag():
                                     "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
                                     "match_index": token.idx})
 
-    elapsed_time = timer() - start
-    print(f"Elapsed time: {elapsed_time}")
+    # elapsed_time = timer() - start
+    # print(f"Elapsed time: {elapsed_time}")
     return render_template('index.html',
                            text=text,
                            details=details,
@@ -532,6 +553,98 @@ def tag():
                            id=idName,
                            tag_results=tag_results,
                            development=development)
+
+#test of the tagger:
+# @profile
+def test_tag(use_oger, ontology_id_list):
+    # print("test_tag received id_list: ", ontology_id_list)
+    id_list = ontology_id_list
+    # id_list = ['ADDICTO:29148565']
+    #todo: Spacy needs text, OGER needs idName..
+    # start = timer()
+    details = ""
+    date = ""
+    title = ""
+    authors = ""
+
+    # process the text
+    tag_results = []
+    
+    # use_oger = False
+
+    for idName in id_list:
+        # print("checking id: ", idName)
+        if use_oger:
+            # print("checking OGER: ", iter)
+
+            coll_pmid = []    
+            coll_pmid.append(idName) #idName is the pubmed id
+            
+            # print("coll_pmid = ", coll_pmid)
+            coll = pl.load_one(coll_pmid, fmt='pubmed')
+            pl.process(coll)
+            
+            for entity in coll[0].iter_entities():
+                span_text = entity.text.strip()
+                # print("span_text: ", span_text)
+                ontol_id = entity.cid.strip() #correct
+                ontol_label = entity.pref.strip()
+                ontol_def = entity.type.strip()
+                ontol_namespace = entity.db.strip()
+                tag_results.append({"ontol_id": ontol_id,
+                                        "span_text": span_text,
+                                        "ontol_label": ontol_label,
+                                        "ontol_def": ontol_def,
+                                        "ontol_namespace": ontol_namespace,
+                                        "ontol_link": "http://addictovocab.org/"+ontol_id,
+                                        "match_index": ontol_id})
+
+        else: #nlp/spacy
+            # print("checking SPACY: ", iter)
+            #get text from idName
+            idName = f"{idName}"
+            text = ""
+            try:
+                results = fetch_details([idName])
+                for result in results:
+                    resultDetail = results[result]
+                    text = get_abstract_text(resultDetail)
+                    # # print(f"Got abstract text {abstractText}")
+                    # articleDetails = get_article_details(resultDetail)
+                    # # print("Got articleDetails: ", articleDetails) #when we get the right details...
+                    # try:
+                    #     dateA, titleA, authorsA = articleDetails.split(';')
+                    # except:
+                    #     pass
+                    # if abstractText:
+                    #     r = requests.post(url_for("tag", _external=True), data={
+                    #                     "inputDetails": articleDetails, "inputText": abstractText, "dateDetails": dateA, "titleDetails": titleA, "authorsDetails": authorsA})
+                    #     return r.text, r.status_code, r.headers.items()
+            except Exception as err:  # 400 bad request handling, also if no internet connection
+                print(err)
+            # print("got text: ", text)
+            doc3 = nlp(text)
+            # get ontology IDs identified
+            for token in doc3:
+                if token._.is_ontol_term:
+                    term=onto_extractor3.get_term(token._.ontol_id)
+                    if term:
+                        ontol_label = term['name']
+                        ontol_def = str(term['definition'])                    
+                        ontol_namespace = term['id'][0:term['id'].index(":")]
+        
+                    tag_results.append({"ontol_id": token._.ontol_id,
+                                        "span_text": token.text,
+                                        "ontol_label": ontol_label,
+                                        "ontol_def": ontol_def,
+                                        "ontol_namespace": ontol_namespace,
+                                        "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
+                                        "match_index": token.idx})
+
+    # elapsed_time = timer() - start
+    # print(f"Elapsed time: {elapsed_time}")
+    
+
 
 if __name__ == "__main__":
     app.run()
