@@ -94,6 +94,7 @@ def hv_generator(ontology_id_input, should_get_descendents):
         opts.Chord(cmap='Category20', edge_cmap='Category20', edge_color=dim('source').str(),
                 labels='name', node_color=dim('index').str()))
     print("The time difference is :", timer() - start_time)
+    start_time_2 = timer()
     #error message html if no chord plot to show:
     if dcp.empty:
         print('empty dataframe, should create an error message chordout.html here')
@@ -103,5 +104,6 @@ def hv_generator(ontology_id_input, should_get_descendents):
         renderer = hv.renderer('bokeh')
         hvplot = renderer.get_plot(chord)
         html = renderer.static_html(hvplot)
+        print("Time taken for preparing render :", timer() - start_time_2)
         return json.dumps(html)
         
