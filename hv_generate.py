@@ -25,10 +25,11 @@ def hv_generator(ontology_id_input, should_get_descendents):
     start_time = timer()
     from app import get_all_descendents #todo: refactor to avoid this circular import
     # load csv:
-    df2 = pd.read_csv("static/ontotermmentions.csv", delimiter = ",", index_col=0, engine='c')
-    
+    df2 = pd.read_csv("static/ontotermmentions.csv", na_filter = False, delimiter = ",", index_col=0, engine='c')    
     # load csv with dtype specified (not working): 
-    # df2 = pd.read_csv("static/ontotermmentions.csv", index_col=0, dtype={'ADDICTOID': 'category' ,'LABEL': 'category', 'PMID': 'int64'}) 
+    # df2 = pd.read_csv("static/ontotermmentions.csv", delimiter = ",", engine="c", na_filter = False, index_col=0, dtype={'ADDICTOID': 'object' ,'LABEL': 'object', 'PMID': 'int64'}) 
+    # df2 = pd.read_csv("static/ontotermmentions.csv", delimiter = ",", engine="c", na_filter = False, index_col=0, dtype={'ADDICTOID': 'category' ,'LABEL': 'category', 'PMID': 'int64'}) 
+
     print("read csv into dataframe")
     # change dtype to category on the fly (not working):
     # df2["LABEL"] = df2["LABEL"].astype("category")
