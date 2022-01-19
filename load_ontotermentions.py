@@ -21,20 +21,21 @@ def load_ontotermentions():
             print(count)
             number, ID, name, pmID = line[0], line[1], line[2], line[3]
             if ID in ontoterminology:
-                if str(pmID) not in ontoterminology[ID]:
-                    ontoterminology[ID].append(str(pmID))
+                if pmID not in ontoterminology[ID]:
+                    ontoterminology[ID]['PMID'].append(pmID)
+                    #got name already!
                     # print("added pmID: ", pmID)
             else: 
-                ontoterminology[ID] = [str(pmID)]  
+                ontoterminology[ID] = {'PMID': [pmID], 'NAME': name} 
                 # print("added pmID: ", pmID)
-    print("got full ontoterminology: ", ontoterminology)  
+    # print("got full ontoterminology: ", ontoterminology)  
     # ontoterminology to pickle:
     with open('ontoterminology.pkl', 'wb') as f:
         pickle.dump(ontoterminology, f)
     
 
-# load_ontotermentions()
-# print("done")
+load_ontotermentions()
+print("done")
    
 def load_check_pickle():
     with open('ontoterminology.pkl', 'rb') as f:
