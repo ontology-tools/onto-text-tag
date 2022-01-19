@@ -76,8 +76,7 @@ def hv_generator(ontology_id_input, should_get_descendents):
                 # print("key: ", key)
                 mentions[ontoterminology[key]['NAME']] = ontoterminology[key]['PMID']
     # print("mentions: ", list(mentions.keys()))
-
-    #todo: below is taking too long... 
+     
     chn_list = []
     for source in list(mentions.keys()):
         for target in list(mentions.keys()): 
@@ -89,21 +88,27 @@ def hv_generator(ontology_id_input, should_get_descendents):
                     chn = {"source": source, "target": target, "PMID": len(intersection)}
                     # print("adding chn: ", chn)
                     chn_list.append(chn)
-    #todo: join the inverse mirror entries: 
+    #check and drop inverse duplicates
     de_dup_chn_list = []
     for i in chn_list:
         for j in chn_list: 
-            if (i['source'] + i['target']) == (j['target'] + j['source']): #todo: finds all, should be half
-                # print("found inverse: ", i['source'] +", " + i['target'])
-                de_dup_chn_list.append(i) #todo: need to still add the PMID numbers together here!
+            if (i['source'] + i['target']) == (j['target'] + j['source']): 
+                add_item = True
+                for k in de_dup_chn_list: #todo: this kludge could be a lot more efficient? 
+                    if i['source'] + i['target'] == k['target'] + k['source']:
+                        add_item = False
+                if add_item: 
+                    de_dup_chn_list.append(i) 
             
 
     # print(de_dup_chn_list)
     print("length: ", len(chn_list))
     print("de-dup len: ", len(de_dup_chn_list))
-
+    # print("need to get this format now: ", data_chord_plot)
+    #todo: convert de_dup_chn_list to data_chord_plot format
+    links = pd.DataFrame.from_dict(de_dup_chn_list)
     # Build the data table expected by the visualisation library
-    links = data_chord_plot
+    # links = data_chord_plot #old version from PD
     node_names = links.source.append(links.target)
     node_names = node_names.unique()
     node_info = {"index":node_names,"name":node_names,"group":[1]*len(node_names)}
