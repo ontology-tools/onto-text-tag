@@ -21,7 +21,7 @@ import io
 # @profile
 def hv_generator(ontology_id_input, should_get_descendents):
     start_time = timer()
-    # from app import get_all_descendents #todo: refactor to avoid this circular import
+    from app import get_all_descendents #todo: refactor to avoid this circular import
     #load ontotermilology.pkl:
     with open('ontoterminology.pkl', 'rb') as f:
         ontoterminology = pickle.load(f)
@@ -41,10 +41,12 @@ def hv_generator(ontology_id_input, should_get_descendents):
     # # print("dtypes: ", df2.dtypes)
 
     # # get descendants?
-    # if should_get_descendents == True:
-    #     ontology_id_list = get_all_descendents(ontology_id_input)
-    # else:
-    #     ontology_id_list = ontology_id_input 
+    if should_get_descendents == True:
+        print("getting descendents now")
+        ontology_id_list = get_all_descendents(ontology_id_input)
+        print("got them")
+    else:
+        ontology_id_list = ontology_id_input 
     
     # df2 = df2.drop(df2[~df2.ADDICTOID.isin(ontology_id_list)].index)
 
@@ -69,7 +71,7 @@ def hv_generator(ontology_id_input, should_get_descendents):
     # print("Final chord plot: ", data_chord_plot)
 
     #new method using ontoterminology: 
-    ontology_id_list = ontology_id_input
+    
     mentions = {}
     for selectedID in ontology_id_list:
         for key in list(ontoterminology.keys()):
@@ -77,7 +79,7 @@ def hv_generator(ontology_id_input, should_get_descendents):
                 # print("key: ", key)
                 mentions[ontoterminology[key]['NAME']] = ontoterminology[key]['PMID']
     # print("mentions: ", list(mentions.keys()))
-     
+    print("loaded mentions")
     chn_list = []
     for source in list(mentions.keys()):
         for target in list(mentions.keys()): 
@@ -91,6 +93,7 @@ def hv_generator(ontology_id_input, should_get_descendents):
                     chn = {"source": source, "target": target, "PMID": len(intersection)}
                     # print("adding chn: ", chn)
                     chn_list.append(chn)
+    print("checking for inverse duplicates")
     #check and drop inverse duplicates
     de_dup_chn_list = []
     for i in chn_list:
@@ -102,7 +105,9 @@ def hv_generator(ontology_id_input, should_get_descendents):
                         add_item = False
                 if add_item: 
                     de_dup_chn_list.append(i) 
-            
+
+    #todo: test if this is faster than above de-dup: 
+    # de_dup_chn_list = chn_list        
 
     # print(de_dup_chn_list)
     print("length: ", len(chn_list))
@@ -124,7 +129,7 @@ def hv_generator(ontology_id_input, should_get_descendents):
     chord.opts(
         opts.Chord(cmap='Category20', edge_cmap='Category20', edge_color=dim('source').str(),
                 labels='name', node_color=dim('index').str()))
-    print("The time difference is :", timer() - start_time)
+    print("Time taken to find mentions :", timer() - start_time)
     start_time_2 = timer()
     #todo: error message html if no chord plot to show:
     # if dcp.empty:
