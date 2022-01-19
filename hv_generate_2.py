@@ -83,6 +83,8 @@ def hv_generator(ontology_id_input, should_get_descendents):
         for target in list(mentions.keys()): 
             if source.strip() == "" or target.strip() == "":
                 pass
+            elif source.strip() == target.strip():
+                pass
             else:
                 intersection = list(set(mentions[source]).intersection(set(mentions[target])))
                 if len(intersection) > 0: 
