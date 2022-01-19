@@ -21,54 +21,55 @@ import io
 # @profile
 def hv_generator(ontology_id_input, should_get_descendents):
     start_time = timer()
-    from app import get_all_descendents #todo: refactor to avoid this circular import
+    # from app import get_all_descendents #todo: refactor to avoid this circular import
     #load ontotermilology.pkl:
     with open('ontoterminology.pkl', 'rb') as f:
         ontoterminology = pickle.load(f)
     #todo: idea here, what about creating a new ontotermentions from the ontology_id_input, with only the ones we need?
 
-    # load csv:
-    df2 = pd.read_csv("static/ontotermmentions.csv", na_filter = False, delimiter = ",", index_col=0, engine='c')    
-    # load csv with dtype specified (not working): 
-    # df2 = pd.read_csv("static/ontotermmentions.csv", delimiter = ",", engine="c", na_filter = False, index_col=0, dtype={'ADDICTOID': 'object' ,'LABEL': 'object', 'PMID': 'int64'}) 
-    # df2 = pd.read_csv("static/ontotermmentions.csv", delimiter = ",", engine="c", na_filter = False, index_col=0, dtype={'ADDICTOID': 'category' ,'LABEL': 'category', 'PMID': 'int64'}) 
+    # # load csv:
+    # df2 = pd.read_csv("static/ontotermmentions.csv", na_filter = False, delimiter = ",", index_col=0, engine='c')    
+    # # load csv with dtype specified (not working): 
+    # # df2 = pd.read_csv("static/ontotermmentions.csv", delimiter = ",", engine="c", na_filter = False, index_col=0, dtype={'ADDICTOID': 'object' ,'LABEL': 'object', 'PMID': 'int64'}) 
+    # # df2 = pd.read_csv("static/ontotermmentions.csv", delimiter = ",", engine="c", na_filter = False, index_col=0, dtype={'ADDICTOID': 'category' ,'LABEL': 'category', 'PMID': 'int64'}) 
 
-    print("read csv into dataframe")
-    # change dtype to category on the fly (not working):
-    # df2["LABEL"] = df2["LABEL"].astype("category")
-    # df2["ADDICTOID"] = df2["ADDICTOID"].astype("category")   
+    # print("read csv into dataframe")
+    # # change dtype to category on the fly (not working):
+    # # df2["LABEL"] = df2["LABEL"].astype("category")
+    # # df2["ADDICTOID"] = df2["ADDICTOID"].astype("category")   
 
-    # print("dtypes: ", df2.dtypes)
+    # # print("dtypes: ", df2.dtypes)
 
-    # get descendants?
-    if should_get_descendents == True:
-        ontology_id_list = get_all_descendents(ontology_id_input)
-    else:
-        ontology_id_list = ontology_id_input 
+    # # get descendants?
+    # if should_get_descendents == True:
+    #     ontology_id_list = get_all_descendents(ontology_id_input)
+    # else:
+    #     ontology_id_list = ontology_id_input 
     
-    df2 = df2.drop(df2[~df2.ADDICTOID.isin(ontology_id_list)].index)
+    # df2 = df2.drop(df2[~df2.ADDICTOID.isin(ontology_id_list)].index)
 
-    # This creates a table of pairs of terms in the same abstract
-    dcp = pd.merge(df2,df2,on="PMID",how="inner")
+    # # This creates a table of pairs of terms in the same abstract
+    # dcp = pd.merge(df2,df2,on="PMID",how="inner")
 
-    dcp = dcp.drop(dcp[dcp.LABEL_x == dcp.LABEL_y].index)    
+    # dcp = dcp.drop(dcp[dcp.LABEL_x == dcp.LABEL_y].index)    
 
-    # We filter the table just to the ones in the ID list we provided as input 
+    # # We filter the table just to the ones in the ID list we provided as input 
     
-    # We filter the table so that pairs are only represented in one direction, i.e. if we have both (smoking, children) and (children, smoking) for the same PMID we drop the second one
+    # # We filter the table so that pairs are only represented in one direction, i.e. if we have both (smoking, children) and (children, smoking) for the same PMID we drop the second one
 
-    # solution 2 from Stack Overflow - replaces iterrows():
-    dcp['ADDICTOID'] = dcp[['ADDICTOID_x', 'ADDICTOID_y']].apply(sorted, axis=1).apply(tuple)
-    dcp = dcp.drop_duplicates(subset=['ADDICTOID', 'PMID'], keep='first')
-    dcp = dcp.drop(['ADDICTOID'], axis=1)
+    # # solution 2 from Stack Overflow - replaces iterrows():
+    # dcp['ADDICTOID'] = dcp[['ADDICTOID_x', 'ADDICTOID_y']].apply(sorted, axis=1).apply(tuple)
+    # dcp = dcp.drop_duplicates(subset=['ADDICTOID', 'PMID'], keep='first')
+    # dcp = dcp.drop(['ADDICTOID'], axis=1)
 
-    # Now we count the distinct numbers of abstracts this combination appeared in    
-    data_chord_plot = dcp.groupby(['LABEL_x', 'LABEL_y'], as_index=False)[['PMID']].count()
-    data_chord_plot.columns = ['source','target','value']           
+    # # Now we count the distinct numbers of abstracts this combination appeared in    
+    # data_chord_plot = dcp.groupby(['LABEL_x', 'LABEL_y'], as_index=False)[['PMID']].count()
+    # data_chord_plot.columns = ['source','target','value']           
 
     # print("Final chord plot: ", data_chord_plot)
 
     #new method using ontoterminology: 
+    ontology_id_list = ontology_id_input
     mentions = {}
     for selectedID in ontology_id_list:
         for key in list(ontoterminology.keys()):
@@ -123,15 +124,15 @@ def hv_generator(ontology_id_input, should_get_descendents):
                 labels='name', node_color=dim('index').str()))
     print("The time difference is :", timer() - start_time)
     start_time_2 = timer()
-    #error message html if no chord plot to show:
-    if dcp.empty:
-        print('empty dataframe, should create an error message chordout.html here')
-        html_error_message = "<!doctype html><div><h4>ERROR CREATING TABLE - no associations found, or possibly some of the ID's were incorrect?</h4></div></html>"
-        return(json.dumps(html_error_message))
-    else:
-        renderer = hv.renderer('bokeh')
-        hvplot = renderer.get_plot(chord)
-        html = renderer.static_html(hvplot)
-        print("Time taken for preparing render :", timer() - start_time_2)
-        return json.dumps(html)
+    #todo: error message html if no chord plot to show:
+    # if dcp.empty:
+    #     print('empty dataframe, should create an error message chordout.html here')
+    #     html_error_message = "<!doctype html><div><h4>ERROR CREATING TABLE - no associations found, or possibly some of the ID's were incorrect?</h4></div></html>"
+    #     return(json.dumps(html_error_message))
+    # else:
+    renderer = hv.renderer('bokeh')
+    hvplot = renderer.get_plot(chord)
+    html = renderer.static_html(hvplot)
+    print("Time taken for preparing render :", timer() - start_time_2)
+    return json.dumps(html)
         
