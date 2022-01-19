@@ -40,6 +40,12 @@ print("done")
 def load_check_pickle():
     with open('ontoterminology.pkl', 'rb') as f:
         check_dict = pickle.load(f)
+    #test new ontotermentions limit to selected ID's: 
+    ontology_id_list =  ['ADDICTO:0000386', 'ADDICTO:0000803', 'ADDICTO:0000828', 'ADDICTO:0000678']
+    for ont in ontology_id_list:
+        for key in list(check_dict.keys()):
+            if ont == key: #found a match. 
+                print("key: ", key)
     print(check_dict)
 
 # load_check_pickle()
