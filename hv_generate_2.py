@@ -93,7 +93,7 @@ def hv_generator(ontology_id_input, should_get_descendents):
                     chn = {"source": source, "target": target, "PMID": len(intersection)}
                     #attempt to do inverse checking here instead of separately: 
                     add_item = True
-                    for k in chn_list: 
+                    for k in chn_list: #todo: another whole loop here, any faster way to do this?
                         if source + target == k['target'] + k['source']:
                             add_item = False
                     if add_item:
