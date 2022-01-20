@@ -287,8 +287,7 @@ def get_ids(ontol_list):
 @app.route('/')
 @app.route('/home')
 def home():
-    if os.environ.get("FLASK_ENV")=='development':
-        development = True
+    development = (os.environ.get("FLASK_ENV")=='development')
     # return redirect(url_for('associations')) #todo: temporary testing redirect - remove this
     return render_template('index.html', development = development)
 
@@ -342,8 +341,7 @@ def visualise_similarities():
 
 @app.route('/pubmed', methods=['POST', 'GET'])
 def pubmed():
-    if os.environ.get("FLASK_ENV")=='development':
-        development = True
+    development = (os.environ.get("FLASK_ENV")=='development')
     id = request.form.get('pubmed_id')
     global idName
     articleDetails = ""
@@ -400,8 +398,7 @@ def tag():
     # elapsed_time = timer() - start
     # print(f"Elapsed time SPACY: {elapsed_time}")
     
-    if os.environ.get("FLASK_ENV")=='development':
-        development=True
+    development = (os.environ.get("FLASK_ENV")=='development')
 
     text = request.form['inputText']
     details = request.form.get('inputDetails') #pmid
