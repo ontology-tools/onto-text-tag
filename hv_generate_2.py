@@ -91,30 +91,40 @@ def hv_generator(ontology_id_input, should_get_descendents):
                 intersection = list(set(mentions[source]).intersection(set(mentions[target])))
                 if len(intersection) > 0: 
                     chn = {"source": source, "target": target, "PMID": len(intersection)}
-                    # print("adding chn: ", chn)
-                    chn_list.append(chn)
-    print("checking for inverse duplicates")
-    #check and drop inverse duplicates
-    de_dup_chn_list = []
-    for i in chn_list:
-        for j in chn_list: 
-            if (i['source'] + i['target']) == (j['target'] + j['source']): 
-                add_item = True
-                for k in de_dup_chn_list: #todo: this kludge could be a lot more efficient? 
-                    if i['source'] + i['target'] == k['target'] + k['source']:
-                        add_item = False
-                if add_item: 
-                    de_dup_chn_list.append(i) 
+                    #attempt to do inverse checking here instead of separately: 
+                    add_item = True
+                    for k in chn_list: 
+                        if source + target == k['target'] + k['source']:
+                            add_item = False
+                    if add_item:
+                        chn_list.append(chn)
+    print("finished checking for inverse duplicates..")
+    # print("checking for inverse duplicates")
+    # old method to check and drop inverse duplicates
+    # de_dup_chn_list = []
+    # for i in chn_list:
+    #     for j in chn_list: 
+    #         if (i['source'] + i['target']) == (j['target'] + j['source']): 
+    #             add_item = True
+    #             for k in de_dup_chn_list: #todo: this kludge could be a lot more efficient? 
+    #                 if i['source'] + i['target'] == k['target'] + k['source']:
+    #                     add_item = False
+    #             if add_item: 
+    #                 de_dup_chn_list.append(i) 
+
+    #todo: replace above iteration with something faster: 
+
 
     #todo: test if this is faster than above de-dup: 
     # de_dup_chn_list = chn_list        
 
     # print(de_dup_chn_list)
     print("length: ", len(chn_list))
-    print("de-dup len: ", len(de_dup_chn_list))
+    # print("de-dup len: ", len(de_dup_chn_list))
     # print("need to get this format now: ", data_chord_plot)
     #todo: convert de_dup_chn_list to data_chord_plot format
-    links = pd.DataFrame.from_dict(de_dup_chn_list)
+    # links = pd.DataFrame.from_dict(de_dup_chn_list)
+    links = pd.DataFrame.from_dict(chn_list)
     # Build the data table expected by the visualisation library
     # links = data_chord_plot #old version from PD
     node_names = links.source.append(links.target)
