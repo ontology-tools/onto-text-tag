@@ -31,7 +31,7 @@ import pprint
 
 #circle graph generator
 import hv_generate
-from hv_generate_2 import hv_generator
+from hv_generate import hv_generator
 
 from bokeh.embed import json_item 
 from jinja2 import Template
