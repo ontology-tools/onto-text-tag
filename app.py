@@ -288,7 +288,6 @@ def get_ids(ontol_list):
 @app.route('/home')
 def home():
     development = (os.environ.get("FLASK_ENV")=='development')
-    # return redirect(url_for('associations')) #todo: temporary testing redirect - remove this
     return render_template('index.html', development = development)
 
 
@@ -298,8 +297,6 @@ def associations():
     ontologies = ontoDict["ontologies"]
     labels = get_ids(ontologies) 
     label_list={'labels': labels}
-    #test values:
-    # label_list = {'labels': ["ADDICTO:123457|smoking", "ADDICTO:123456|vaping", "ADDICTO:123458|human being", "BCIO:123456|addiction", "BCIO:223456|long term ", "ADDICTO:133456|ontology" ]}
     json.dumps(label_list)
     return render_template('associations.html', label_list = label_list)
 
@@ -308,7 +305,6 @@ def associations():
 @app.route('/visualise_associations', methods=['POST'])
 def visualise_associations():  
     ontology_id_list = json.loads(request.form.get('ontology_id_list')) 
-    # print("got ontology_id_list: ", ontology_id_list)
     include_descendents = request.form.get("include_descendent_classes")
     session['saved_ontology_id_list'] = ontology_id_list
     session['get_descendents'] = include_descendents
@@ -331,9 +327,7 @@ def chordout():
 @app.route('/visualise_similarities', methods=['POST'])
 def visualise_similarities():  
     ontology_id_list = json.loads(request.form.get('ontology_id_list')) 
-    # print("ontology_id_list is: ", ontology_id_list)
     include_descendent_classes = request.form.get('include_descendent_classes')
-    # print("checkbox says: ", include_descendent_classes)
     print("time for a similarity visual!")
     # hv_generator(ontology_id_list) #todo: something different here?
     # return ( json.dumps({"message":"Success"}), 200 )
@@ -346,18 +340,14 @@ def pubmed():
     global idName
     articleDetails = ""
     idName = ""
-    #print(f"Pubmed id {id}")
     if id:
-        #print(f"Got it {id}")
         idName = f"{id}"
         try:
             results = fetch_details([id])
             for result in results:
                 resultDetail = results[result]
                 abstractText = get_abstract_text(resultDetail)
-                # print(f"Got abstract text {abstractText}")
                 articleDetails = get_article_details(resultDetail)
-                # print("Got articleDetails: ", articleDetails) #when we get the right details...
                 try:
                     dateA, titleA, authorsA = articleDetails.split(';')
                 except:
