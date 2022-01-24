@@ -61,17 +61,21 @@ def hv_generator(ontology_id_input, should_get_descendents):
                             chn_list.append(chn)
         print("finished checking for inverse duplicates..")        
         print("length: ", len(chn_list))
+        print(chn_list)
 
         # Build the data table expected by the visualisation library
-        links = pd.DataFrame.from_dict(chn_list)        
+        links = pd.DataFrame.from_dict(chn_list)      
         node_names = links.source.append(links.target)
         node_names = node_names.unique()
-        node_info = {"index":node_names,"name":node_names,"group":[1]*len(node_names)}
+        print(node_names)
+        # node_info = {"index":node_names,"name":node_names,"group":[1]*len(node_names)}
+        node_info = {"index":node_names,"name":node_names,"group":node_names}
+
 
         nodes = hv.Dataset(pd.DataFrame(node_info), 'index')
         nodes.data.head()
 
-        chord = hv.Chord((links, nodes)).select(value=(5, None)) #todo: was value=5 - changed to 0 now it works for more? 
+        chord = hv.Chord((links, nodes)).select(value=(5, None)) # value=5 - changing to 0 works for more? 
 
         chord.opts(
             opts.Chord(cmap='Category20', edge_cmap='Category20', edge_color=dim('source').str(),
@@ -82,6 +86,7 @@ def hv_generator(ontology_id_input, should_get_descendents):
         hvplot = renderer.get_plot(chord)
         html = renderer.static_html(hvplot)
         print("Time taken for preparing render :", timer() - start_time_2) #test code
+        # print(html)
         return json.dumps(html)
     except: 
         html_error_message = "<!doctype html><div><h4>ERROR CREATING TABLE - no associations found, or possibly some of the ID's were incorrect?</h4></div></html>"

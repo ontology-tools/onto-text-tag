@@ -97,7 +97,6 @@ nlp = en_core_web_sm.load()
 
 location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
 location2 = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
-# location = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
 
 print("Fetching release file from", location)
 ontol1 = pyhornedowl.open_ontology(urlopen(location).read().decode('utf-8'))
@@ -129,13 +128,10 @@ ontoDict = {
 def get_all_descendents(id_list):   
     descendent_ids = []
 
-    #print("should be getting descendants here")
     #todo: refactor below:
     for entry in id_list:
-        #print("looking at entry: ", entry)
         entryIri = ontol1.get_iri_for_id(entry.replace("_", ":"))
         if entryIri:
-            #print("looking at entryIri: ", entryIri)
             descs = pyhornedowl.get_descendants(ontol1, entryIri)
             if len(descs) > 0:
                 for d in descs:
@@ -144,31 +140,19 @@ def get_all_descendents(id_list):
                         descendent_ids.append(add_id.replace("_", ":"))
                     except:
                         print("error when getting descendents of ",d)
-                # if add_id:
-                #     if add_id not in descendent_ids:
-                #         print("adding id: ", add_id)
-                #         descendent_ids.append(add_id)
-                # id_list.append(repo1.get_id_for_iri(d).replace(":", "_")) #todo: does adding this to same array cause issues? 
+                
     for entry in id_list:
-        #print("looking at entry: ", entry)
         entryIri = ontol2.get_iri_for_id(entry.replace("_", ":"))
         if entryIri:
-            #print("looking at entryIri: ", entryIri)
             descs = pyhornedowl.get_descendants(ontol2, entryIri)
             if len(descs) > 0:
                 for d in descs:
                     try:
                         add_id = ontol1.get_id_for_iri(d).replace(":", "_")
-                        #print("add_id is: ", add_id)
                         descendent_ids.append(add_id.replace("_", ":"))
                     except:
                         print("error getting descendents of ",d)
-                #todo: remove duplicates
-                # if add_id:
-                #     if add_id not in descendent_ids:
-                #         print("adding id: ", add_id)
-                        # descendent_ids.append(add_id)
-                # id_list.append(repo2.get_id_for_iri(d).replace(":", "_"))
+                
     if len(descendent_ids) == 0:
         return id_list
     else:
