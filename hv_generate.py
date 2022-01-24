@@ -30,7 +30,7 @@ def hv_generator(ontology_id_input, should_get_descendents):
         if should_get_descendents == True:
             print("getting descendents now")
             ontology_id_list = get_all_descendents(ontology_id_input)
-            print("got them")
+            # print("got them")
         else:
             ontology_id_list = ontology_id_input 
 
@@ -61,15 +61,15 @@ def hv_generator(ontology_id_input, should_get_descendents):
                             chn_list.append(chn)
         print("finished checking for inverse duplicates..")        
         print("length: ", len(chn_list))
-        print(chn_list)
+        # print(chn_list)
 
         # Build the data table expected by the visualisation library
         links = pd.DataFrame.from_dict(chn_list)      
         node_names = links.source.append(links.target)
         node_names = node_names.unique()
-        print(node_names)
-        # node_info = {"index":node_names,"name":node_names,"group":[1]*len(node_names)}
-        node_info = {"index":node_names,"name":node_names,"group":node_names}
+        # print(node_names)
+        node_info = {"index":node_names,"name":node_names,"group":[1]*len(node_names)}
+        # node_info = {"index":node_names,"name":node_names,"group":node_names}
 
 
         nodes = hv.Dataset(pd.DataFrame(node_info), 'index')
