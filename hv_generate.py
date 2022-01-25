@@ -11,12 +11,10 @@ import pyhornedowl
 import requests
 from urllib.request import urlopen
 import json
-from memory_profiler import profile
 from timeit import default_timer as timer
 import pickle 
 import io
 
-# @profile
 def hv_generator(ontology_id_input, should_get_descendents):
     try:
         start_time = timer() #test code

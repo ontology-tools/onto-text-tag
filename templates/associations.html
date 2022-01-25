@@ -106,8 +106,9 @@
       <div class="float-right">
         <div class="custom-control custom-checkbox">
           <input type="checkbox" class="custom-control-input" id="include-descendent-classes-checkbox">
-          <label class="custom-control-label" for="include-descendent-classes-checkbox">Include descendent
-            classes</label>
+          <label class="custom-control-label" for="include-descendent-classes-checkbox" data-trigger="hover" data-toggle="popover" data-placement="top" data-content="In some cases this will add thousands of associations and increase the time it takes to compute the graph to some minutes. Please be patient.">
+            Include descendent classes
+          </label>
         </div>
         <button type="submit" id="visualise-associations" class="btn btn-outline-success"> Visualise
           associations</button>
@@ -119,6 +120,10 @@
 </form>
 
 <script type="text/javascript">
+  $(function () {
+    $('[data-toggle="popover"]').popover({ html: true });
+  })
+
   var ontologyArray = [];
   var idResultList = [];
   var labelJson = '{{label_list | tojson | safe}}';

@@ -46,7 +46,6 @@
     <div class="col-md-12">
       <div class="form-group green-border-focus">
         <label for="inputText">Enter text below:</label>
-        <!-- todo: make largeTextArea responsive to screen size -->
         <textarea id="textArea" form="submitText" class="form-control" id="inputText"
                   name="inputText" rows="10"></textarea>
       </div>
@@ -82,15 +81,13 @@ $("#pagelink").text("View associations");
 
     <div class="float-right">
       <div class="custom-control custom-checkbox">
-        <input type="checkbox" class="custom-control-input" id="include-descendent-classes-checkbox">
-        <label class="custom-control-label" for="include-descendent-classes-checkbox">Include descendent
-          classes</label>
+        <input type="checkbox" class="custom-control-input" id="include-descendent-classes-checkbox" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="In some cases this will add thousands of associations and increase the time it takes to compute the graph to some minutes. Please be patient.">
+        <label class="custom-control-label" for="include-descendent-classes-checkbox" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="In some cases this will add thousands of associations and increase the time it takes to compute the graph to some minutes. Please be patient.">
+          Include descendent classes
+        </label>
       </div>
-      <!-- add button to submit ids_for_chord: float-right: -->
-
       <button type="submit" id="submit-ids-for-chord" class="btn btn-outline-success">Visualise associations</button>
     </div>
-    <!-- <b id="articleDetails" class="container-fluid"> {{details}} </b> -->
   </div>
 </div>
 
