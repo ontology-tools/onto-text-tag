@@ -11,13 +11,11 @@ import pyhornedowl
 import requests
 from urllib.request import urlopen
 import json
-from timeit import default_timer as timer
 import pickle 
 import io
 
 def hv_generator(ontology_id_input, should_get_descendents):
     try:
-        start_time = timer() #test code
         from app import get_all_descendents #todo: refactor to avoid this circular import
         #load ontotermilology.pkl:
         with open('ontoterminology.pkl', 'rb') as f:
@@ -26,7 +24,7 @@ def hv_generator(ontology_id_input, should_get_descendents):
 
         # get descendants
         if should_get_descendents == True:
-            print("getting descendents now")
+            # print("getting descendents now")
             ontology_id_list = get_all_descendents(ontology_id_input)
             # print("got them")
         else:
@@ -38,7 +36,7 @@ def hv_generator(ontology_id_input, should_get_descendents):
             for key in list(ontoterminology.keys()):
                 if selectedID == key: #found a match. 
                     mentions[ontoterminology[key]['NAME']] = ontoterminology[key]['PMID']
-        print("loaded mentions")
+        # print("loaded mentions")
         chn_list = []
         for source in list(mentions.keys()):
             for target in list(mentions.keys()): 
@@ -50,15 +48,15 @@ def hv_generator(ontology_id_input, should_get_descendents):
                     intersection = list(set(mentions[source]).intersection(set(mentions[target])))
                     if len(intersection) > 0: 
                         chn = {"source": source, "target": target, "PMID": len(intersection)}
-                        #attempt to do inverse checking here instead of separately: 
+                        #inverse duplicate checking here: 
                         add_item = True
-                        for k in chn_list: #todo: another whole loop here, any faster way to do this?
+                        for k in chn_list: #todo: another whole loop here, any faster way to do this? I can't see it.
                             if source + target == k['target'] + k['source']:
                                 add_item = False
                         if add_item:
                             chn_list.append(chn)
-        print("finished checking for inverse duplicates..")        
-        print("length: ", len(chn_list))
+        # print("finished checking for inverse duplicates..")        
+        # print("length: ", len(chn_list))
         # print(chn_list)
 
         # Build the data table expected by the visualisation library
@@ -78,13 +76,9 @@ def hv_generator(ontology_id_input, should_get_descendents):
         chord.opts(
             opts.Chord(cmap='Category20', edge_cmap='Category20', edge_color=dim('source').str(),
                     labels='name', node_color=dim('index').str()))
-        print("Time taken to find mentions :", timer() - start_time) #test code
-        start_time_2 = timer() #test code
         renderer = hv.renderer('bokeh')
         hvplot = renderer.get_plot(chord)
         html = renderer.static_html(hvplot)
-        print("Time taken for preparing render :", timer() - start_time_2) #test code
-        # print(html)
         return json.dumps(html)
     except: 
         html_error_message = "<!doctype html><div><h4>ERROR CREATING TABLE - no associations found, or possibly some of the ID's were incorrect?</h4></div></html>"
