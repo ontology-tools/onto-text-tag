@@ -351,7 +351,7 @@ def pubmed():
                                     "inputDetails": articleDetails, "inputText": fixed_abstractText, "dateDetails": dateA, "titleDetails": titleA, "authorsDetails": authorsA})
         return r.text, r.status_code, r.headers.items()
     except: 
-        return render_template('index.html', error_msg=f"No abstract found for PubMed ID {id}", development = development)
+        return render_template('index.html', error_msg=f"This PubMed ID {id} was not indexed  - try pasting in the abstract text instead", development = development)
 
     # else:     
     #     return render_template('index.html', error_msg=f"No abstract found for PubMed ID {id}", development = development)
