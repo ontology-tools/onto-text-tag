@@ -325,6 +325,7 @@ def visualise_similarities():
 def pubmed():
     development = (os.environ.get("FLASK_ENV")=='development')
     id = request.form.get('pubmed_id')
+    fixed_id = id.strip()
     global idName
     articleDetails = ""
     idName = ""
