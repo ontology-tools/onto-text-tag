@@ -164,7 +164,8 @@ $("#pagelink").text("View associations");
         $(".jQueryLink" + shortValue).css("color", invertColor(specificColor, true)); //inverse colour for text
         $(".jQueryLink" + shortValue).css("backgroundColor", specificColor); //different colours depending on namespace
         $(".jQueryLink" + shortValue).attr("data-toggle", "popover");
-        $(".jQueryLink" + shortValue).popover({ html: true, title: value.ontol_id + "<br><br><a href='" + value.ontol_link + "'target='_blank'> View in AddictO Vocab </a>", content: value.ontol_label + ": " + value.ontol_def, trigger: "manual", placement: "top" })
+        if(value.ontol_id.includes('BCIO')){
+          $(".jQueryLink" + shortValue).popover({ html: true, title: value.ontol_id + "<br><br><a href='" + value.ontol_link + "'target='_blank'> View in BCIOVocab </a>", content: value.ontol_label + ": " + value.ontol_def, trigger: "manual", placement: "top" })
           .on("mouseenter", function () {
             var _this = this;
             $(this).popover("show");
@@ -179,6 +180,24 @@ $("#pagelink").text("View associations");
               }
             }, 300);
           });
+        } else{
+          $(".jQueryLink" + shortValue).popover({ html: true, title: value.ontol_id + "<br><br><a href='" + value.ontol_link + "'target='_blank'> View in AddictO Vocab </a>", content: value.ontol_label + ": " + value.ontol_def, trigger: "manual", placement: "top" })
+        
+          .on("mouseenter", function () {
+            var _this = this;
+            $(this).popover("show");
+            $(".popover").on("mouseleave", function () {
+              $(_this).popover('hide');
+            });
+          }).on("mouseleave", function () {
+            var _this = this;
+            setTimeout(function () {
+              if (!$(".popover:hover").length) {
+                $(_this).popover("hide");
+              }
+            }, 300);
+          });
+        }
       });
     });
 

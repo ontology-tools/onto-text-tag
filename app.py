@@ -131,6 +131,7 @@ def get_all_descendents(id_list):
     descendent_ids = []
 
     #todo: refactor below:
+
     for entry in id_list:
         entryIri = ontol1.get_iri_for_id(entry.replace("_", ":"))
         if entryIri:
@@ -172,12 +173,13 @@ nlp.add_pipe(onto_extractor3, after="ner")
 
 # Interaction with PubMed: get detailed results for a list of IDs
 def fetch_details(id_list):
-    ids = ','.join(id_list)
-    Entrez.email = 'janna.hastings@ucl.ac.uk'
-    handle = Entrez.efetch(db='pubmed',
-                           retmode='xml',
-                           id=ids)
-    results = Entrez.read(handle)
+    results = ""
+    # ids = ','.join(id_list)
+    # Entrez.email = 'janna.hastings@ucl.ac.uk'
+    # handle = Entrez.efetch(db='pubmed',
+    #                        retmode='xml',
+    #                        id=ids)
+    # results = Entrez.read(handle)
     return results
 
 # parse the title, authors and date published
@@ -512,10 +514,16 @@ def tag():
     coll = pl.load_one(load_file, fmt='txt')#, iter_mode='document')
     pl.process(coll)
     
+    
     # note: the entity.names below are just to fit in with OGER's un-related column naming. 
     for entity in coll[0].iter_entities():
         span_text = entity.text.strip()
         ontol_id = entity.cid.strip() 
+        link_prefix_http = ""
+        if 'BCIO' in ontol_id.strip():
+            link_prefix_http = "https://bciovocab.org/"
+        else: 
+            link_prefix_http = "http://addictovocab.org/"
         ontol_label = entity.pref.strip()
         ontol_def = entity.type.strip()
         ontol_namespace = entity.db.strip()
@@ -524,7 +532,7 @@ def tag():
                                 "ontol_label": ontol_label,
                                 "ontol_def": ontol_def,
                                 "ontol_namespace": ontol_namespace,
-                                "ontol_link": "http://addictovocab.org/"+ontol_id,
+                                "ontol_link": link_prefix_http+ontol_id,
                                 "match_index": ontol_id})
     # else: #nlp/spacy
     #     doc3 = nlp(text)
