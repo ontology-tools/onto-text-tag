@@ -45,6 +45,7 @@ from bokeh.sampledata.iris import flowers
 import os
 import csv #for writing test_terms.csv (once only)
 import pickle
+import shelve
 
 #OGER:
 import oger
@@ -101,8 +102,9 @@ ontol1 = pyhornedowl.open_ontology(urlopen(location).read().decode('utf-8'))
 print("Fetching release file from", location2)
 ontol2 = pyhornedowl.open_ontology(urlopen(location2).read().decode('utf-8'))
 
-pickle_in = open("allAbstracts.pkl","rb")
-abstract_associations = pickle.load(pickle_in)
+# pickle_in = open("allAbstracts.pkl","rb")
+# abstract_associations = pickle.load(pickle_in)
+abstract_ass_db = shelve.open('allAbstracts.db')
 print("loaded abstract associations pickle")
 
 for prefix in PREFIXES:
@@ -325,26 +327,34 @@ def visualise_similarities():
 def pubmed():
     development = (os.environ.get("FLASK_ENV")=='development')
     id = request.form.get('pubmed_id')
-    fixed_id = id.strip()
+    fixed_id = ""
+    if id:
+        fixed_id = id.strip()
     global idName
     articleDetails = ""
     idName = ""
     dateA = ""
     titleA = ""
     authorsA = "" #todo: get these details from somewhere? Also where does the id go? 
-    if id in abstract_associations:
-        one_abstract = abstract_associations[id]         
-        if("StringElement" in one_abstract):
-            fixed = re.findall(r'StringElement\((.+?)attributes',one_abstract)
-            fixed_abstractText = "".join(fixed)
-        else:
-            fixed_abstractText = one_abstract.strip('[]') # remove "[]"
-        print(fixed_abstractText)
+    #todo: did this shelve test work?:
+    try: 
+        fixed_abstractText = abstract_ass_db[fixed_id]
+    # if fixed_id in abstract_associations:
+    #     one_abstract = abstract_associations[fixed_id]         
+    #     if("StringElement" in one_abstract):
+    #         fixed = re.findall(r'StringElement\((.+?)attributes',one_abstract)
+    #         fixed_abstractText = "".join(fixed)
+    #     else:
+    #         fixed_abstractText = one_abstract.strip('[]') # remove "[]"
+    #     print(fixed_abstractText)
         r = requests.post(url_for("tag", _external=True), data={
                                     "inputDetails": articleDetails, "inputText": fixed_abstractText, "dateDetails": dateA, "titleDetails": titleA, "authorsDetails": authorsA})
         return r.text, r.status_code, r.headers.items()
-    else:     
+    except: 
         return render_template('index.html', error_msg=f"No abstract found for PubMed ID {id}", development = development)
+
+    # else:     
+    #     return render_template('index.html', error_msg=f"No abstract found for PubMed ID {id}", development = development)
 
     #old method using entrez:
     # if id:

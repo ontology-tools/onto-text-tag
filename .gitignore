@@ -3,3 +3,6 @@ chordout.html
 __pycache__/
 run.sh
 allAbstracts.pkl
+*.dat
+*.bak
+*.dir
