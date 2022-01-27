@@ -13,7 +13,7 @@
 # limitations under the License.
 from logging import error
 import pyhornedowl
-from flask import Flask, request, redirect, url_for, session, Response, stream_with_context 
+from flask import Flask, request, redirect, url_for, session, Response, stream_with_context, current_app
 from flask.templating import render_template
 # from ontotagtext import ExtractorComponent
 from ontotagtext import MultiExtractorComponent
@@ -347,6 +347,7 @@ def tag():
     development = (os.environ.get("FLASK_ENV")=='development')
 
     text = request.form['inputText']
+    # print("got text", text)
     details = request.form.get('inputDetails') #pmid
     date = request.form.get('dateDetails')
     title = request.form.get('titleDetails')
@@ -436,7 +437,8 @@ def tag():
                         except:
                             print("Problem getting plural of ",s)
                             pass
-    
+
+                          
         filename = 'static/test_terms.tsv'
         fields = ['a', 'ont', 'id', 'alt_name', 'name', 'definition'] 
         with open(filename, 'w') as tsvfile: 
@@ -448,47 +450,77 @@ def tag():
 
     # replaced nlp with OGER:
     # fields list for entity is here: https://github.com/OntoGene/OGER/blob/f23cf9bec70ba51f85605f26f3de2df72f7c4d5a/oger/doc/document.py
-    if (text is None or ""):
-        coll_pmid = []    
-        coll_pmid.append(idName) #idName is the pubmed id
+    # if (len(idName.strip()) > 0): #todo: fix this or it won't work when text is in the text field
+    #     coll_pmid = []    
+    #     coll_pmid.append(idName) #idName is the pubmed id
         
-        # print("coll_pmid = ", coll_pmid)
-        coll = pl.load_one(coll_pmid, fmt='pubmed')
-        pl.process(coll)
+    #     # print("coll_pmid = ", coll_pmid)
+    #     coll = pl.load_one(coll_pmid, fmt='pubmed')
+    #     pl.process(coll)
         
-        # note: the entity.names below are just to fit in with OGER's un-related column naming. 
-        for entity in coll[0].iter_entities():
-            span_text = entity.text.strip()
-            ontol_id = entity.cid.strip() 
-            ontol_label = entity.pref.strip()
-            ontol_def = entity.type.strip()
-            ontol_namespace = entity.db.strip()
-            tag_results.append({"ontol_id": ontol_id,
-                                    "span_text": span_text,
-                                    "ontol_label": ontol_label,
-                                    "ontol_def": ontol_def,
-                                    "ontol_namespace": ontol_namespace,
-                                    "ontol_link": "http://addictovocab.org/"+ontol_id,
-                                    "match_index": ontol_id})
+    #     # note: the entity.names below are just to fit in with OGER's un-related column naming. 
+    #     for entity in coll[0].iter_entities():
+    #         span_text = entity.text.strip()
+    #         ontol_id = entity.cid.strip() 
+    #         ontol_label = entity.pref.strip()
+    #         ontol_def = entity.type.strip()
+    #         ontol_namespace = entity.db.strip()
+    #         tag_results.append({"ontol_id": ontol_id,
+    #                                 "span_text": span_text,
+    #                                 "ontol_label": ontol_label,
+    #                                 "ontol_def": ontol_def,
+    #                                 "ontol_namespace": ontol_namespace,
+    #                                 "ontol_link": "http://addictovocab.org/"+ontol_id,
+    #                                 "match_index": ontol_id})
+    # else:
+        #todo: can we load text directly without saving? 
+    file_path = os.path.join(current_app.root_path,'static') 
+    # file_path = url_for('static', filename = 'text.txt')
+    with open(file_path + 'text.txt', "w") as textfile:
+        textfile.write(text)
+        textfile.close()
+
+
+    # coll_pmid = []    
+    # coll_pmid.append(idName) #idName is the pubmed id
+    # pass
+    # print("coll_pmid = ", coll_pmid)
+    load_file = file_path + 'text.txt'
+    coll = pl.load_one(load_file, fmt='txt')#, iter_mode='document')
+    pl.process(coll)
     
-    else: #nlp/spacy
-        doc3 = nlp(text)
-        # get ontology IDs identified
-        for token in doc3:
-            if token._.is_ontol_term:
-                term=onto_extractor3.get_term(token._.ontol_id)
-                if term:
-                    ontol_label = term['name']
-                    ontol_def = str(term['definition'])                    
-                    ontol_namespace = term['id'][0:term['id'].index(":")]
+    # note: the entity.names below are just to fit in with OGER's un-related column naming. 
+    for entity in coll[0].iter_entities():
+        span_text = entity.text.strip()
+        ontol_id = entity.cid.strip() 
+        ontol_label = entity.pref.strip()
+        ontol_def = entity.type.strip()
+        ontol_namespace = entity.db.strip()
+        tag_results.append({"ontol_id": ontol_id,
+                                "span_text": span_text,
+                                "ontol_label": ontol_label,
+                                "ontol_def": ontol_def,
+                                "ontol_namespace": ontol_namespace,
+                                "ontol_link": "http://addictovocab.org/"+ontol_id,
+                                "match_index": ontol_id})
+    # else: #nlp/spacy
+    #     doc3 = nlp(text)
+    #     # get ontology IDs identified
+    #     for token in doc3:
+    #         if token._.is_ontol_term:
+    #             term=onto_extractor3.get_term(token._.ontol_id)
+    #             if term:
+    #                 ontol_label = term['name']
+    #                 ontol_def = str(term['definition'])                    
+    #                 ontol_namespace = term['id'][0:term['id'].index(":")]
     
-                tag_results.append({"ontol_id": token._.ontol_id,
-                                    "span_text": token.text,
-                                    "ontol_label": ontol_label,
-                                    "ontol_def": ontol_def,
-                                    "ontol_namespace": ontol_namespace,
-                                    "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
-                                    "match_index": token.idx})
+    #             tag_results.append({"ontol_id": token._.ontol_id,
+    #                                 "span_text": token.text,
+    #                                 "ontol_label": ontol_label,
+    #                                 "ontol_def": ontol_def,
+    #                                 "ontol_namespace": ontol_namespace,
+    #                                 "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
+    #                                 "match_index": token.idx})
 
     return render_template('index.html',
                            text=text,
