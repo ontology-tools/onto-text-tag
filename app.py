@@ -331,8 +331,8 @@ def pubmed():
     dateA = ""
     titleA = ""
     authorsA = "" #todo: get these details from somewhere? Also where does the id go? 
-    one_abstract = abstract_associations[id]
-    if one_abstract: 
+    if id in abstract_associations:
+        one_abstract = abstract_associations[id]         
         if("StringElement" in one_abstract):
             fixed = re.findall(r'StringElement\((.+?)attributes',one_abstract)
             fixed_abstractText = "".join(fixed)
@@ -340,7 +340,7 @@ def pubmed():
             fixed_abstractText = one_abstract.strip('[]') # remove "[]"
         print(fixed_abstractText)
         r = requests.post(url_for("tag", _external=True), data={
-                                      "inputDetails": articleDetails, "inputText": fixed_abstractText, "dateDetails": dateA, "titleDetails": titleA, "authorsDetails": authorsA})
+                                    "inputDetails": articleDetails, "inputText": fixed_abstractText, "dateDetails": dateA, "titleDetails": titleA, "authorsDetails": authorsA})
         return r.text, r.status_code, r.headers.items()
     else:     
         return render_template('index.html', error_msg=f"No abstract found for PubMed ID {id}", development = development)
