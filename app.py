@@ -44,6 +44,7 @@ from bokeh.sampledata.iris import flowers
 
 import os
 import csv #for writing test_terms.csv (once only)
+import pickle
 
 #OGER:
 import oger
@@ -99,6 +100,10 @@ print("Fetching release file from", location)
 ontol1 = pyhornedowl.open_ontology(urlopen(location).read().decode('utf-8'))
 print("Fetching release file from", location2)
 ontol2 = pyhornedowl.open_ontology(urlopen(location2).read().decode('utf-8'))
+
+pickle_in = open("allAbstracts.pkl","rb")
+abstract_associations = pickle.load(pickle_in)
+print("loaded abstract associations pickle")
 
 for prefix in PREFIXES:
     ontol1.add_prefix_mapping(prefix[0], prefix[1])
@@ -321,25 +326,43 @@ def pubmed():
     global idName
     articleDetails = ""
     idName = ""
-    if id:
-        idName = f"{id}"
-        try:
-            results = fetch_details([id])
-            for result in results:
-                resultDetail = results[result]
-                abstractText = get_abstract_text(resultDetail)
-                articleDetails = get_article_details(resultDetail)
-                try:
-                    dateA, titleA, authorsA = articleDetails.split(';')
-                except:
-                    pass
-                if abstractText:
-                    r = requests.post(url_for("tag", _external=True), data={
-                                      "inputDetails": articleDetails, "inputText": abstractText, "dateDetails": dateA, "titleDetails": titleA, "authorsDetails": authorsA})
-                    return r.text, r.status_code, r.headers.items()
-        except Exception as err:  # 400 bad request handling, also if no internet connection
-            print(err)
-    return render_template('index.html', error_msg=f"No abstract found for PubMed ID {id}", development = development)
+    dateA = ""
+    titleA = ""
+    authorsA = "" #todo: get these details from somewhere? Also where does the id go? 
+    one_abstract = abstract_associations[id]
+    if one_abstract: 
+        if("StringElement" in one_abstract):
+            fixed = re.findall(r'StringElement\((.+?)attributes',one_abstract)
+            fixed_abstractText = "".join(fixed)
+        else:
+            fixed_abstractText = one_abstract.strip('[]') # remove "[]"
+        print(fixed_abstractText)
+        r = requests.post(url_for("tag", _external=True), data={
+                                      "inputDetails": articleDetails, "inputText": fixed_abstractText, "dateDetails": dateA, "titleDetails": titleA, "authorsDetails": authorsA})
+        return r.text, r.status_code, r.headers.items()
+    else:     
+        return render_template('index.html', error_msg=f"No abstract found for PubMed ID {id}", development = development)
+
+    #old method using entrez:
+    # if id:
+    #     idName = f"{id}"
+    #     try:
+    #         results = fetch_details([id])
+    #         for result in results:
+    #             resultDetail = results[result]
+    #             abstractText = get_abstract_text(resultDetail)
+    #             articleDetails = get_article_details(resultDetail)
+    #             try:
+    #                 dateA, titleA, authorsA = articleDetails.split(';')
+    #             except:
+    #                 pass
+    #             if abstractText:
+    #                 r = requests.post(url_for("tag", _external=True), data={
+    #                                   "inputDetails": articleDetails, "inputText": abstractText, "dateDetails": dateA, "titleDetails": titleA, "authorsDetails": authorsA})
+    #                 return r.text, r.status_code, r.headers.items()
+    #     except Exception as err:  # 400 bad request handling, also if no internet connection
+    #         print(err)
+    # return render_template('index.html', error_msg=f"No abstract found for PubMed ID {id}", development = development)
 
 
 @ app.route('/tag', methods=['POST'])
