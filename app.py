@@ -448,28 +448,47 @@ def tag():
 
     # replaced nlp with OGER:
     # fields list for entity is here: https://github.com/OntoGene/OGER/blob/f23cf9bec70ba51f85605f26f3de2df72f7c4d5a/oger/doc/document.py
+    if (text is None or ""):
+        coll_pmid = []    
+        coll_pmid.append(idName) #idName is the pubmed id
+        
+        # print("coll_pmid = ", coll_pmid)
+        coll = pl.load_one(coll_pmid, fmt='pubmed')
+        pl.process(coll)
+        
+        # note: the entity.names below are just to fit in with OGER's un-related column naming. 
+        for entity in coll[0].iter_entities():
+            span_text = entity.text.strip()
+            ontol_id = entity.cid.strip() 
+            ontol_label = entity.pref.strip()
+            ontol_def = entity.type.strip()
+            ontol_namespace = entity.db.strip()
+            tag_results.append({"ontol_id": ontol_id,
+                                    "span_text": span_text,
+                                    "ontol_label": ontol_label,
+                                    "ontol_def": ontol_def,
+                                    "ontol_namespace": ontol_namespace,
+                                    "ontol_link": "http://addictovocab.org/"+ontol_id,
+                                    "match_index": ontol_id})
     
-    coll_pmid = []    
-    coll_pmid.append(idName) #idName is the pubmed id
+    else: #nlp/spacy
+        doc3 = nlp(text)
+        # get ontology IDs identified
+        for token in doc3:
+            if token._.is_ontol_term:
+                term=onto_extractor3.get_term(token._.ontol_id)
+                if term:
+                    ontol_label = term['name']
+                    ontol_def = str(term['definition'])                    
+                    ontol_namespace = term['id'][0:term['id'].index(":")]
     
-    # print("coll_pmid = ", coll_pmid)
-    coll = pl.load_one(coll_pmid, fmt='pubmed')
-    pl.process(coll)
-    
-    # note: the entity.names below are just to fit in with OGER's un-related column naming. 
-    for entity in coll[0].iter_entities():
-        span_text = entity.text.strip()
-        ontol_id = entity.cid.strip() 
-        ontol_label = entity.pref.strip()
-        ontol_def = entity.type.strip()
-        ontol_namespace = entity.db.strip()
-        tag_results.append({"ontol_id": ontol_id,
-                                "span_text": span_text,
-                                "ontol_label": ontol_label,
-                                "ontol_def": ontol_def,
-                                "ontol_namespace": ontol_namespace,
-                                "ontol_link": "http://addictovocab.org/"+ontol_id,
-                                "match_index": ontol_id})
+                tag_results.append({"ontol_id": token._.ontol_id,
+                                    "span_text": token.text,
+                                    "ontol_label": ontol_label,
+                                    "ontol_def": ontol_def,
+                                    "ontol_namespace": ontol_namespace,
+                                    "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
+                                    "match_index": token.idx})
 
     return render_template('index.html',
                            text=text,
