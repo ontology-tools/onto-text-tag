@@ -339,6 +339,7 @@ def pubmed():
     #todo: did this shelve test work?:
     try: 
         fixed_abstractText = abstract_ass_db[fixed_id]
+        articleDetails = fixed_id
     # if fixed_id in abstract_associations:
     #     one_abstract = abstract_associations[fixed_id]         
     #     if("StringElement" in one_abstract):
