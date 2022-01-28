@@ -44,19 +44,36 @@ def other_values():
             one_date = dates[id]    
             #add to shelf:
             db[id]=one_date
-        db.close()    
+        db.close()  
+
+    authors_in = open("/home/tom/Documents/PROGRAMMING/Python/addiction-ontology/scripts/allAuthorAffiliations.pkl","rb")  
+    authors = pickle.load(authors_in)
+    with shelve.open('allAuthors.db', "c") as db: #will overwrite
+        for id in authors: 
+            # print("adding: ", id)
+            one_author = authors[id]    
+            #add to shelf:
+            db[id]=one_author
+        db.close()
+
+
     
-    #test that it worked:
-    with shelve.open('allTitles.db') as db_titles: 
-        print("title: ", db_titles['35021268'])
-    with shelve.open('allDates.db') as db_dates: 
-        print("date: ", db_dates['35021268'])
-    with shelve.open('allAbstracts.db') as dbread: 
-        print("abstract: ", dbread['35021268'])
     
     
 
-
+#associations:
 associate()
+#date, title and authors:
+other_values()
+
+#test that it worked:
+with shelve.open('allTitles.db') as db_titles: 
+    print("title: ", db_titles['35021268'])
+with shelve.open('allDates.db') as db_dates: 
+    print("date: ", db_dates['35021268'])
+with shelve.open('allAuthors.db') as db_authors: 
+    print("authors: ", db_authors['35021268'])
+with shelve.open('allAbstracts.db') as dbread: 
+    print("abstract: ", dbread['35021268'])
 
 
