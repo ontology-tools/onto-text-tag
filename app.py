@@ -105,7 +105,13 @@ ontol2 = pyhornedowl.open_ontology(urlopen(location2).read().decode('utf-8'))
 # pickle_in = open("allAbstracts.pkl","rb")
 # abstract_associations = pickle.load(pickle_in)
 abstract_ass_db = shelve.open('allAbstracts.db')
-print("loaded abstract associations pickle")
+print("loaded abstract associations db")
+all_titles_db = shelve.open('allTitles.db')
+print("loaded abstract titles db")
+all_dates_db = shelve.open('allDates.db')
+print("loaded abstract dates db")
+all_authors_db = shelve.open('allAuthors.db')
+print("loaded abstract authors db")
 
 for prefix in PREFIXES:
     ontol1.add_prefix_mapping(prefix[0], prefix[1])
@@ -335,11 +341,19 @@ def pubmed():
     idName = ""
     dateA = ""
     titleA = ""
-    authorsA = "" #todo: get these details from somewhere? Also where does the id go? 
-    #todo: did this shelve test work?:
+    authorsA = "" 
+
     try: 
+        idName = fixed_id
         fixed_abstractText = abstract_ass_db[fixed_id]
-        articleDetails = fixed_id
+        articleDetails = id
+
+        if all_dates_db[fixed_id] is not None: 
+            dateA = all_dates_db[fixed_id]
+        if all_titles_db[fixed_id] is not None: 
+            titleA = all_titles_db[fixed_id]
+        if all_authors_db[fixed_id] is not None: 
+            authorsA = all_authors_db[fixed_id]
     # if fixed_id in abstract_associations:
     #     one_abstract = abstract_associations[fixed_id]         
     #     if("StringElement" in one_abstract):
@@ -386,6 +400,7 @@ def tag():
     text = request.form['inputText']
     # print("got text", text)
     details = request.form.get('inputDetails') #pmid
+    print("should have id: ", details)
     date = request.form.get('dateDetails')
     title = request.form.get('titleDetails')
     authors = request.form.get('authorsDetails')
