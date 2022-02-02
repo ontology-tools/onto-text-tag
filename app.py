@@ -352,6 +352,7 @@ def pubmed():
             dateA = all_dates_db[fixed_id]
         if all_titles_db[fixed_id] is not None: 
             titleA = all_titles_db[fixed_id]
+        #todo: authors incorrect - showing country instead?!
         if all_authors_db[fixed_id] is not None: 
             authorsA = all_authors_db[fixed_id]
     # if fixed_id in abstract_associations:

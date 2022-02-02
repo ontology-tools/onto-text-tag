@@ -28,8 +28,8 @@ if __name__ == '__main__':
         # ontopath = "/home/tom/Documents/PROGRAMMING/Python/Flask/onto-text-tag"
 
         addictopath = path + "/scripts/"
-        # os.chdir(addictopath)
-        # exec(open("./1getPubMedAbstractsAuthors.py").read())
+        os.chdir(addictopath)
+        exec(open("./1getPubMedAbstractsAuthors.py").read())
         os.chdir(ontopath)
         exec(open("./ontotagtext.py").read())
         os.chdir(addictopath)

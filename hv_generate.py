@@ -13,14 +13,20 @@ from urllib.request import urlopen
 import json
 import pickle 
 import io
+import shelve
+# from memory_profiler import profile
+
+ontoterminology = shelve.open('ontoterminology.db') #works
+print("loaded terms db")
+
 
 def hv_generator(ontology_id_input, should_get_descendents):
     try:
         from app import get_all_descendents #todo: refactor to avoid this circular import
         #load ontotermilology.pkl:
-        with open('ontoterminology.pkl', 'rb') as f:
-            ontoterminology = pickle.load(f)
-        #todo: idea here, what about creating a new ontotermentions from the ontology_id_input, with only the ones we need?
+        #todo: check that replacing .pkl with shelve .db works, then delete below load .pkl
+        # with open('ontoterminology.pkl', 'rb') as f:
+        #     ontoterminology = pickle.load(f)
 
         # get descendants
         if should_get_descendents == True:

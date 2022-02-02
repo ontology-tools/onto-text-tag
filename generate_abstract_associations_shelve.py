@@ -68,12 +68,12 @@ other_values()
 
 #test that it worked:
 with shelve.open('allTitles.db') as db_titles: 
-    print("title: ", db_titles['35021268'])
+    print("title: ", db_titles['35100637'])
 with shelve.open('allDates.db') as db_dates: 
-    print("date: ", db_dates['35021268'])
+    print("date: ", db_dates['35100637'])
 with shelve.open('allAuthors.db') as db_authors: 
-    print("authors: ", db_authors['35021268'])
+    print("authors: ", db_authors['35100637'])
 with shelve.open('allAbstracts.db') as dbread: 
-    print("abstract: ", dbread['35021268'])
+    print("abstract: ", dbread['35100637'])
 
 
