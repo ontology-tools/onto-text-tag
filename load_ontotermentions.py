@@ -113,7 +113,7 @@ def load_ontotermentions():
         pickle.dump(ontoterminology, f)
     
 
-# load_ontotermentions()
+load_ontotermentions()
 
 
 def ontotermentions_to_shelve():
