@@ -61,32 +61,6 @@ pp = pprint.PrettyPrinter(depth=4)
 
 app = Flask(__name__)
 
-page = Template("""
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  {{ resources }}
-</head>
-<body>
-  <div id="myplot"></div>
-  <script>
-  fetch('/plot')
-    .then(function(response) { return response.json(); })
-    .then(function(item) { return Bokeh.embed.embed_item(item); })
-  </script>
-</body>
-""")
-
-colormap = {'setosa': 'red', 'versicolor': 'green', 'virginica': 'blue'}
-colors = [colormap[x] for x in flowers['species']]
-
-def make_plot(x, y):
-    p = figure(title = "Iris Morphology", sizing_mode="fixed", width=400, height=400)
-    p.xaxis.axis_label = x
-    p.yaxis.axis_label = y
-    p.circle(flowers[x], flowers[y], color=colors, fill_alpha=0.2, size=10)
-    return p
-
 app.config.from_object('config')
 idName = "ID"
 # python -m spacy download en_core_web_md
