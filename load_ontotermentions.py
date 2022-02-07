@@ -183,7 +183,7 @@ def load_check_pickle():
     #test new ontotermentions limit to selected ID's: 
     ontology_id_list =  ['ADDICTO:0000692']
     for ont in ontology_id_list:
-        for key in list(check_dict.keys()):
+        for key in check_dict:
             # print(key)
             if ont == key: #found a match. 
                 print("key: ", key)
