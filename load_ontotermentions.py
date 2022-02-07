@@ -121,7 +121,7 @@ def ontotermentions_to_shelve():
     terms_in = open("ontoterminology.pkl","rb")
     terms = pickle.load(terms_in)
     
-    with shelve.open('ontoterminology.db', "c",) as db: #will overwrite
+    with shelve.open('static/ontoterminology.db', "c",) as db: #will overwrite
         for id in terms: 
             # print("adding: ", terms[id], "with id: ", id)
             one_term = terms[id]   
@@ -140,7 +140,7 @@ def ontotermentions_to_shelve():
 ontotermentions_to_shelve()
 
 def check_shelve_db():
-    terms_db = shelve.open('ontoterminology.db')
+    terms_db = shelve.open('static/ontoterminology.db')
     print("loaded terms db")
     selectedID = 'ADDICTO:0000990'
     selectedData = terms_db[selectedID]
@@ -167,7 +167,7 @@ def check_shelve_db():
     #     else: 
     #         print("no match found")
 
-    # with shelve.open('ontoterminology.db') as terms: 
+    # with shelve.open('static/ontoterminology.db') as terms: 
     #     print(terms['ADDICTO:0000692'])
         # ontology_id_list =  ['http://addictovocab.org/ADDICTO_0000468', 'http://humanbehaviourchange.org/ontology/BCIO_038000', 'http://purl.obolibrary.org/obo/IAO_0000007', 'http://addictovocab.org/ADDICTO_0000372']
         # for term in terms:

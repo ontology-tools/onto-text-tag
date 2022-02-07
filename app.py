@@ -61,6 +61,7 @@ pp = pprint.PrettyPrinter(depth=4)
 
 app = Flask(__name__)
 
+
 app.config.from_object('config')
 idName = "ID"
 # python -m spacy download en_core_web_md
@@ -78,13 +79,13 @@ ontol2 = pyhornedowl.open_ontology(urlopen(location2).read().decode('utf-8'))
 
 # pickle_in = open("allAbstracts.pkl","rb")
 # abstract_associations = pickle.load(pickle_in)
-abstract_ass_db = shelve.open('allAbstracts.db')
+abstract_ass_db = shelve.open('static/allAbstracts.db')
 print("loaded abstract associations db")
-all_titles_db = shelve.open('allTitles.db')
+all_titles_db = shelve.open('static/allTitles.db')
 print("loaded abstract titles db")
-all_dates_db = shelve.open('allDates.db')
+all_dates_db = shelve.open('static/allDates.db')
 print("loaded abstract dates db")
-all_authors_db = shelve.open('allAuthors.db')
+all_authors_db = shelve.open('static/allAuthors.db')
 print("loaded abstract authors db")
 
 for prefix in PREFIXES:
