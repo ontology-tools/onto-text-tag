@@ -344,31 +344,7 @@ def pubmed():
     except: 
         return render_template('index.html', error_msg=f"This PubMed ID {id} was not indexed  - try pasting in the abstract text instead", development = development)
 
-    # else:     
-    #     return render_template('index.html', error_msg=f"No abstract found for PubMed ID {id}", development = development)
-
-    #old method using entrez:
-    # if id:
-    #     idName = f"{id}"
-    #     try:
-    #         results = fetch_details([id])
-    #         for result in results:
-    #             resultDetail = results[result]
-    #             abstractText = get_abstract_text(resultDetail)
-    #             articleDetails = get_article_details(resultDetail)
-    #             try:
-    #                 dateA, titleA, authorsA = articleDetails.split(';')
-    #             except:
-    #                 pass
-    #             if abstractText:
-    #                 r = requests.post(url_for("tag", _external=True), data={
-    #                                   "inputDetails": articleDetails, "inputText": abstractText, "dateDetails": dateA, "titleDetails": titleA, "authorsDetails": authorsA})
-    #                 return r.text, r.status_code, r.headers.items()
-    #     except Exception as err:  # 400 bad request handling, also if no internet connection
-    #         print(err)
-    # return render_template('index.html', error_msg=f"No abstract found for PubMed ID {id}", development = development)
-
-
+    
 @ app.route('/tag', methods=['POST'])
 def tag():    
     development = (os.environ.get("FLASK_ENV")=='development')
@@ -475,36 +451,9 @@ def tag():
             writer.writerows(mydict) 
         print("done creating test_terms.tsv")
     
-
-    # replaced nlp with OGER:
-    # fields list for entity is here: https://github.com/OntoGene/OGER/blob/f23cf9bec70ba51f85605f26f3de2df72f7c4d5a/oger/doc/document.py
-    # if (len(idName.strip()) > 0): #todo: fix this or it won't work when text is in the text field
-    #     coll_pmid = []    
-    #     coll_pmid.append(idName) #idName is the pubmed id
-        
-    #     # print("coll_pmid = ", coll_pmid)
-    #     coll = pl.load_one(coll_pmid, fmt='pubmed')
-    #     pl.process(coll)
-        
-    #     # note: the entity.names below are just to fit in with OGER's un-related column naming. 
-    #     for entity in coll[0].iter_entities():
-    #         span_text = entity.text.strip()
-    #         ontol_id = entity.cid.strip() 
-    #         ontol_label = entity.pref.strip()
-    #         ontol_def = entity.type.strip()
-    #         ontol_namespace = entity.db.strip()
-    #         tag_results.append({"ontol_id": ontol_id,
-    #                                 "span_text": span_text,
-    #                                 "ontol_label": ontol_label,
-    #                                 "ontol_def": ontol_def,
-    #                                 "ontol_namespace": ontol_namespace,
-    #                                 "ontol_link": "http://addictovocab.org/"+ontol_id,
-    #                                 "match_index": ontol_id})
-    # else:
-        #todo: can we load text directly without saving? 
     file_path = os.path.join(current_app.root_path,'static') 
     # file_path = url_for('static', filename = 'text.txt')
-    with open(file_path + 'text.txt', "w") as textfile:
+    with open(file_path + '/text.txt', "w") as textfile:
         textfile.write(text)
         textfile.close()
 
@@ -537,24 +486,6 @@ def tag():
                                 "ontol_namespace": ontol_namespace,
                                 "ontol_link": link_prefix_http+ontol_id,
                                 "match_index": ontol_id})
-    # else: #nlp/spacy
-    #     doc3 = nlp(text)
-    #     # get ontology IDs identified
-    #     for token in doc3:
-    #         if token._.is_ontol_term:
-    #             term=onto_extractor3.get_term(token._.ontol_id)
-    #             if term:
-    #                 ontol_label = term['name']
-    #                 ontol_def = str(term['definition'])                    
-    #                 ontol_namespace = term['id'][0:term['id'].index(":")]
-    
-    #             tag_results.append({"ontol_id": token._.ontol_id,
-    #                                 "span_text": token.text,
-    #                                 "ontol_label": ontol_label,
-    #                                 "ontol_def": ontol_def,
-    #                                 "ontol_namespace": ontol_namespace,
-    #                                 "ontol_link": "http://addictovocab.org/"+token._.ontol_id,
-    #                                 "match_index": token.idx})
 
     return render_template('index.html',
                            text=text,
