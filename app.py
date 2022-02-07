@@ -462,7 +462,7 @@ def tag():
     # coll_pmid.append(idName) #idName is the pubmed id
     # pass
     # print("coll_pmid = ", coll_pmid)
-    load_file = file_path + 'text.txt'
+    load_file = file_path + '/text.txt'
     coll = pl.load_one(load_file, fmt='txt')#, iter_mode='document')
     pl.process(coll)
     
