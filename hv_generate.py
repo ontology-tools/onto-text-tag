@@ -39,13 +39,13 @@ def hv_generator(ontology_id_input, should_get_descendents):
         #new method using ontoterminology:         
         mentions = {}
         for selectedID in ontology_id_list:
-            for key in list(ontoterminology.keys()):
+            for key in ontoterminology:
                 if selectedID == key: #found a match. 
                     mentions[ontoterminology[key]['NAME']] = ontoterminology[key]['PMID']
         # print("loaded mentions")
         chn_list = []
-        for source in list(mentions.keys()):
-            for target in list(mentions.keys()): 
+        for source in mentions:
+            for target in mentions: 
                 if source.strip() == "" or target.strip() == "":
                     pass
                 elif source.strip() == target.strip():
