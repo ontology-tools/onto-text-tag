@@ -1,6 +1,7 @@
 #usage: 
 #python generate_abstract_associations_shelve.py --path "/home/tom/Documents/PROGRAMMING/Python/addiction-ontology"
 
+#todo: delete this function, it's not used - now generating directly in build
 
 import pickle
 import re
