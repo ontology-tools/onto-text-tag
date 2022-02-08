@@ -39,21 +39,24 @@ if __name__ == '__main__':
                         os.unlink(file_path)
             except Exception as e:
                 print(e)
+        try:
+            os.chdir(addictopath)
+            exec(open("./1getPubMedAbstractsAuthors.py").read())
+            os.chdir(ontopath)
+            exec(open("./ontotagtext.py").read())
+            os.chdir(addictopath)
+            exec(open("./3applyTextTaggingToAbstracts.py").read())
+        except: 
+            print("Error building")
+            exit()
 
-        os.chdir(addictopath)
-        exec(open("./1getPubMedAbstractsAuthors.py").read())
-        os.chdir(ontopath)
-        exec(open("./ontotagtext.py").read())
-        os.chdir(addictopath)
-        exec(open("./3applyTextTaggingToAbstracts.py").read())
-
-    #delete all db files in the static folder:
+    #delete all db files in the static folder, as well as the oger .pkl and .tsv files:
         os.chdir(ontopath + "/static/")
         for the_file in os.listdir(ontopath + "/static"):
             file_path = os.path.join(ontopath + "/static/", the_file)
             try:
                 if os.path.isfile(file_path):
-                    if file_path.endswith('.bak') or file_path.endswith('.dat') or file_path.endswith('.dir'): 
+                    if file_path.endswith('.bak') or file_path.endswith('.dat') or file_path.endswith('.dir') or file_path.endswith('.pickle') or file_path.endswith('.tsv'): 
                         os.unlink(file_path)
             except Exception as e:
                 print(e)
