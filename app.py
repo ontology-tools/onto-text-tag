@@ -27,6 +27,7 @@ from urllib.request import urlopen
 import json
 import re
 import io
+import traceback
 
 import pprint
 
@@ -64,7 +65,7 @@ app = Flask(__name__)
 
 
 app.config.from_object('config')
-idName = "ID"
+#idName = "ID"
 # python -m spacy download en_core_web_md
 # or: en_core_web_md or en_core_web_lg
 # nlp = spacy.load('en_core_web_md')
@@ -80,13 +81,15 @@ ontol2 = pyhornedowl.open_ontology(urlopen(location2).read().decode('utf-8'))
 
 # pickle_in = open("allAbstracts.pkl","rb")
 # abstract_associations = pickle.load(pickle_in)
-abstract_ass_db = shelve.open('static/allAbstracts.db')
+development = (os.environ.get("FLASK_ENV")=='development')
+#if development:
+abstract_ass_db = shelve.open('static/allAbstracts.db', flag='r', writeback=False)
 print("loaded abstract associations db")
-all_titles_db = shelve.open('static/allTitles.db')
+all_titles_db = shelve.open('static/allTitles.db', flag='r', writeback=False)
 print("loaded abstract titles db")
-all_dates_db = shelve.open('static/allDates.db')
+all_dates_db = shelve.open('static/allDates.db', flag='r', writeback=False)
 print("loaded abstract dates db")
-all_authors_db = shelve.open('static/allAuthorAffils.db')
+all_authors_db = shelve.open('static/allAuthorAffils.db', flag='r', writeback=False)
 print("loaded abstract authors db")
 
 for prefix in PREFIXES:
@@ -156,15 +159,15 @@ nlp.add_pipe(onto_extractor3, after="ner")
 
 
 # Interaction with PubMed: get detailed results for a list of IDs
-def fetch_details(id_list):
-    results = ""
-    # ids = ','.join(id_list)
-    # Entrez.email = 'janna.hastings@ucl.ac.uk'
-    # handle = Entrez.efetch(db='pubmed',
-    #                        retmode='xml',
-    #                        id=ids)
-    # results = Entrez.read(handle)
-    return results
+#def fetch_details(id_list):
+#    results = ""
+#    # ids = ','.join(id_list)
+#    # Entrez.email = 'janna.hastings@ucl.ac.uk'
+#    # handle = Entrez.efetch(db='pubmed',
+#    #                        retmode='xml',
+#    #                        id=ids)
+#    # results = Entrez.read(handle)
+#    return results
 
 # parse the title, authors and date published
 # try return separate values for year, day, month, AuthourList and ArticleTitle
@@ -306,46 +309,50 @@ def visualise_similarities():
     # return ( json.dumps({"message":"Success"}), 200 )
     return render_template('similarity.html')
 
-@app.route('/pubmed', methods=['POST', 'GET'])
+@app.route('/pubmed', methods=['POST'])
 def pubmed():
     development = (os.environ.get("FLASK_ENV")=='development')
+    #if not development:
+    #    return render_template('index.html',
+    #                           error_msg=f"Retrieving from PubMed is not yet supported. Try pasting in the abstract text instead.",
+    #                           development=development)
     id = request.form.get('pubmed_id')
-    fixed_id = ""
     if id:
         fixed_id = id.strip()
-    global idName
-    articleDetails = ""
-    idName = ""
+    else:
+        return render_template('index.html',
+            error_msg=f"Error: cannot retrieve PubMed for empty ID.",
+            development=development)
     dateA = ""
     titleA = ""
     authorsA = "" 
 
 #todo: below try/except fails on any issue with missing pubmed ID. Deal with each case individually. 
-    try: 
-        idName = fixed_id
-        fixed_abstractText = abstract_ass_db[fixed_id]
-        articleDetails = id
-
-        if all_dates_db[fixed_id] is not None: 
+    try:
+        if fixed_id is not None and fixed_id in abstract_ass_db.keys():
+            fixed_abstractText = abstract_ass_db[fixed_id]
+            articleDetails = id
+        else:
+            return render_template('index.html',
+                                   error_msg=f"The PubMed ID {id} was not indexed  - try pasting in the abstract text instead",
+                                   development=development)
+        if all_dates_db[fixed_id] is not None:
             dateA = all_dates_db[fixed_id]
         if all_titles_db[fixed_id] is not None: 
             titleA = all_titles_db[fixed_id]
         #todo: authors incorrect - showing country instead?!
         if all_authors_db[fixed_id] is not None: 
             authorsA = all_authors_db[fixed_id]
-    # if fixed_id in abstract_associations:
-    #     one_abstract = abstract_associations[fixed_id]         
-    #     if("StringElement" in one_abstract):
-    #         fixed = re.findall(r'StringElement\((.+?)attributes',one_abstract)
-    #         fixed_abstractText = "".join(fixed)
-    #     else:
-    #         fixed_abstractText = one_abstract.strip('[]') # remove "[]"
-    #     print(fixed_abstractText)
         r = requests.post(url_for("tag", _external=True), data={
-                                    "inputDetails": articleDetails, "inputText": fixed_abstractText, "dateDetails": dateA, "titleDetails": titleA, "authorsDetails": authorsA})
+                                    "inputDetails": articleDetails,
+            "inputText": fixed_abstractText, "dateDetails": dateA,
+            "titleDetails": titleA, "authorsDetails": authorsA})
         return r.text, r.status_code, r.headers.items()
-    except: 
-        return render_template('index.html', error_msg=f"This PubMed ID {id} was not indexed  - try pasting in the abstract text instead", development = development)
+    except Exception as e:
+        print(e)
+        traceback.print_exc()
+        return render_template('index.html',
+                               error_msg=f"This PubMed ID {id} was not indexed  - try pasting in the abstract text instead", development = development)
 
     
 @ app.route('/tag', methods=['POST'])
@@ -359,20 +366,18 @@ def tag():
     date = request.form.get('dateDetails')
     title = request.form.get('titleDetails')
     authors = request.form.get('authorsDetails')
-    if details == None:
+    if details is None:
         details = ""
-    if date == None:
+    if date is None:
         date = ""
-    if title == None:
+    if title is None:
         title = ""
-    if authors == None:
+    if authors is None:
         authors = ""
 
     # process the text
     tag_results = []
     
-   
-
     # NOTE: build_terms is for re-building test_terms.tsv
     # to do this, set build_terms to True and delete the test_terms.tsv, and test_terms.tsv.pickle (generated by OGER)
     # only necessary if the ontotermentions.csv file has been updated. 
@@ -387,7 +392,7 @@ def tag():
     engine = inflect.engine()
 
            
-    if build_terms:
+    if development and build_terms:
         print("Building terms, please wait...")
         # stop words, don't try to match these
         stopwords = nlp.Defaults.stop_words
@@ -505,7 +510,7 @@ def tag():
                            date=date,
                            title=title,
                            authors=authors,
-                           id=idName,
+                           id='',
                            tag_results=tag_results,
                            development=development)
 
