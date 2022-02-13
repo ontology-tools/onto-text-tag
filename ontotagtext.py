@@ -60,8 +60,10 @@ class MultiExtractorComponent(object):
                     self.all_labels = self.all_labels + value
                 if (key == "ontology"):
                     self.ontols.append(value)
-
-        print("all_labels = ", self.all_labels)
+        # print("self.ontols: ", self.ontols)
+        # for x in self.ontols: 
+        #     print("got x: ", x)
+        # print("all_labels = ", self.all_labels)
         
         # for making plural forms of labels for text matching
         engine = inflect.engine()
@@ -75,15 +77,23 @@ class MultiExtractorComponent(object):
         # print(f"Importing {nr_terms} terms")
 
         #build unified table of all ID, IRI, Label and Synonyms:
-        for k, ontol in [self.ontols]: #should be all ontols in 
+        # for k, ontol in [self.ontols]: #should be all ontols in 
+        for ontol in self.ontols: #should be all ontols in 
+            print("checking ontol: ", ontol)
             for termid in ontol.get_classes():
                 # print("k is: ", k)
-                termshortid = ontol.get_id_for_iri(termid)
+                termshortid = ontol.get_id_for_iri(termid)    
+                        
                 label = ontol.get_annotation(termid, RDFSLABEL)
                 definition = ontol.get_annotation(termid, DEFINITION)
-                term_entry = {'id': termid if termshortid is None else termshortid,
-                              'name': label.strip(),
-                              'definition': definition}
+                if label: 
+                    # if label.strip().lower() == "bupropion":
+                    #         print("got bupropion")
+                    # if label.strip().lower() == "intervention":
+                    #         print("got intervention")                   
+                    term_entry = {'id': termid if termshortid is None else termshortid,
+                                'name': label.strip(),
+                                'definition': definition}
                 if label is not None and label.strip().lower() not in stopwords:
                     self.terms[label.strip().lower()] = term_entry
                     patterns.append(nlp.make_doc(label.strip().lower()))
@@ -92,7 +102,12 @@ class MultiExtractorComponent(object):
                     patterns.append(nlp.make_doc(plural.lower()))
                 synonyms = ontol.get_annotations(termid, SYN)
                 for s in synonyms:
+                    # print("adding SYNONYM in ontotagtext: ", s)
                     if s.strip().lower() not in stopwords:
+                        # if s.strip().lower() == "tobacco":
+                        #     print("got tobacco")
+                        # if s.strip().lower() == "intervention":
+                        #     print("got intervention")
                         self.terms[s.strip().lower()] = term_entry
                         patterns.append(nlp.make_doc(s.strip().lower()))
                         try:
@@ -102,7 +117,7 @@ class MultiExtractorComponent(object):
                         except:
                             print("Problem getting plural of ",s)
                             continue
-
+        
         # initialize matcher and add patterns
         self.matcher = PhraseMatcher(nlp.vocab, attr='LOWER')        
         self.matcher.add(self.all_labels, None, *patterns)
@@ -139,8 +154,17 @@ class MultiExtractorComponent(object):
         return any([t._.get("is_ontol_term") for t in tokens])
 
     def get_term(self, term_id): 
+        # print("getting term")
         if term_id in [ v['id'] for v in self.terms.values()]: 
-            keys = [k for k, v in self.terms.items() if v['id'] == term_id]
+            keys = [k for k, v in self.terms.items() if v['id'].strip() == term_id.strip()]
+            return self.terms[keys[0]]
+        else:
+            return None             
+
+    def get_label(self, label): 
+        # print("getting label")
+        if label.strip().lower() in [ v['name'].strip().lower() for v in self.terms.values()]: 
+            keys = [k for k, v in self.terms.items() if v['name'].strip().lower() == label.strip().lower()]
             return self.terms[keys[0]]
         else:
             return None

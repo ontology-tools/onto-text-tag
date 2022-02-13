@@ -4,87 +4,92 @@ from holoviews import opts, dim
 hv.extension('bokeh')
 hv.renderer('bokeh')
 hv.output(size=200)
-# from hv.extension.bokeh.embed import json_item
 from bokeh.embed import json_item
 from bokeh.embed import file_html
-# from hv.extension.bokeh.
 import pprint as pp
 import pyhornedowl
 import requests
 from urllib.request import urlopen
 import json
+import pickle 
+import io
+import shelve
+import traceback
+# from memory_profiler import profile
+
+ontoterminology = shelve.open('static/ontoterminology.db') #works
+print("loaded terms db")
 
 
-def hv_generator(ontology_id_input, should_get_descendents):
-    from app import get_all_descendents #todo: refactor to avoid this circular import
-    df2 = pd.read_csv("static/ontotermmentions.csv",index_col=0)    
-    # print("ontology_id_input type is: ", type(ontology_id_input))
-    # print("received ontology_id_input values: ", ontology_id_input)
-    # ontology_id_list = ontology_id_input 
+def hv_generator(ontology_id_list):
+    try:
+        #from app import get_all_descendents #todo: refactor to avoid this circular import
+        #load ontotermilology.pkl:
+        #todo: check that replacing .pkl with shelve .db works, then delete below load .pkl
+        # with open('ontoterminology.pkl', 'rb') as f:
+        #     ontoterminology = pickle.load(f)
 
-    # get descendants?
-    if should_get_descendents == True:
-        ontology_id_list = get_all_descendents(ontology_id_input)
-    else:
-        ontology_id_list = ontology_id_input 
-    # print("ontology_id_list is now: ", ontology_id_list)
-        # print("get_descendents is: ", should_get_descendents)
-    #todo: trying filtering by ontology_id_list before merge - works
-    df2 = df2.drop(df2[~df2.ADDICTOID.isin(ontology_id_list)].index)
-    # This creates a table of pairs of terms in the same abstract
-    # print("df2 after drop: ", df2)
+        # get descendants
+        #if should_get_descendents == True:
+        #    # print("getting descendents now")
+        #    ontology_id_list = get_all_descendents(ontology_id_input)
+        #    # print("got them")
+        #else:
+        #    ontology_id_list = ontology_id_input
 
-    dcp = pd.merge(df2,df2,on="PMID",how="inner")
-    # print("dcp after merge: ", dcp)
-    # change nan values to "":  - doesn't seem to help any
-    # dcp['LABEL_y'].fillna('', inplace=True) 
-    # dcp['LABEL_x'].fillna('', inplace=True) 
+        #new method using ontoterminology:         
+        mentions = {}
+        for selectedID in ontology_id_list:
+            if selectedID in ontoterminology.keys():
+                mentions[ontoterminology[selectedID]['NAME']] = set(ontoterminology[selectedID]['PMID'])
+            else:
+                print("No mentions found for ",selectedID)
+        # print("loaded mentions")
+        chn_list = []
+        for source in mentions:
+            for target in mentions: 
+                if source.strip() == "" or target.strip() == "":
+                    pass
+                elif source.strip() == target.strip():
+                    pass
+                else:
+                    intersection = mentions[source].intersection(mentions[target])
+                    if len(intersection) > 0: 
+                        chn = {"source": source, "target": target, "PMID": len(intersection)}
+                        #inverse duplicate checking here: 
+                        add_item = True
+                        for k in chn_list: #todo: another whole loop here, any faster way to do this? I can't see it.
+                            if source + target == k['target'] + k['source']:
+                                add_item = False
+                        if add_item:
+                            chn_list.append(chn)
+        # print("finished checking for inverse duplicates..")        
+        # print("length of intersection list: ", len(chn_list))
+        # print(chn_list)
 
-    dcp = dcp.drop(dcp[dcp.LABEL_x == dcp.LABEL_y].index) 
-    # print("dcp after drop Label_x == Label_y ", dcp)
+        # Build the data table expected by the visualisation library
+        links = pd.DataFrame.from_dict(chn_list)      
+        node_names = links.source.append(links.target)
+        node_names = node_names.unique()
+        # print(node_names)
+        node_info = {"index":node_names,"name":node_names,"group":[1]*len(node_names)}
+        # node_info = {"index":node_names,"name":node_names,"group":node_names}
+        # print(node_info)
+        nodes = hv.Dataset(pd.DataFrame(node_info), 'index')
+        nodes.data.head()
 
-    # We filter the table just to the ones in the ID list we provided as input 
-    # print("about to filter dcp to correct values from ", dcp)
-    
-    # We filter the table so that pairs are only represented in one direction, i.e. if we have both (smoking, children) and (children, smoking) for the same PMID we drop the second one
-    # print("about to drop duplicates")
+        chord = hv.Chord((links, nodes)).select(value=(0, None)) # value=5 - changing to 0 works for more?
 
-    # solution 2 from Stack Overflow - replaces iterrows():
-    dcp['ADDICTOID'] = dcp[['ADDICTOID_x', 'ADDICTOID_y']].apply(sorted, axis=1).apply(tuple)
-    dcp = dcp.drop_duplicates(subset=['ADDICTOID', 'PMID'], keep='first')
-    # drop "ADDICTOID" column - this column is not needed anymore:  
-    dcp = dcp.drop(['ADDICTOID'], axis=1)
-
-    # print("final dcp is: ", dcp)
-
-    # Now we count the distinct numbers of abstracts this combination appeared in    
-    data_chord_plot = dcp.groupby(['LABEL_x', 'LABEL_y'], as_index=False)[['PMID']].count()
-    data_chord_plot.columns = ['source','target','value']
-
-    # print("Final chord plot: ", data_chord_plot)
-    # Build the data table expected by the visualisation library
-    links = data_chord_plot
-    node_names = links.source.append(links.target)
-    node_names = node_names.unique()
-    node_info = {"index":node_names,"name":node_names,"group":[1]*len(node_names)}
-
-    nodes = hv.Dataset(pd.DataFrame(node_info), 'index')
-    nodes.data.head()
-
-    chord = hv.Chord((links, nodes)).select(value=(0, None)) #todo: was value=5 - changed to 0 now it works for more? 
-
-    chord.opts(
-        opts.Chord(cmap='Category20', edge_cmap='Category20', edge_color=dim('source').str(),
-                labels='name', node_color=dim('index').str()))
-
-    #error message html if no chord plot to show:
-    if dcp.empty:
-        print('empty dataframe, should create an error message chordout.html here')
-        html_error_message = "<!doctype html><div><h4>ERROR CREATING TABLE - no associations found, or possibly some of the ID's were incorrect?</h4></div></html>"
-        return(json.dumps(html_error_message))
-    else:
+        chord.opts(
+            opts.Chord(cmap='Category20', edge_cmap='Category20', edge_color='source',
+                    labels='name', node_color='index'))
         renderer = hv.renderer('bokeh')
         hvplot = renderer.get_plot(chord)
         html = renderer.static_html(hvplot)
         return json.dumps(html)
+    except Exception as e:
+        print(e)
+        traceback.print_exc()
+        html_error_message = "<!doctype html><div><h4>ERROR CREATING TABLE - no associations found, or possibly some of the ID's were incorrect?</h4></div></html>"
+        return(json.dumps(html_error_message))
         
