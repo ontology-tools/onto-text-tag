@@ -14,34 +14,36 @@ import json
 import pickle 
 import io
 import shelve
+import traceback
 # from memory_profiler import profile
 
 ontoterminology = shelve.open('static/ontoterminology.db') #works
 print("loaded terms db")
 
 
-def hv_generator(ontology_id_input, should_get_descendents):
+def hv_generator(ontology_id_list):
     try:
-        from app import get_all_descendents #todo: refactor to avoid this circular import
+        #from app import get_all_descendents #todo: refactor to avoid this circular import
         #load ontotermilology.pkl:
         #todo: check that replacing .pkl with shelve .db works, then delete below load .pkl
         # with open('ontoterminology.pkl', 'rb') as f:
         #     ontoterminology = pickle.load(f)
 
         # get descendants
-        if should_get_descendents == True:
-            # print("getting descendents now")
-            ontology_id_list = get_all_descendents(ontology_id_input)
-            # print("got them")
-        else:
-            ontology_id_list = ontology_id_input 
+        #if should_get_descendents == True:
+        #    # print("getting descendents now")
+        #    ontology_id_list = get_all_descendents(ontology_id_input)
+        #    # print("got them")
+        #else:
+        #    ontology_id_list = ontology_id_input
 
         #new method using ontoterminology:         
         mentions = {}
         for selectedID in ontology_id_list:
-            for key in ontoterminology:
-                if selectedID == key: #found a match. 
-                    mentions[ontoterminology[key]['NAME']] = ontoterminology[key]['PMID']
+            if selectedID in ontoterminology.keys():
+                mentions[ontoterminology[selectedID]['NAME']] = set(ontoterminology[selectedID]['PMID'])
+            else:
+                print("No mentions found for ",selectedID)
         # print("loaded mentions")
         chn_list = []
         for source in mentions:
@@ -51,7 +53,7 @@ def hv_generator(ontology_id_input, should_get_descendents):
                 elif source.strip() == target.strip():
                     pass
                 else:
-                    intersection = list(set(mentions[source]).intersection(set(mentions[target])))
+                    intersection = mentions[source].intersection(mentions[target])
                     if len(intersection) > 0: 
                         chn = {"source": source, "target": target, "PMID": len(intersection)}
                         #inverse duplicate checking here: 
@@ -62,7 +64,7 @@ def hv_generator(ontology_id_input, should_get_descendents):
                         if add_item:
                             chn_list.append(chn)
         # print("finished checking for inverse duplicates..")        
-        # print("length: ", len(chn_list))
+        # print("length of intersection list: ", len(chn_list))
         # print(chn_list)
 
         # Build the data table expected by the visualisation library
@@ -72,21 +74,22 @@ def hv_generator(ontology_id_input, should_get_descendents):
         # print(node_names)
         node_info = {"index":node_names,"name":node_names,"group":[1]*len(node_names)}
         # node_info = {"index":node_names,"name":node_names,"group":node_names}
-
-
+        # print(node_info)
         nodes = hv.Dataset(pd.DataFrame(node_info), 'index')
         nodes.data.head()
 
-        chord = hv.Chord((links, nodes)).select(value=(5, None)) # value=5 - changing to 0 works for more? 
+        chord = hv.Chord((links, nodes)).select(value=(0, None)) # value=5 - changing to 0 works for more?
 
         chord.opts(
-            opts.Chord(cmap='Category20', edge_cmap='Category20', edge_color=dim('source').str(),
-                    labels='name', node_color=dim('index').str()))
+            opts.Chord(cmap='Category20', edge_cmap='Category20', edge_color='source',
+                    labels='name', node_color='index'))
         renderer = hv.renderer('bokeh')
         hvplot = renderer.get_plot(chord)
         html = renderer.static_html(hvplot)
         return json.dumps(html)
-    except: 
+    except Exception as e:
+        print(e)
+        traceback.print_exc()
         html_error_message = "<!doctype html><div><h4>ERROR CREATING TABLE - no associations found, or possibly some of the ID's were incorrect?</h4></div></html>"
         return(json.dumps(html_error_message))
         

@@ -290,9 +290,10 @@ def chordout():
         saved_ontology_id_list = session['saved_ontology_id_list']
         get_descendents = session['get_descendents']
         if get_descendents == "true":
-            html = json.loads(hv_generator(saved_ontology_id_list, True))
+            ontology_id_list = get_all_descendents(saved_ontology_id_list)
+            html = json.loads(hv_generator(ontology_id_list))
         else:
-            html = json.loads(hv_generator(saved_ontology_id_list, False))    
+            html = json.loads(hv_generator(saved_ontology_id_list))
     return render_template('chordout2.html', html=html)
 
 @app.route('/visualise_similarities', methods=['POST'])
