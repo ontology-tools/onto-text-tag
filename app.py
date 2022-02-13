@@ -26,6 +26,7 @@ import requests
 from urllib.request import urlopen
 import json
 import re
+import io
 
 import pprint
 
@@ -459,19 +460,22 @@ def tag():
             writer.writerows(mydict) 
         print("done creating test_terms.tsv")
     
-    file_path = os.path.join(current_app.root_path,'static') 
+    #file_path = os.path.join(current_app.root_path,'static')
     # file_path = url_for('static', filename = 'text.txt')
-    with open(file_path + '/text.txt', "w") as textfile:
-        textfile.write(text)
-        textfile.close()
+
+    #with open(file_path + '/text.txt', "w") as textfile:
+    #    textfile.write(text)
+    #    textfile.close()
+
+    textfile = io.StringIO(text)
 
 
     # coll_pmid = []    
     # coll_pmid.append(idName) #idName is the pubmed id
     # pass
     # print("coll_pmid = ", coll_pmid)
-    load_file = file_path + '/text.txt'
-    coll = pl.load_one(load_file, fmt='txt')#, iter_mode='document')
+    #load_file = file_path + '/text.txt'
+    coll = pl.load_one(textfile, fmt='txt')#, iter_mode='document')
     pl.process(coll)
     
     
