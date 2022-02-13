@@ -23,7 +23,6 @@
 {% endif %}
 
 {% if not text %}
-{% if development %}
 <div class="row mb-3">
   <div class="col-md-12">
     <div class="float-right">
@@ -38,7 +37,6 @@
     </div>
   </div>
 </div>
-{% endif %}
 
 <!-- PubMed ID form input -->
 <form id="submitText" action="{{ url_for('tag') }}" method="post">
@@ -70,14 +68,22 @@ $("#pagelink").text("View associations");
 {% elif text %}
 <div class="row mb-3">
   <div class="col-md-12">
-    <b id="articleDate" class="container-fluid"> {{title}} </b>
+    {% if title %}
+    <b id="articleTitle" class="container-fluid"> {{title}} </b>
     <br>
+    {% endif %}
+    {% if id and not id == 'ID' %}
     <b id="articleID" class="container-fluid"> Pubmed ID: {{id}} </b>
     <br>
+    {% endif %}
+    {% if date and not date == '//'%}
     <b id="articleDate" class="container-fluid"> Date published: {{date}} </b>
     <br>
-    <b id="articleDate" class="container-fluid"> {{authors}} </b>
+    {% endif %}
+    {% if authors %}
+    <b id="articleAuthors" class="container-fluid"> {{authors}} </b>
     <br>
+    {% endif %}
 
     <div class="float-right">
       <div class="custom-control custom-checkbox">
