@@ -127,7 +127,7 @@
   var ontologyArray = [];
   var idResultList = [];
   var labelJson = '{{label_list | tojson | safe}}';
-  // console.log("labelJson is: " + labelJson);
+  console.log("labelJson is: " + labelJson);
   var labelArray = []; //get right format
   var labelList = JSON.parse('{{label_list | tojson | safe}}');
   var labels = labelList.labels;
@@ -208,8 +208,15 @@
           _this.val(ui.item[_data.item_label]);
           _hidden_field.val(ui.item[_data.item_id]);
           event.preventDefault();
-          idResultList.push(ui.item[_data.item_label]);
-          $("#textArea").val(idResultList);
+          idResultList.push(ui.item[_data.item_label]); //todo: not needed anymore? 
+          // $("#textArea").val(idResultList);
+          //append to text box: 
+          var elem = document.getElementById('textArea');
+          if(elem.value.trim() == "" || elem.value == null){
+            elem.value += ui.item[_data.item_label];
+          } else{
+            elem.value += (" ," + ui.item[_data.item_label]) ;
+          }
           _this.val(""); //clear input on submit
         }
       })
