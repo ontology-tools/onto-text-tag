@@ -355,89 +355,92 @@ def pubmed():
             articleDetails = id
         else:
             #not in pre-downloaded abstracts, get pubmed info direct from pubmed here:
-            detailResults = fetch_details([id])
-            # print("got fetched_details: ", detailResults)
-            #todo: get dates, titles, authors, articleDetails from fetched_details
-            # r = requests.post(url_for("tag", _external=True), data={....})
-            articleDetails = id
-            for result in detailResults:
-                # print("dealing with ", result)
-                resultDetail = detailResults[result]
-                for detail in resultDetail:
-                    if 'MedlineCitation' in detail:
-                        PMID = str(detail['MedlineCitation']['PMID'])
-                        if 'Article' in detail['MedlineCitation']:
-                            #title: 
-                            if 'ArticleTitle' in detail['MedlineCitation']['Article']:
-                                articleTitle = str(detail['MedlineCitation']['Article']['ArticleTitle'])
-                                titleA = articleTitle
-                                # print("got title: ", articleTitle)
-                            #date: 
-                            if 'ArticleDate' in detail['MedlineCitation']['Article']:
-                                try: 
-                                    year = detail['MedlineCitation']['Article']['ArticleDate'][0]['Year']
-                                    month = detail['MedlineCitation']['Article']['ArticleDate'][0]['Month']
-                                    day = detail['MedlineCitation']['Article']['ArticleDate'][0]['Day']
-                                except: 
-                                    year = ""
-                                    month = ""
-                                    day = ""
-                                articleDate = day + "/" + month + "/" + year
-                                # print("year: ", articleDate)
-                                dateA = articleDate
-                            if 'Abstract' in detail['MedlineCitation']['Article']:
-                                # print(detail['MedlineCitation']['Article'])
-                                if 'AbstractText' in detail['MedlineCitation']['Article']['Abstract']: 
-                                    # abstractText = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText'])
-                                    # abstractText = strip_tags(abstractText) #strip html tags
-                                    # allAbstracts[PMID] = abstractText
-                                    #trying to parse StringElement here:
-                                    res = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText']).strip('][').split(', ')
-                                    abstractText = ""
-                                    for r in res: 
-                                        if "StringElement" in r: 
-                                            r = r.replace("StringElement('", "")
-                                            r = r.replace("StringElement(\"", "")
-                                        if not "})" in r:         
-                                            if not "attributes" in r: 
-                                                abstractText = abstractText.strip() + " " + r
-                                    abstractText = strip_tags(abstractText) #strip html tags
-                                    fixed_abstractText = abstractText
-                                    
-                                    
+            #todo: refactor this duplicate block
+            try:
+                detailResults = fetch_details([id])
+                # print("got fetched_details: ", detailResults)
+                articleDetails = id
+                for result in detailResults:
+                    # print("dealing with ", result)
+                    resultDetail = detailResults[result]
+                    for detail in resultDetail:
+                        if 'MedlineCitation' in detail:
+                            PMID = str(detail['MedlineCitation']['PMID'])
+                            if 'Article' in detail['MedlineCitation']:
+                                #title: 
+                                if 'ArticleTitle' in detail['MedlineCitation']['Article']:
+                                    articleTitle = str(detail['MedlineCitation']['Article']['ArticleTitle'])
+                                    titleA = articleTitle
+                                    # print("got title: ", articleTitle)
+                                #date: 
+                                if 'ArticleDate' in detail['MedlineCitation']['Article']:
+                                    try: 
+                                        year = detail['MedlineCitation']['Article']['ArticleDate'][0]['Year']
+                                        month = detail['MedlineCitation']['Article']['ArticleDate'][0]['Month']
+                                        day = detail['MedlineCitation']['Article']['ArticleDate'][0]['Day']
+                                    except: 
+                                        year = ""
+                                        month = ""
+                                        day = ""
+                                    articleDate = day + "/" + month + "/" + year
+                                    # print("year: ", articleDate)
+                                    dateA = articleDate
+                                if 'Abstract' in detail['MedlineCitation']['Article']:
+                                    # print(detail['MedlineCitation']['Article'])
+                                    if 'AbstractText' in detail['MedlineCitation']['Article']['Abstract']: 
+                                        # abstractText = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText'])
+                                        # abstractText = strip_tags(abstractText) #strip html tags
+                                        # allAbstracts[PMID] = abstractText
+                                        #trying to parse StringElement here:
+                                        res = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText']).strip('][').split(', ')
+                                        abstractText = ""
+                                        for r in res: 
+                                            if "StringElement" in r: 
+                                                r = r.replace("StringElement('", "")
+                                                r = r.replace("StringElement(\"", "")
+                                            if not "})" in r:         
+                                                if not "attributes" in r: 
+                                                    abstractText = abstractText.strip() + " " + r
+                                        abstractText = strip_tags(abstractText) #strip html tags
+                                        fixed_abstractText = abstractText
+                                        
+                                        
 
-                            # using code from get_article_details in onto-text-tag app.py
-                            # this works, need to refine though
-                            authorDetails = ""
-                            if 'AuthorList' in detail['MedlineCitation']['Article']:
-                                # articleDetails += ";Authors: "
-                                try: 
-                                    for s in range(len(detail['MedlineCitation']['Article']['AuthorList'])):
-                                        authorDetails += detail['MedlineCitation']['Article']['AuthorList'][s]['LastName']
-                                        if(s == (len(detail['MedlineCitation']['Article']['AuthorList'])-1)):
-                                            authorDetails += "."
-                                        else:
-                                            authorDetails += ", "
-                                    authorsA = authorDetails
-                                except:
+                                # using code from get_article_details in onto-text-tag app.py
+                                # this works, need to refine though
+                                authorDetails = ""
+                                if 'AuthorList' in detail['MedlineCitation']['Article']:
+                                    # articleDetails += ";Authors: "
+                                    try: 
+                                        for s in range(len(detail['MedlineCitation']['Article']['AuthorList'])):
+                                            authorDetails += detail['MedlineCitation']['Article']['AuthorList'][s]['LastName']
+                                            if(s == (len(detail['MedlineCitation']['Article']['AuthorList'])-1)):
+                                                authorDetails += "."
+                                            else:
+                                                authorDetails += ", "
+                                        authorsA = authorDetails
+                                    except:
+                                        authorDetails += ""
+                                        AuthorsA = authorDetails
+                                        
+                                else:
+                                    # print(f"AuthorList not found")
                                     authorDetails += ""
-                                    AuthorsA = authorDetails
-                                    
-                            else:
-                                # print(f"AuthorList not found")
-                                authorDetails += ""
-                                authorsA = authorDetails
-                                # print("added author: ", authorDetails, " to PMID: ", PMID)
+                                    authorsA = authorDetails
+                                    # print("added author: ", authorDetails, " to PMID: ", PMID)
 
-            #todo: return details from fetch_details here: 
-            r = requests.post(url_for("tag", _external=True), data={
-                                    "inputDetails": articleDetails,
-            "inputText": fixed_abstractText, "dateDetails": dateA,
-            "titleDetails": titleA, "authorsDetails": authorsA})
-            return r.text, r.status_code, r.headers.items()
-            # return render_template('index.html',
-            #                        error_msg=f"The PubMed ID {id} was not indexed  - try pasting in the abstract text instead",
-            #                        development=development)
+                #returning details from fetch_details here: 
+                r = requests.post(url_for("tag", _external=True), data={
+                                        "inputDetails": articleDetails,
+                "inputText": fixed_abstractText, "dateDetails": dateA,
+                "titleDetails": titleA, "authorsDetails": authorsA})
+                return r.text, r.status_code, r.headers.items()
+            except Exception as exe:
+                print(exe)
+                traceback.print_exc()
+                return render_template('index.html',
+                                       error_msg=f"The PubMed ID {id} was not indexed  - try pasting in the abstract text instead",
+                                       development=development)
         if all_dates_db[fixed_id] is not None:
             dateA = all_dates_db[fixed_id]
         if all_titles_db[fixed_id] is not None: 
@@ -452,88 +455,92 @@ def pubmed():
     except Exception as e:
         print(e)
         traceback.print_exc()
+        try:
+            #get pubmed info direct from pubmed here
+            fetched_details = fetch_details([id])
+            #todo: refactor this duplicate block
+            # print("got fetched_details: ", fetched_details)
+            articleDetails = id
+            for result in detailResults:
+                    # print("dealing with ", result)
+                    resultDetail = detailResults[result]
+                    for detail in resultDetail:
+                        if 'MedlineCitation' in detail:
+                            PMID = str(detail['MedlineCitation']['PMID'])
+                            if 'Article' in detail['MedlineCitation']:
+                                #title: 
+                                if 'ArticleTitle' in detail['MedlineCitation']['Article']:
+                                    articleTitle = str(detail['MedlineCitation']['Article']['ArticleTitle'])
+                                    titleA = articleTitle
+                                    # print("got title: ", articleTitle)
+                                #date: 
+                                if 'ArticleDate' in detail['MedlineCitation']['Article']:
+                                    try: 
+                                        year = detail['MedlineCitation']['Article']['ArticleDate'][0]['Year']
+                                        month = detail['MedlineCitation']['Article']['ArticleDate'][0]['Month']
+                                        day = detail['MedlineCitation']['Article']['ArticleDate'][0]['Day']
+                                    except: 
+                                        year = ""
+                                        month = ""
+                                        day = ""
+                                    articleDate = day + "/" + month + "/" + year
+                                    # print("year: ", articleDate)
+                                    dateA = articleDate
+                                if 'Abstract' in detail['MedlineCitation']['Article']:
+                                    # print(detail['MedlineCitation']['Article'])
+                                    if 'AbstractText' in detail['MedlineCitation']['Article']['Abstract']: 
+                                        # abstractText = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText'])
+                                        # abstractText = strip_tags(abstractText) #strip html tags
+                                        # allAbstracts[PMID] = abstractText
+                                        #trying to parse StringElement here:
+                                        res = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText']).strip('][').split(', ')
+                                        abstractText = ""
+                                        for r in res: 
+                                            if "StringElement" in r: 
+                                                r = r.replace("StringElement('", "")
+                                                r = r.replace("StringElement(\"", "")
+                                            if not "})" in r:         
+                                                if not "attributes" in r: 
+                                                    abstractText = abstractText.strip() + " " + r
+                                        abstractText = strip_tags(abstractText) #strip html tags
+                                        fixed_abstractText = abstractText
+                                        
+                                        
 
-        #todo: get pubmed info direct from pubmed here?
-        fetched_details = fetch_details([id])
-        # print("got fetched_details: ", fetched_details)
-        articleDetails = id
-        for result in detailResults:
-                # print("dealing with ", result)
-                resultDetail = detailResults[result]
-                for detail in resultDetail:
-                    if 'MedlineCitation' in detail:
-                        PMID = str(detail['MedlineCitation']['PMID'])
-                        if 'Article' in detail['MedlineCitation']:
-                            #title: 
-                            if 'ArticleTitle' in detail['MedlineCitation']['Article']:
-                                articleTitle = str(detail['MedlineCitation']['Article']['ArticleTitle'])
-                                titleA = articleTitle
-                                # print("got title: ", articleTitle)
-                            #date: 
-                            if 'ArticleDate' in detail['MedlineCitation']['Article']:
-                                try: 
-                                    year = detail['MedlineCitation']['Article']['ArticleDate'][0]['Year']
-                                    month = detail['MedlineCitation']['Article']['ArticleDate'][0]['Month']
-                                    day = detail['MedlineCitation']['Article']['ArticleDate'][0]['Day']
-                                except: 
-                                    year = ""
-                                    month = ""
-                                    day = ""
-                                articleDate = day + "/" + month + "/" + year
-                                # print("year: ", articleDate)
-                                dateA = articleDate
-                            if 'Abstract' in detail['MedlineCitation']['Article']:
-                                # print(detail['MedlineCitation']['Article'])
-                                if 'AbstractText' in detail['MedlineCitation']['Article']['Abstract']: 
-                                    # abstractText = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText'])
-                                    # abstractText = strip_tags(abstractText) #strip html tags
-                                    # allAbstracts[PMID] = abstractText
-                                    #trying to parse StringElement here:
-                                    res = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText']).strip('][').split(', ')
-                                    abstractText = ""
-                                    for r in res: 
-                                        if "StringElement" in r: 
-                                            r = r.replace("StringElement('", "")
-                                            r = r.replace("StringElement(\"", "")
-                                        if not "})" in r:         
-                                            if not "attributes" in r: 
-                                                abstractText = abstractText.strip() + " " + r
-                                    abstractText = strip_tags(abstractText) #strip html tags
-                                    fixed_abstractText = abstractText
-                                    
-                                    
-
-                            # using code from get_article_details in onto-text-tag app.py
-                            # this works, need to refine though
-                            authorDetails = ""
-                            if 'AuthorList' in detail['MedlineCitation']['Article']:
-                                # articleDetails += ";Authors: "
-                                try: 
-                                    for s in range(len(detail['MedlineCitation']['Article']['AuthorList'])):
-                                        authorDetails += detail['MedlineCitation']['Article']['AuthorList'][s]['LastName']
-                                        if(s == (len(detail['MedlineCitation']['Article']['AuthorList'])-1)):
-                                            authorDetails += "."
-                                        else:
-                                            authorDetails += ", "
-                                    authorsA = authorDetails
-                                except:
+                                # using code from get_article_details in onto-text-tag app.py
+                                # this works, need to refine though
+                                authorDetails = ""
+                                if 'AuthorList' in detail['MedlineCitation']['Article']:
+                                    # articleDetails += ";Authors: "
+                                    try: 
+                                        for s in range(len(detail['MedlineCitation']['Article']['AuthorList'])):
+                                            authorDetails += detail['MedlineCitation']['Article']['AuthorList'][s]['LastName']
+                                            if(s == (len(detail['MedlineCitation']['Article']['AuthorList'])-1)):
+                                                authorDetails += "."
+                                            else:
+                                                authorDetails += ", "
+                                        authorsA = authorDetails
+                                    except:
+                                        authorDetails += ""
+                                        AuthorsA = authorDetails
+                                        
+                                else:
+                                    # print(f"AuthorList not found")
                                     authorDetails += ""
-                                    AuthorsA = authorDetails
-                                    
-                            else:
-                                # print(f"AuthorList not found")
-                                authorDetails += ""
-                                authorsA = authorDetails
-                                # print("added author: ", authorDetails, " to PMID: ", PMID)
+                                    authorsA = authorDetails
+                                    # print("added author: ", authorDetails, " to PMID: ", PMID)
 
-        #todo: return details from fetch_details here: 
-        r = requests.post(url_for("tag", _external=True), data={
-                                "inputDetails": articleDetails,
-        "inputText": fixed_abstractText, "dateDetails": dateA,
-        "titleDetails": titleA, "authorsDetails": authorsA})
-        return r.text, r.status_code, r.headers.items()
-        # return render_template('index.html',
-        #                        error_msg=f"This PubMed ID {id} was not indexed  - try pasting in the abstract text instead", development = development)
+            #returning details from fetch_details here: 
+            r = requests.post(url_for("tag", _external=True), data={
+                                    "inputDetails": articleDetails,
+            "inputText": fixed_abstractText, "dateDetails": dateA,
+            "titleDetails": titleA, "authorsDetails": authorsA})
+            return r.text, r.status_code, r.headers.items()
+        except Exception as exe:
+            print(exe)
+            traceback.print_exc()
+            return render_template('index.html',
+                                   error_msg=f"This PubMed ID {id} was not indexed  - try pasting in the abstract text instead", development = development)
 
     
 @ app.route('/tag', methods=['POST'])
