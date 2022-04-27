@@ -361,7 +361,6 @@ def pubmed():
                 # print("got fetched_details: ", detailResults)
                 articleDetails = id
                 for result in detailResults:
-                    # print("dealing with ", result)
                     resultDetail = detailResults[result]
                     for detail in resultDetail:
                         if 'MedlineCitation' in detail:
@@ -371,7 +370,6 @@ def pubmed():
                                 if 'ArticleTitle' in detail['MedlineCitation']['Article']:
                                     articleTitle = str(detail['MedlineCitation']['Article']['ArticleTitle'])
                                     titleA = articleTitle
-                                    # print("got title: ", articleTitle)
                                 #date: 
                                 if 'ArticleDate' in detail['MedlineCitation']['Article']:
                                     try: 
@@ -383,15 +381,9 @@ def pubmed():
                                         month = ""
                                         day = ""
                                     articleDate = day + "/" + month + "/" + year
-                                    # print("year: ", articleDate)
                                     dateA = articleDate
                                 if 'Abstract' in detail['MedlineCitation']['Article']:
-                                    # print(detail['MedlineCitation']['Article'])
                                     if 'AbstractText' in detail['MedlineCitation']['Article']['Abstract']: 
-                                        # abstractText = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText'])
-                                        # abstractText = strip_tags(abstractText) #strip html tags
-                                        # allAbstracts[PMID] = abstractText
-                                        #trying to parse StringElement here:
                                         res = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText']).strip('][').split(', ')
                                         abstractText = ""
                                         for r in res: 
@@ -404,13 +396,8 @@ def pubmed():
                                         abstractText = strip_tags(abstractText) #strip html tags
                                         fixed_abstractText = abstractText
                                         
-                                        
-
-                                # using code from get_article_details in onto-text-tag app.py
-                                # this works, need to refine though
                                 authorDetails = ""
                                 if 'AuthorList' in detail['MedlineCitation']['Article']:
-                                    # articleDetails += ";Authors: "
                                     try: 
                                         for s in range(len(detail['MedlineCitation']['Article']['AuthorList'])):
                                             authorDetails += detail['MedlineCitation']['Article']['AuthorList'][s]['LastName']
@@ -424,11 +411,8 @@ def pubmed():
                                         AuthorsA = authorDetails
                                         
                                 else:
-                                    # print(f"AuthorList not found")
                                     authorDetails += ""
                                     authorsA = authorDetails
-                                    # print("added author: ", authorDetails, " to PMID: ", PMID)
-
                 #returning details from fetch_details here: 
                 r = requests.post(url_for("tag", _external=True), data={
                                         "inputDetails": articleDetails,
@@ -436,6 +420,7 @@ def pubmed():
                 "titleDetails": titleA, "authorsDetails": authorsA})
                 return r.text, r.status_code, r.headers.items()
             except Exception as exe:
+                #no pubmed ID found, return error message
                 print(exe)
                 traceback.print_exc()
                 return render_template('index.html',
@@ -462,7 +447,6 @@ def pubmed():
             # print("got fetched_details: ", fetched_details)
             articleDetails = id
             for result in detailResults:
-                    # print("dealing with ", result)
                     resultDetail = detailResults[result]
                     for detail in resultDetail:
                         if 'MedlineCitation' in detail:
@@ -472,7 +456,6 @@ def pubmed():
                                 if 'ArticleTitle' in detail['MedlineCitation']['Article']:
                                     articleTitle = str(detail['MedlineCitation']['Article']['ArticleTitle'])
                                     titleA = articleTitle
-                                    # print("got title: ", articleTitle)
                                 #date: 
                                 if 'ArticleDate' in detail['MedlineCitation']['Article']:
                                     try: 
@@ -484,15 +467,9 @@ def pubmed():
                                         month = ""
                                         day = ""
                                     articleDate = day + "/" + month + "/" + year
-                                    # print("year: ", articleDate)
                                     dateA = articleDate
                                 if 'Abstract' in detail['MedlineCitation']['Article']:
-                                    # print(detail['MedlineCitation']['Article'])
                                     if 'AbstractText' in detail['MedlineCitation']['Article']['Abstract']: 
-                                        # abstractText = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText'])
-                                        # abstractText = strip_tags(abstractText) #strip html tags
-                                        # allAbstracts[PMID] = abstractText
-                                        #trying to parse StringElement here:
                                         res = str(detail['MedlineCitation']['Article']['Abstract']['AbstractText']).strip('][').split(', ')
                                         abstractText = ""
                                         for r in res: 
@@ -505,13 +482,8 @@ def pubmed():
                                         abstractText = strip_tags(abstractText) #strip html tags
                                         fixed_abstractText = abstractText
                                         
-                                        
-
-                                # using code from get_article_details in onto-text-tag app.py
-                                # this works, need to refine though
                                 authorDetails = ""
                                 if 'AuthorList' in detail['MedlineCitation']['Article']:
-                                    # articleDetails += ";Authors: "
                                     try: 
                                         for s in range(len(detail['MedlineCitation']['Article']['AuthorList'])):
                                             authorDetails += detail['MedlineCitation']['Article']['AuthorList'][s]['LastName']
@@ -525,10 +497,8 @@ def pubmed():
                                         AuthorsA = authorDetails
                                         
                                 else:
-                                    # print(f"AuthorList not found")
                                     authorDetails += ""
                                     authorsA = authorDetails
-                                    # print("added author: ", authorDetails, " to PMID: ", PMID)
 
             #returning details from fetch_details here: 
             r = requests.post(url_for("tag", _external=True), data={
@@ -537,6 +507,7 @@ def pubmed():
             "titleDetails": titleA, "authorsDetails": authorsA})
             return r.text, r.status_code, r.headers.items()
         except Exception as exe:
+            #no pubmed found, return error message
             print(exe)
             traceback.print_exc()
             return render_template('index.html',
