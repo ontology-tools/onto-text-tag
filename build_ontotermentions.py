@@ -50,6 +50,8 @@ if __name__ == '__main__':
             print("Error building")
             exit()
 
+    #todo: shelve db can also be named .db, not just .bak .dat and .dir due to different back-end databases!
+
     #delete all db files in the static folder, as well as the oger .pkl and .tsv files:
         os.chdir(ontopath + "/static/")
         for the_file in os.listdir(ontopath + "/static"):

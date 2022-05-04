@@ -290,7 +290,9 @@ def home():
 
 @app.route('/associations', methods=['GET', 'POST'])
 def associations():
+    # todo: filter by get_ids
     ontologies = ontoDict["ontologies"]
+    print(ontologies)
     labels = get_ids(ontologies) 
     label_list={'labels': labels}
     json.dumps(label_list)
@@ -332,11 +334,7 @@ def visualise_similarities():
 
 @app.route('/pubmed', methods=['POST'])
 def pubmed():
-    development = (os.environ.get("FLASK_ENV")=='development')
-    #if not development:
-    #    return render_template('index.html',
-    #                           error_msg=f"Retrieving from PubMed is not yet supported. Try pasting in the abstract text instead.",
-    #                           development=development)
+    print("pubmed")
     id = request.form.get('pubmed_id')
     if id:
         fixed_id = id.strip()
@@ -413,7 +411,8 @@ def pubmed():
                                 else:
                                     authorDetails += ""
                                     authorsA = authorDetails
-                #returning details from fetch_details here: 
+                #returning details from fetch_details here:
+                print("should get tag here") 
                 r = requests.post(url_for("tag", _external=True), data={
                                         "inputDetails": articleDetails,
                 "inputText": fixed_abstractText, "dateDetails": dateA,
@@ -426,6 +425,7 @@ def pubmed():
                 return render_template('index.html',
                                        error_msg=f"The PubMed ID {id} was not indexed  - try pasting in the abstract text instead",
                                        development=development)
+        # get from all_abstracts db:
         if all_dates_db[fixed_id] is not None:
             dateA = all_dates_db[fixed_id]
         if all_titles_db[fixed_id] is not None: 
@@ -436,6 +436,7 @@ def pubmed():
                                     "inputDetails": articleDetails,
             "inputText": fixed_abstractText, "dateDetails": dateA,
             "titleDetails": titleA, "authorsDetails": authorsA})
+        print("pubmed return")
         return r.text, r.status_code, r.headers.items()
     except Exception as e:
         print(e)
@@ -501,10 +502,12 @@ def pubmed():
                                     authorsA = authorDetails
 
             #returning details from fetch_details here: 
+            print("should get tag here2")
             r = requests.post(url_for("tag", _external=True), data={
                                     "inputDetails": articleDetails,
             "inputText": fixed_abstractText, "dateDetails": dateA,
             "titleDetails": titleA, "authorsDetails": authorsA})
+            print("pubmed return2")
             return r.text, r.status_code, r.headers.items()
         except Exception as exe:
             #no pubmed found, return error message
@@ -566,6 +569,11 @@ def tag():
                 term=onto_extractor3.get_term(l['id'])
                 if term:                        
                     ont = term['id'][0:term['id'].index(":")]
+                    #checking different ontologies:
+                    if ont == "BCIO":
+                        print("BCIO")
+                    else: 
+                        print(ont)
                     if term['id'] == "BCIO:010055":
                         continue
                     else:

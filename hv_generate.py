@@ -86,10 +86,13 @@ def hv_generator(ontology_id_list):
         renderer = hv.renderer('bokeh')
         hvplot = renderer.get_plot(chord)
         html = renderer.static_html(hvplot)
+        #close shelve db:
+        ontoterminology.close()
         return json.dumps(html)
     except Exception as e:
         print(e)
         traceback.print_exc()
         html_error_message = "<!doctype html><div><h4>ERROR CREATING TABLE - no associations found, or possibly some of the ID's were incorrect?</h4></div></html>"
+        ontoterminology.close()
         return(json.dumps(html_error_message))
         
