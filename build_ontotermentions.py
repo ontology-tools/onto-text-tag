@@ -35,7 +35,7 @@ if __name__ == '__main__':
             file_path = os.path.join(addictopath + "DB/", the_file)
             try:
                 if os.path.isfile(file_path):
-                    if file_path.endswith('.bak') or file_path.endswith('.dat') or file_path.endswith('.dir'): 
+                    if file_path.endswith('.bak') or file_path.endswith('.dat') or file_path.endswith('.dir') or file_path.endswith('.db'): 
                         os.unlink(file_path)
             except Exception as e:
                 print(e)
@@ -58,7 +58,7 @@ if __name__ == '__main__':
             file_path = os.path.join(ontopath + "/static/", the_file)
             try:
                 if os.path.isfile(file_path):
-                    if file_path.endswith('.bak') or file_path.endswith('.dat') or file_path.endswith('.dir') or file_path.endswith('.pickle') or file_path.endswith('.tsv'): 
+                    if file_path.endswith('.bak') or file_path.endswith('.dat') or file_path.endswith('.dir') or file_path.endswith('.pickle') or file_path.endswith('.tsv') or file_path.endswith('.dir'): 
                         os.unlink(file_path)
             except Exception as e:
                 print(e)
