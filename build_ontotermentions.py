@@ -50,15 +50,15 @@ if __name__ == '__main__':
             print("Error building")
             exit()
 
-    #todo: shelve db can also be named .db, not just .bak .dat and .dir due to different back-end databases!
-
+    # todo: shelve db can also be named .db, not just .bak .dat and .dir due to different back-end databases!
+    # todo: test_terms.tsv seems to be required, but deleted below.. change this? 
     #delete all db files in the static folder, as well as the oger .pkl and .tsv files:
         os.chdir(ontopath + "/static/")
         for the_file in os.listdir(ontopath + "/static"):
             file_path = os.path.join(ontopath + "/static/", the_file)
             try:
                 if os.path.isfile(file_path):
-                    if file_path.endswith('.bak') or file_path.endswith('.dat') or file_path.endswith('.dir') or file_path.endswith('.pickle') or file_path.endswith('.tsv') or file_path.endswith('.dir'): 
+                    if file_path.endswith('.bak') or file_path.endswith('.dat') or file_path.endswith('.dir') or file_path.endswith('.pickle') or file_path.endswith('.tsv') or file_path.endswith('.db'): 
                         os.unlink(file_path)
             except Exception as e:
                 print(e)
@@ -69,7 +69,7 @@ if __name__ == '__main__':
         file_path = os.path.join(addictopath + "DB/", the_file)
         try:
             if os.path.isfile(file_path):
-                if file_path.endswith('.bak') or file_path.endswith('.dat') or file_path.endswith('.dir'): 
+                if file_path.endswith('.bak') or file_path.endswith('.dat') or file_path.endswith('.dir') or file_path.endswith('.db'): 
                     os.rename(file_path, ontopath + "/static/" + the_file)
         except Exception as e:
             print(e)
