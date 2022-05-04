@@ -17,7 +17,7 @@ import shelve
 import traceback
 # from memory_profiler import profile
 
-ontoterminology = shelve.open('static/ontoterminology.db') #works
+ontoterminology = shelve.open('static/ontoterminology.db', flag='r', writeback=False) #works
 print("loaded terms db")
 
 
