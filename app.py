@@ -546,7 +546,7 @@ def tag():
     # todo: re-factor to build terms when ontotermentions.csv is updated
 
     #new idea: if test_terms.tsv is not in the /static directory, then build it.
-    build_terms = True
+    build_terms = False
 
     if not os.path.isfile(os.path.join(app.root_path, 'static/test_terms.tsv.pickle')):
         build_terms = True
