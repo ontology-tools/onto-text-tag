@@ -19,10 +19,12 @@ import traceback
 import shelve 
 import dbm.gnu
 
-def gdbm_shelve(filename, flag="c"): 
-    return shelve.Shelf(dbm.open(filename, flag)) 
+def gdbm_shelve(filename, flag="c", writeback=False): 
+    return shelve.Shelf(dbm.open(filename, flag, writeback)) 
 
-ontoterminology = gdbm_shelve.open('static/ontoterminology.db', flag='r', writeback=False) #works
+# ontoterminology = gdbm_shelve.open('static/ontoterminology.db', flag='r', writeback=False) 
+ontoterminology = gdbm_shelve('static/ontoterminology.db', flag='r', writeback=False) 
+
 print("loaded terms db")
 
 
