@@ -318,6 +318,7 @@ def chordout():
         get_descendents = session['get_descendents']
         if get_descendents == "true":
             ontology_id_list = get_all_descendents(saved_ontology_id_list)
+            print("looking for: ", ontology_id_list)
             html = json.loads(hv_generator(ontology_id_list))
         else:
             html = json.loads(hv_generator(saved_ontology_id_list))
