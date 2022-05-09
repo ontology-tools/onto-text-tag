@@ -59,8 +59,10 @@ def hv_generator(ontology_id_list):
         for source in mentions:
             for target in mentions: 
                 if source.strip() == "" or target.strip() == "":
+                    print("blank source or target")
                     pass
                 elif source.strip() == target.strip():
+                    print("intersection: ", source.strip())
                     pass
                 else:
                     intersection = mentions[source].intersection(mentions[target])
