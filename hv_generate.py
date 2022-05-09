@@ -70,18 +70,18 @@ def hv_generator(ontology_id_list):
                                 add_item = False
                         if add_item:
                             chn_list.append(chn)
-        # print("finished checking for inverse duplicates..")        
-        # print("length of intersection list: ", len(chn_list))
-        # print(chn_list)
+        print("finished checking for inverse duplicates..")        
+        print("length of intersection list: ", len(chn_list))
+        print(chn_list)
 
         # Build the data table expected by the visualisation library
         links = pd.DataFrame.from_dict(chn_list)      
         node_names = links.source.append(links.target)
         node_names = node_names.unique()
-        # print(node_names)
+        print(node_names)
         node_info = {"index":node_names,"name":node_names,"group":[1]*len(node_names)}
         # node_info = {"index":node_names,"name":node_names,"group":node_names}
-        # print(node_info)
+        print(node_info)
         nodes = hv.Dataset(pd.DataFrame(node_info), 'index')
         nodes.data.head()
 
