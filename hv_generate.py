@@ -17,13 +17,15 @@ import io
 import traceback
 # from memory_profiler import profile
 import shelve 
-import dbm.gnu
+# import dbm.gnu
 
-def gdbm_shelve(filename, flag="c", writeback=False): 
-    return shelve.Shelf(dbm.open(filename, flag, writeback)) 
+# def gdbm_shelve(filename, flag="c", writeback=False): 
+#     return shelve.Shelf(dbm.open(filename, flag, writeback)) 
 
 # ontoterminology = gdbm_shelve.open('static/ontoterminology.db', flag='r', writeback=False) 
-ontoterminology = gdbm_shelve('static/ontoterminology.db', flag='r', writeback=False) 
+# ontoterminology = gdbm_shelve('static/ontoterminology.db', flag='r', writeback=False) 
+
+ontoterminology = shelve.open('static/ontoterminology.db', flag='r', writeback=False) #works
 
 print("loaded terms db")
 
