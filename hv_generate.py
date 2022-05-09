@@ -25,7 +25,7 @@ def gdbm_shelve(filename, flag="c", writeback=False):
 # ontoterminology = gdbm_shelve.open('static/ontoterminology.db', flag='r', writeback=False) 
 ontoterminology = gdbm_shelve('static/ontoterminology.db', flag='r', writeback=False) 
 
-print("loaded terms db")
+print("loaded terms db", ontoterminology.keys())
 
 
 def hv_generator(ontology_id_list):
