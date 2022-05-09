@@ -292,7 +292,7 @@ def home():
 def associations():
     # todo: filter by get_ids
     ontologies = ontoDict["ontologies"]
-    print(ontologies)
+    # print(ontologies)
     labels = get_ids(ontologies) 
     label_list={'labels': labels}
     json.dumps(label_list)
@@ -335,7 +335,7 @@ def visualise_similarities():
 
 @app.route('/pubmed', methods=['POST'])
 def pubmed():
-    print("pubmed")
+    # print("pubmed")
     id = request.form.get('pubmed_id')
     if id:
         fixed_id = id.strip()
@@ -413,7 +413,7 @@ def pubmed():
                                     authorDetails += ""
                                     authorsA = authorDetails
                 #returning details from fetch_details here:
-                print("should get tag here") 
+                # print("should get tag here") 
                 r = requests.post(url_for("tag", _external=True), data={
                                         "inputDetails": articleDetails,
                 "inputText": fixed_abstractText, "dateDetails": dateA,
@@ -503,12 +503,12 @@ def pubmed():
                                     authorsA = authorDetails
 
             #returning details from fetch_details here: 
-            print("should get tag here2")
+            # print("should get tag here2")
             r = requests.post(url_for("tag", _external=True), data={
                                     "inputDetails": articleDetails,
             "inputText": fixed_abstractText, "dateDetails": dateA,
             "titleDetails": titleA, "authorsDetails": authorsA})
-            print("pubmed return2")
+            # print("pubmed return2")
             return r.text, r.status_code, r.headers.items()
         except Exception as exe:
             #no pubmed found, return error message
@@ -555,7 +555,7 @@ def tag():
     engine = inflect.engine()
 
            
-    if development and build_terms:
+    if build_terms: 
         print("Building terms, please wait...")
         # stop words, don't try to match these
         stopwords = nlp.Defaults.stop_words
@@ -571,10 +571,10 @@ def tag():
                 if term:                        
                     ont = term['id'][0:term['id'].index(":")]
                     #checking different ontologies:
-                    if ont == "BCIO":
-                        print("BCIO")
-                    else: 
-                        print(ont)
+                    # if ont == "BCIO":
+                    #     print("BCIO")
+                    # else: 
+                    #     print(ont)
                     if term['id'] == "BCIO:010055":
                         continue
                     else:
@@ -588,7 +588,7 @@ def tag():
                             plur = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': plural, 'name': term['name'], 'definition': term['definition']}
                             mydict.append(plur)
                         except: 
-                            print("Problem getting plural of ", term['name'].strip())
+                            # print("Problem getting plural of ", term['name'].strip())
                             continue        
                 else:
                     print("No term for label: ", l)

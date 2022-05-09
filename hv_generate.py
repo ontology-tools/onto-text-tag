@@ -29,8 +29,8 @@ ontoterminology = shelve.open('static/ontoterminology.db', flag='r', writeback=F
 
 print("loaded terms db")
 
-for ont in ontoterminology:
-    print("ontoterminology", ont)
+# for ont in ontoterminology:
+#     print("ontoterminology", ont)
 
 def hv_generator(ontology_id_list):
     try:
@@ -52,19 +52,23 @@ def hv_generator(ontology_id_list):
         mentions = {}
         for selectedID in ontology_id_list:
             if selectedID in ontoterminology.keys():
+                # print("ontoterminology selectedID 'NAME'", ontoterminology[selectedID]['NAME'])
+                # print("set:  ", set(ontoterminology[selectedID]['PMID']))
                 mentions[ontoterminology[selectedID]['NAME']] = set(ontoterminology[selectedID]['PMID'])
-                print("got one: ", mentions[ontoterminology[selectedID]['NAME']])
+                # print("got one: ", mentions[ontoterminology[selectedID]['NAME']])
             else:
-                print("No mentions found for ",selectedID)
-        # print("loaded mentions")
+                # print("No mentions found for ",selectedID)
+                pass
+        # print("loaded mentions", mentions)
         chn_list = []
         for source in mentions:
+            # print("plain source: ", source)
             for target in mentions: 
                 if source.strip() == "" or target.strip() == "":
-                    print("blank source or target")
+                    # print("blank source or target")
                     pass
                 elif source.strip() == target.strip():
-                    print("intersection: ", source.strip())
+                    # print("intersection: ", source.strip())
                     pass
                 else:
                     intersection = mentions[source].intersection(mentions[target])
@@ -78,17 +82,17 @@ def hv_generator(ontology_id_list):
                         if add_item:
                             chn_list.append(chn)
         print("finished checking for inverse duplicates..")        
-        print("length of intersection list: ", len(chn_list))
-        print(chn_list)
+        # print("length of intersection list: ", len(chn_list))
+        # print(chn_list)
 
         # Build the data table expected by the visualisation library
         links = pd.DataFrame.from_dict(chn_list)      
         node_names = links.source.append(links.target)
         node_names = node_names.unique()
-        print(node_names)
+        # print(node_names)
         node_info = {"index":node_names,"name":node_names,"group":[1]*len(node_names)}
         # node_info = {"index":node_names,"name":node_names,"group":node_names}
-        print(node_info)
+        # print(node_info)
         nodes = hv.Dataset(pd.DataFrame(node_info), 'index')
         nodes.data.head()
 
