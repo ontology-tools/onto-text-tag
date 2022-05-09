@@ -51,6 +51,7 @@ def hv_generator(ontology_id_list):
         for selectedID in ontology_id_list:
             if selectedID in ontoterminology.keys():
                 mentions[ontoterminology[selectedID]['NAME']] = set(ontoterminology[selectedID]['PMID'])
+                print("got one: ", mentions[ontoterminology[selectedID]['NAME']])
             else:
                 print("No mentions found for ",selectedID)
         # print("loaded mentions")
