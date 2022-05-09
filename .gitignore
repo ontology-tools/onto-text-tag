@@ -6,3 +6,4 @@ allAbstracts.pkl
 *.dat
 *.bak
 *.dir
+backup/

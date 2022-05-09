@@ -13,11 +13,16 @@ from urllib.request import urlopen
 import json
 import pickle 
 import io
-import shelve
+# import shelve
 import traceback
 # from memory_profiler import profile
+import shelve 
+import dbm.gnu
 
-ontoterminology = shelve.open('static/ontoterminology.db', flag='r', writeback=False) #works
+def gdbm_shelve(filename, flag="c"): 
+    return shelve.Shelf(dbm.open(filename, flag)) 
+
+ontoterminology = gdbm_shelve.open('static/ontoterminology.db', flag='r', writeback=False) #works
 print("loaded terms db")
 
 
