@@ -289,11 +289,15 @@ def build():
         # todo: use RQ scheduler instead of below, need better system to indicate success
         # todo: relative path to addiction-ontology
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
-        os.system("python build_ontotermentions.py --path /home/tom/addiction-ontology")
-        return "Build Successful" # will take a very long time
+        os.system("python build_ontotermentions.py -W ignore --path /home/tom/addiction-ontology")
+        os.chdir(os.path.dirname(os.path.realpath(__file__)))
+        os.system("touch success.txt")
+        return "Build Successful"
     except: 
+        os.chdir(os.path.dirname(os.path.realpath(__file__)))
+        os.system("touch failed.txt")
         return "Build call FAILED"
-    return "Busy Building"
+    
 
 
 # Pages for the app
