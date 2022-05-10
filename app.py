@@ -35,6 +35,8 @@ import pprint
 import hv_generate
 from hv_generate import hv_generator
 
+from build_ontotermentions import buildit
+
 from bokeh.embed import json_item 
 from jinja2 import Template
 
@@ -278,6 +280,21 @@ def strip_tags(html):
     returnString = re.sub(r'\\x..', '', returnString) #from StackOverflow, works
     returnString = re.sub(r'\\u....', '', returnString) #
     return returnString
+
+
+@app.route('/build')
+@app.route('/build')
+def build():
+    try:
+        # todo: use RQ scheduler instead of below, need better system to indicate success
+        # todo: relative path to addiction-ontology
+        os.chdir(os.path.dirname(os.path.realpath(__file__)))
+        os.system("python build_ontotermentions.py --path /home/tom/addiction-ontology")
+        return "Build Successful" # will take a very long time
+    except: 
+        return "Build call FAILED"
+    return "Busy Building"
+
 
 # Pages for the app
 @app.route('/')
