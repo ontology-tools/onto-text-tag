@@ -32,5 +32,7 @@ else:
      # Access the secret version.
      #response = client.access_secret_version(request={"name": name})
      #SECRET_KEY = response.payload.data.decode("UTF-8")
-     SECRET_KEY = os.environ.get('FLASK_SECRET_KEY')
+     # SECRET_KEY = os.environ.get('FLASK_SECRET_KEY')
+     SECRET_KEY = os.urandom(24)
+
 
