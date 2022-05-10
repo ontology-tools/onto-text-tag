@@ -1,3 +1,11 @@
+"""
+Module to run build scripts from addition-ontology repo
+If run successfully, results in db files in /static being replaced
+- as well as removing the test_terms list files, which means these need to be re-build at runtime. 
+Run directly with python build_ontotermentions.py --path "/path/to/addiction-ontology/"
+"""
+
+
 import os
 import argparse
 import sys
@@ -8,8 +16,7 @@ if __name__ == '__main__':
     parser.add_argument('--path', '-i',help='Name of the path')
     
     args=parser.parse_args()
-    path = args.path
-    
+    path = args.path    
     
     if args is None :
         parser.print_help()
@@ -25,8 +32,6 @@ if __name__ == '__main__':
         #Get ontopath from current directory
         ontopath = os.path.dirname(os.path.realpath(__file__))
         print("ontopath is: ", ontopath)
-        # ontopath = "/home/tom/Documents/PROGRAMMING/Python/Flask/onto-text-tag"
-
         addictopath = path + "/scripts/"
         
         # #delete all the db files in the DB folder:
@@ -50,8 +55,6 @@ if __name__ == '__main__':
             print("Error building")
             exit()
 
-    # todo: shelve db can also be named .db, not just .bak .dat and .dir due to different back-end databases!
-    # todo: test_terms.tsv seems to be required, but deleted below.. change this? 
     #delete all db files in the static folder, as well as the oger .pkl and .tsv files:
         os.chdir(ontopath + "/static/")
         for the_file in os.listdir(ontopath + "/static"):
@@ -77,13 +80,4 @@ if __name__ == '__main__':
 
 
 
-    #OLD CODE:
-    # os.chdir("/home/tom/Documents/PROGRAMMING/Python/addiction-ontology/scripts/")
-    # exec(open("./4buldDataFrame.py").read())
-    # os.chdir("/home/tom/Documents/PROGRAMMING/Python/addiction-ontology/scripts/")
-    # exec(open("./5otherGraphs.py").read())
-
-    # os.chdir("/home/tom/Documents/PROGRAMMING/Python/addiction-ontology/scripts/")
-    # exec(open("./6buildOntoBio.py").read())
-    # print("df is: ", df)
-    # df.to_csv("/home/tom/Documents/PROGRAMMING/Python/addiction-ontology/ontotermentins.csv", sep = ",", encoding= "utf-8")
+    

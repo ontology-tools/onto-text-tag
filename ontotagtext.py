@@ -72,12 +72,7 @@ class MultiExtractorComponent(object):
         self.terms = {}
         patterns = []
 
-        #todo: get this to work with "ontols":
-        # nr_terms = len(self.ontol2.get_classes())+len(self.ontol.get_classes())
-        # print(f"Importing {nr_terms} terms")
-
         #build unified table of all ID, IRI, Label and Synonyms:
-        # for k, ontol in [self.ontols]: #should be all ontols in 
         for ontol in self.ontols: #should be all ontols in 
             print("checking ontol: ", ontol)
             for termid in ontol.get_classes():
@@ -86,11 +81,7 @@ class MultiExtractorComponent(object):
                         
                 label = ontol.get_annotation(termid, RDFSLABEL)
                 definition = ontol.get_annotation(termid, DEFINITION)
-                if label: 
-                    # if label.strip().lower() == "bupropion":
-                    #         print("got bupropion")
-                    # if label.strip().lower() == "intervention":
-                    #         print("got intervention")                   
+                if label:                    
                     term_entry = {'id': termid if termshortid is None else termshortid,
                                 'name': label.strip(),
                                 'definition': definition}
@@ -104,10 +95,6 @@ class MultiExtractorComponent(object):
                 for s in synonyms:
                     # print("adding SYNONYM in ontotagtext: ", s)
                     if s.strip().lower() not in stopwords:
-                        # if s.strip().lower() == "tobacco":
-                        #     print("got tobacco")
-                        # if s.strip().lower() == "intervention":
-                        #     print("got intervention")
                         self.terms[s.strip().lower()] = term_entry
                         patterns.append(nlp.make_doc(s.strip().lower()))
                         try:
@@ -168,127 +155,4 @@ class MultiExtractorComponent(object):
             return self.terms[keys[0]]
         else:
             return None
-
-# Testing
-#if __name__ == "__main__":
-#    import requests
-#    from urllib.request import urlopen
-#    location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
-#    location2 = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
-#    # location = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
-
-#    print("Fetching release file from", location)
-#    data = urlopen(location).read()  # bytes
-#    print("Fetching release file from", location2)
-#    data2 = urlopen(location2).read()  # bytes
-
-#    ontofile1 = data.decode('utf-8')
-#    ontofile2 = data2.decode('utf-8')
-
-
-#    ontoDict = {
-#        "ontologies": [
-#            {
-#                "label": "BCIO",
-#                "name": "BCIO",
-#                "ontologyfile": ontofile2, #todo: why ontofile2 not working here if BCIO added after AddictO?
-#            },
-#            {
-#                "label": "AddictO",
-#                "name": "AddictO",
-#                "ontologyfile": ontofile1,
-#            },
-#        ]
-#    }
-    # python -m spacy download en_core_web_md
-    # or: en_core_web_sm or en_core_web_lg
-#    nlp = spacy.load('en_core_web_md')
-
-#    onto_extractor = MultiExtractorComponent(
-#        nlp,
-#        ontoDict)
-#        # name="ADDICTO",
-#        # label="ADDICTO",
-#        # ontologyfile="/home/tom/Documents/PROGRAMMING/Python/addiction-ontology/addicto-merged.owx")
-#    nlp.add_pipe(onto_extractor, after="parser")
-
-    # test = '''
-    # The promotion of the London Smoking Cessation Transformation Programme during September 2017 was associated with a significant increase in quit attempts compared with the rest of England. The results were inconclusive regarding an effect on quit success among those who tried.
-    # Smokers were more successful than non-smokers and this was good. Those who smoked were associated with ...
-    # '''
-
-    # doc = nlp(test)
-
-    # # print ontology IDs identified
-    # for token in doc:
-    #     if token._.is_ontol_term:
-    #         print(token._.ontol_id, token.text, token.idx)
-
-
-    # from spacy import displacy
-
-    # svg = displacy.serve(doc, style='ent')
-
-    # from spacy.matcher import PhraseMatcher
-
-    # matcher = PhraseMatcher(nlp.vocab, attr='LEMMA')
-
-    # terms = ['smoking cessation', 'smoker', 'non-smoker', 'smoke', 'effect']
-    # patterns = [nlp(text) for text in terms]
-    # matcher.add("TerminologyList", patterns)
-
-    # matches = matcher(doc)
-    # print(matches)
-
-    # for (match_id, start, end) in matches:
-    #     print(nlp.vocab.strings[match_id], doc[start:end])
-
-
-    ## Another approach using spacylookup
-
-    #nlp = English()
-    #from spacy_lookup import Entity
-
-
-    #addicto = Entity(keywords_list=['smoking cessation','smoker','effect'])
-    #nlp.add_pipe(addicto, last=False)
-
-    #doc = nlp(test)
-
-    #print([(token.text, token._.canonical) for token in doc if token._.is_entity])
-
-
-    #svg = spacy.displacy.render(doc, style="dep")
-    #output_path = Path(os.path.join("./", "sentence.svg"))
-    #output_path.open('w', encoding="utf-8").write(svg)
-
-
-    # Test using EntityRuler rather than PatternMatcher
-#    from spacy.lang.en import English
-#    from spacy.pipeline import EntityRuler
-
-#    nlp = English()
-#    ruler = EntityRuler(nlp)
-#    patterns = [{"label": "ORG", "pattern": "Apple", "id": "apple"},
-#                {"label": "GPE", "pattern": [{"LOWER": "san"}, {"LOWER": "francisco"}],
-#                 "id": "san-francisco"},
-#                {"label": "GPE", "pattern": [{"LOWER": "san"}, {"LOWER": "fran"}],
-#                 "id": "san-francisco"}]
-#    ruler.add_patterns(patterns)
-#    nlp.add_pipe(ruler)
-
-#    doc1 = nlp("Apple is opening its first big office in San Francisco.")
-#    print([(ent.text, ent.label_, ent.ent_id_) for ent in doc1.ents])
-
-#    doc2 = nlp("Apple is opening its first big office in San Fran.")
-#    print([(ent.text, ent.label_, ent.ent_id_) for ent in doc2.ents])
-
-#    '''
-#    {"label": "ORG", "pattern": "Apple"}
-#    {"label": "GPE", "pattern": [{"LOWER": "san"}, {"LOWER": "francisco"}]}
-#    '''
-
-#    ruler.to_disk("./patterns.jsonl")
-#    new_ruler = EntityRuler(nlp).from_disk("./patterns.jsonl")
-
 

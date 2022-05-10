@@ -13,42 +13,17 @@ from urllib.request import urlopen
 import json
 import pickle 
 import io
-# import shelve
 import traceback
-# from memory_profiler import profile
 import shelve 
-# import dbm.gnu
 
-# def gdbm_shelve(filename, flag="c", writeback=False): 
-#     return shelve.Shelf(dbm.open(filename, flag, writeback)) 
-
-# ontoterminology = gdbm_shelve.open('static/ontoterminology.db', flag='r', writeback=False) 
-# ontoterminology = gdbm_shelve('static/ontoterminology.db', flag='r', writeback=False) 
 
 ontoterminology = shelve.open('static/ontoterminology.db', flag='r', writeback=False) #works
 
 print("loaded terms db")
 
-# for ont in ontoterminology:
-#     print("ontoterminology", ont)
 
 def hv_generator(ontology_id_list):
-    try:
-        #from app import get_all_descendents #todo: refactor to avoid this circular import
-        #load ontotermilology.pkl:
-        #todo: check that replacing .pkl with shelve .db works, then delete below load .pkl
-        # with open('ontoterminology.pkl', 'rb') as f:
-        #     ontoterminology = pickle.load(f)
-
-        # get descendants
-        #if should_get_descendents == True:
-        #    # print("getting descendents now")
-        #    ontology_id_list = get_all_descendents(ontology_id_input)
-        #    # print("got them")
-        #else:
-        #    ontology_id_list = ontology_id_input
-
-        #new method using ontoterminology:         
+    try:      
         mentions = {}
         for selectedID in ontology_id_list:
             if selectedID in ontoterminology.keys():
@@ -76,7 +51,7 @@ def hv_generator(ontology_id_list):
                         chn = {"source": source, "target": target, "PMID": len(intersection)}
                         #inverse duplicate checking here: 
                         add_item = True
-                        for k in chn_list: #todo: another whole loop here, any faster way to do this? I can't see it.
+                        for k in chn_list: 
                             if source + target == k['target'] + k['source']:
                                 add_item = False
                         if add_item:
@@ -91,7 +66,6 @@ def hv_generator(ontology_id_list):
         node_names = node_names.unique()
         # print(node_names)
         node_info = {"index":node_names,"name":node_names,"group":[1]*len(node_names)}
-        # node_info = {"index":node_names,"name":node_names,"group":node_names}
         # print(node_info)
         nodes = hv.Dataset(pd.DataFrame(node_info), 'index')
         nodes.data.head()
