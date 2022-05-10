@@ -289,7 +289,7 @@ def build():
         # todo: use RQ scheduler instead of below, need better system to indicate success
         # todo: relative path to addiction-ontology
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
-        os.system("python build_ontotermentions.py -W ignore --path /home/tom/addiction-ontology")
+        os.system("python -W ignore build_ontotermentions.py --path /home/tom/addiction-ontology")
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
         os.system("touch success.txt")
         return "Build Successful"
