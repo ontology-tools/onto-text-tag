@@ -551,8 +551,9 @@ def pubmed():
     
 @ app.route('/tag', methods=['POST'])
 def tag():
-    development = (os.environ.get("FLASK_ENV")=='development')
-
+    print("/tag")
+    # development = (os.environ.get("FLASK_ENV")=='development')
+    development="production"
     text = request.form['inputText']
     # print("got text", text)
     details = request.form.get('inputDetails') #pmid
@@ -702,7 +703,7 @@ def tag():
                                 "ontol_namespace": ontol_namespace,
                                 "ontol_link": link_prefix_http+ontol_id,
                                 "match_index": ontol_id})
-
+    print("should render index.html here (/tag)")
     return render_template('index.html',
                            text=text,
                            details=details,
