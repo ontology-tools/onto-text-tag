@@ -434,12 +434,17 @@ def pubmed():
                                     authorDetails += ""
                                     authorsA = authorDetails
                 #returning details from fetch_details here:
-                # print("should get tag here") 
-                r = requests.post(url_for("tag", _external=True), data={
-                                        "inputDetails": articleDetails,
-                "inputText": fixed_abstractText, "dateDetails": dateA,
-                "titleDetails": titleA, "authorsDetails": authorsA})
-                return r.text, r.status_code, r.headers.items()
+                print("should get tag here") 
+                try:
+                    r = requests.post(url_for("tag", _external=True), data={
+                                            "inputDetails": articleDetails,
+                    "inputText": fixed_abstractText, "dateDetails": dateA,
+                    "titleDetails": titleA, "authorsDetails": authorsA})
+                    return r.text, r.status_code, r.headers.items()
+                except: 
+                    return render_template('index.html',
+                                       error_msg=f"Error tagging {id}",
+                                       development=development)
             except Exception as exe:
                 #no pubmed ID found, return error message
                 print(exe)
@@ -524,11 +529,16 @@ def pubmed():
                                     authorsA = authorDetails
 
             #returning details from fetch_details here: 
-            # print("should get tag here2")
-            r = requests.post(url_for("tag", _external=True), data={
-                                    "inputDetails": articleDetails,
-            "inputText": fixed_abstractText, "dateDetails": dateA,
-            "titleDetails": titleA, "authorsDetails": authorsA})
+            print("should get tag here2")
+            try:
+                r = requests.post(url_for("tag", _external=True), data={
+                                        "inputDetails": articleDetails,
+                "inputText": fixed_abstractText, "dateDetails": dateA,
+                "titleDetails": titleA, "authorsDetails": authorsA})
+            except: 
+                return render_template('index.html',
+                                    error_msg=f"Error tagging {id}",
+                                    development=development)
             # print("pubmed return2")
             return r.text, r.status_code, r.headers.items()
         except Exception as exe:
