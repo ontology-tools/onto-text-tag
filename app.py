@@ -373,6 +373,12 @@ def pubmed():
         if fixed_id is not None and fixed_id in abstract_ass_db.keys():
             fixed_abstractText = abstract_ass_db[fixed_id]
             articleDetails = id
+            if all_dates_db[fixed_id] is not None:
+                dateA = all_dates_db[fixed_id]
+            if all_titles_db[fixed_id] is not None: 
+                titleA = all_titles_db[fixed_id]
+            if all_authors_db[fixed_id] is not None: 
+                authorsA = all_authors_db[fixed_id]
         else:
             #not in pre-downloaded abstracts, get pubmed info direct from pubmed here:
             #todo: refactor this duplicate block
@@ -458,12 +464,13 @@ def pubmed():
                 return render_template('index.html',
                                        error_msg=f"The PubMed ID {id} was not indexed  - try pasting in the abstract text instead",)
         # get from all_abstracts db:
-        if all_dates_db[fixed_id] is not None:
-            dateA = all_dates_db[fixed_id]
-        if all_titles_db[fixed_id] is not None: 
-            titleA = all_titles_db[fixed_id]
-        if all_authors_db[fixed_id] is not None: 
-            authorsA = all_authors_db[fixed_id]
+        # todo: below if statements causing errors - is this still needed? 
+        # if all_dates_db[fixed_id] is not None:
+        #     dateA = all_dates_db[fixed_id]
+        # if all_titles_db[fixed_id] is not None: 
+        #     titleA = all_titles_db[fixed_id]
+        # if all_authors_db[fixed_id] is not None: 
+        #     authorsA = all_authors_db[fixed_id]
         r = requests.post(url_for("tag", _external=True), data={
                                     "inputDetails": articleDetails,
             "inputText": fixed_abstractText, "dateDetails": dateA,
@@ -545,7 +552,7 @@ def pubmed():
             #     return render_template('index.html',
             #                         error_msg=f"Error tagging {id}",
             #                         development=development)
-            # print("pubmed return2")
+            print("pubmed return2")
             return r.text, r.status_code, r.headers.items()
         except Exception as exe:
             #no pubmed found, return error message
