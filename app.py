@@ -434,24 +434,29 @@ def pubmed():
                                     authorDetails += ""
                                     authorsA = authorDetails
                 #returning details from fetch_details here:
-                print("should get tag here") 
-                try:
-                    r = requests.post(url_for("tag", _external=True), data={
-                                            "inputDetails": articleDetails,
-                    "inputText": fixed_abstractText, "dateDetails": dateA,
-                    "titleDetails": titleA, "authorsDetails": authorsA})
-                    return r.text, r.status_code, r.headers.items()
-                except: 
-                    return render_template('index.html',
-                                       error_msg=f"Error tagging {id}",
-                                       development=development)
+                # print("should get tag here") 
+                # # try:
+                # return render_template('tag.html', data={
+                #                         "inputDetails": articleDetails,
+                # "inputText": fixed_abstractText, "dateDetails": dateA,
+                # "titleDetails": titleA, "authorsDetails": authorsA})
+
+                # r = requests.post(url_for("tag", _external=True), data={
+                #                         "inputDetails": articleDetails,
+                # "inputText": fixed_abstractText, "dateDetails": dateA,
+                # "titleDetails": titleA, "authorsDetails": authorsA})
+                # print("got result: ", r.text, r.status_code, r.header)
+                # return r.text, r.status_code, r.headers.items() #this line is giving issue..
+                # except: 
+                #     return render_template('index.html',
+                #                        error_msg=f"Error tagging {id}",
+                #                        development=development)
             except Exception as exe:
                 #no pubmed ID found, return error message
                 print(exe)
                 traceback.print_exc()
                 return render_template('index.html',
-                                       error_msg=f"The PubMed ID {id} was not indexed  - try pasting in the abstract text instead",
-                                       development=development)
+                                       error_msg=f"The PubMed ID {id} was not indexed  - try pasting in the abstract text instead",)
         # get from all_abstracts db:
         if all_dates_db[fixed_id] is not None:
             dateA = all_dates_db[fixed_id]
@@ -530,15 +535,16 @@ def pubmed():
 
             #returning details from fetch_details here: 
             print("should get tag here2")
-            try:
-                r = requests.post(url_for("tag", _external=True), data={
-                                        "inputDetails": articleDetails,
-                "inputText": fixed_abstractText, "dateDetails": dateA,
-                "titleDetails": titleA, "authorsDetails": authorsA})
-            except: 
-                return render_template('index.html',
-                                    error_msg=f"Error tagging {id}",
-                                    development=development)
+            # try:
+            r = requests.post(url_for("tag", _external=True), data={
+                                    "inputDetails": articleDetails,
+            "inputText": fixed_abstractText, "dateDetails": dateA,
+            "titleDetails": titleA, "authorsDetails": authorsA})
+            print("got result: ", r.text, r.status_code, r.header)
+            # except: 
+            #     return render_template('index.html',
+            #                         error_msg=f"Error tagging {id}",
+            #                         development=development)
             # print("pubmed return2")
             return r.text, r.status_code, r.headers.items()
         except Exception as exe:
@@ -546,14 +552,14 @@ def pubmed():
             print(exe)
             traceback.print_exc()
             return render_template('index.html',
-                                   error_msg=f"This PubMed ID {id} was not indexed  - try pasting in the abstract text instead", development = development)
+                                   error_msg=f"This PubMed ID {id} was not indexed  - try pasting in the abstract text instead")
 
     
 @ app.route('/tag', methods=['POST'])
 def tag():
     print("/tag")
     # development = (os.environ.get("FLASK_ENV")=='development')
-    development="production"
+    development="development"
     text = request.form['inputText']
     # print("got text", text)
     details = request.form.get('inputDetails') #pmid
