@@ -338,6 +338,7 @@ def chordout():
     if 'saved_ontology_id_list' in session:
         saved_ontology_id_list = session['saved_ontology_id_list']
         get_descendents = session['get_descendents']
+        print("saved_ontology_id_list: ", saved_ontology_id_list)
         if get_descendents == "true":
             ontology_id_list = get_all_descendents(saved_ontology_id_list)
             # print("looking for: ", ontology_id_list)
