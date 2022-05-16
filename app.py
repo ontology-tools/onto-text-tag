@@ -327,6 +327,7 @@ def visualise_associations():
     # print("got ontology id list: ", ontology_id_list)
     include_descendents = request.form.get("include_descendent_classes")
     session['saved_ontology_id_list'] = ontology_id_list
+    #todo: saved_ontology_id_list not being saved to session..??
     print("saved_ontology_id_list should be: ", session['saved_ontology_id_list'])
     session['get_descendents'] = include_descendents
     iframe = url_for('chordout')
