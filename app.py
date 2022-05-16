@@ -324,6 +324,7 @@ def associations():
 @app.route('/visualise_associations', methods=['POST'])
 def visualise_associations():  
     ontology_id_list = json.loads(request.form.get('ontology_id_list')) 
+    print("got ontology id list: ", ontology_id_list)
     include_descendents = request.form.get("include_descendent_classes")
     session['saved_ontology_id_list'] = ontology_id_list
     session['get_descendents'] = include_descendents
@@ -333,7 +334,7 @@ def visualise_associations():
 
 #generate chord plot as html, to insert into iframe:
 @app.route('/chordout')
-def chordout():    
+def chordout():  
     if 'saved_ontology_id_list' in session:
         saved_ontology_id_list = session['saved_ontology_id_list']
         get_descendents = session['get_descendents']
