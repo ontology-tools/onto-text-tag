@@ -324,7 +324,7 @@ def associations():
 @app.route('/visualise_associations', methods=['POST'])
 def visualise_associations():  
     ontology_id_list = json.loads(request.form.get('ontology_id_list')) 
-    print("got ontology id list: ", ontology_id_list)
+    # print("got ontology id list: ", ontology_id_list)
     include_descendents = request.form.get("include_descendent_classes")
     session['saved_ontology_id_list'] = ontology_id_list
     session['get_descendents'] = include_descendents
@@ -347,7 +347,7 @@ def chordout():
         else:
             html = json.loads(hv_generator(saved_ontology_id_list))
             return render_template('chordout2.html', html=html)
-    return("No ontology ID List error") #todo: error message in index.html here
+    # return("No ontology ID List error") #todo: error message in index.html here
 
 @app.route('/visualise_similarities', methods=['POST'])
 def visualise_similarities():  
