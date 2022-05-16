@@ -349,6 +349,8 @@ def chordout():
         else:
             html = json.loads(hv_generator(saved_ontology_id_list))
             return render_template('chordout2.html', html=html)
+    return render_template('index.html',
+                                   error_msg=f"No associations found or error in application")
     # return("No ontology ID List error") #todo: error message in index.html here
 
 @app.route('/visualise_similarities', methods=['POST'])
