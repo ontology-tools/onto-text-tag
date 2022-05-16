@@ -342,9 +342,11 @@ def chordout():
             ontology_id_list = get_all_descendents(saved_ontology_id_list)
             # print("looking for: ", ontology_id_list)
             html = json.loads(hv_generator(ontology_id_list))
+            return render_template('chordout2.html', html=html)
         else:
             html = json.loads(hv_generator(saved_ontology_id_list))
-    return render_template('chordout2.html', html=html)
+            return render_template('chordout2.html', html=html)
+    return("No ontology ID List error") #todo: error message in index.html here
 
 @app.route('/visualise_similarities', methods=['POST'])
 def visualise_similarities():  
