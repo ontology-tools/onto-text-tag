@@ -327,6 +327,7 @@ def visualise_associations():
     # print("got ontology id list: ", ontology_id_list)
     include_descendents = request.form.get("include_descendent_classes")
     session['saved_ontology_id_list'] = ontology_id_list
+    print("saved_ontology_id_list should be: ", session['saved_ontology_id_list'])
     session['get_descendents'] = include_descendents
     iframe = url_for('chordout')
     return render_template("chord.html", iframe=iframe)
@@ -338,7 +339,7 @@ def chordout():
     if 'saved_ontology_id_list' in session:
         saved_ontology_id_list = session['saved_ontology_id_list']
         get_descendents = session['get_descendents']
-        print("saved_ontology_id_list: ", saved_ontology_id_list)
+        print("saved_ontology_id_list in /chordout ", saved_ontology_id_list)
         if get_descendents == "true":
             ontology_id_list = get_all_descendents(saved_ontology_id_list)
             # print("looking for: ", ontology_id_list)
