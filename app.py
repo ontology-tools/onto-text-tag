@@ -364,6 +364,7 @@ def visualise_similarities():
 
 @app.route('/pubmed', methods=['POST'])
 def pubmed():
+    development='development'
     # print("pubmed")
     id = request.form.get('pubmed_id')
     if id:
@@ -484,7 +485,7 @@ def pubmed():
             "inputText": fixed_abstractText, "dateDetails": dateA,
             "titleDetails": titleA, "authorsDetails": authorsA})
         print("pubmed return")
-        return r.text, r.status_code, r.headers.items()
+        return r.text.strip(), r.status_code.strip(), r.headers.items().strip()
     except Exception as e:
         print(e)
         traceback.print_exc()
@@ -561,7 +562,7 @@ def pubmed():
             #                         error_msg=f"Error tagging {id}",
             #                         development=development)
             print("pubmed return2")
-            return r.text, r.status_code, r.headers.items()
+            return r.text.strip, r.status_code.strip(), r.headers.items().strip()
         except Exception as exe:
             #no pubmed found, return error message
             print(exe)
