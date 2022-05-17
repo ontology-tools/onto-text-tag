@@ -480,7 +480,7 @@ def pubmed():
         #     titleA = all_titles_db[fixed_id]
         # if all_authors_db[fixed_id] is not None: 
         #     authorsA = all_authors_db[fixed_id]
-        r = requests.post(url_for("tag"), data={
+        r = requests.post(url_for("tag", _external=True), data={
                                     "inputDetails": articleDetails,
             "inputText": fixed_abstractText, "dateDetails": dateA,
             "titleDetails": titleA, "authorsDetails": authorsA})
@@ -552,7 +552,7 @@ def pubmed():
             #returning details from fetch_details here: 
             print("should get tag here2")
             # try:
-            r = requests.post(url_for("tag"), data={
+            r = requests.post(url_for("tag", _external=True), data={
                                     "inputDetails": articleDetails,
             "inputText": fixed_abstractText, "dateDetails": dateA,
             "titleDetails": titleA, "authorsDetails": authorsA})
