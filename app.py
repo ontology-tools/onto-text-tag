@@ -362,6 +362,10 @@ def visualise_similarities():
     # return ( json.dumps({"message":"Success"}), 200 )
     return render_template('similarity.html')
 
+@app.route('/pubmed', methods=['GET'])
+def pubmed_get():
+    return ""
+
 @app.route('/pubmed', methods=['POST'])
 def pubmed():
     development='development'
