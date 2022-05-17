@@ -485,7 +485,7 @@ def pubmed():
             "inputText": fixed_abstractText, "dateDetails": dateA,
             "titleDetails": titleA, "authorsDetails": authorsA})
         print("pubmed return")
-        return r.text.strip(), r.status_code, r.headers.items().strip()
+        return r.text.strip(), r.status_code, r.headers.items()
     except Exception as e:
         print(e)
         traceback.print_exc()
@@ -556,13 +556,13 @@ def pubmed():
                                     "inputDetails": articleDetails,
             "inputText": fixed_abstractText, "dateDetails": dateA,
             "titleDetails": titleA, "authorsDetails": authorsA})
-            print("got result: ", r.text, r.status_code, r.header)
+            # print("got result: ", r.text, r.status_code, r.headers.items())
             # except: 
             #     return render_template('index.html',
             #                         error_msg=f"Error tagging {id}",
             #                         development=development)
             print("pubmed return2")
-            return r.text.strip, r.status_code, r.headers.items().strip()
+            return r.text.strip, r.status_code, r.headers.items()
         except Exception as exe:
             #no pubmed found, return error message
             print(exe)
