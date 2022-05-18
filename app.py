@@ -51,6 +51,8 @@ import csv #for writing test_terms.csv (once only)
 import pickle
 import shelve
 
+import subprocess
+
 #OGER:
 import oger
 from oger.ctrl.router import Router, PipelineServer
@@ -281,22 +283,32 @@ def strip_tags(html):
     returnString = re.sub(r'\\u....', '', returnString) #
     return returnString
 
+# page with button to trigger build
 
 @app.route('/build')
-@app.route('/build')
 def build():
+    return render_template("build.html")
+
+# runs build_ontotermentions.py
+
+@app.route('/build-ontotermentions-now')
+def build_ontotermentions_now():
     try:
         # todo: use RQ scheduler instead of below, need better system to indicate success
         # todo: relative path to addiction-ontology
+        # todo: use subprocess instead of os.system
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
-        os.system("python -W ignore build_ontotermentions.py --path /home/tom/addiction-ontology")
+        os.system("python -W ignore build_ontotermentions.py --path /home/tom/Documents/PROGRAMMING/Python/addiction-ontology")
+        # os.system("python -W ignore build_ontotermentions.py --path /home/tom/addiction-ontology") # todo: path hard coded here, change
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
         os.system("touch success.txt")
+        os.system("echo `date +'%Y-%m-%d %T'` >> success.txt") #save date and time to file
         return "Build Successful"
     except: 
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
         os.system("touch failed.txt")
-        return "Build call FAILED"
+        os.system("echo `date +'%Y-%m-%d %T'` >> failed.txt") #save date and time to file
+        return "Build FAILED"
     
 
 
