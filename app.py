@@ -496,18 +496,41 @@ def pubmed():
         #     titleA = all_titles_db[fixed_id]
         # if all_authors_db[fixed_id] is not None: 
         #     authorsA = all_authors_db[fixed_id]
-        r = requests.post(url_for("tag", _external=True), data={
-                                    "inputDetails": articleDetails,
-            "inputText": fixed_abstractText, "dateDetails": dateA,
-            "titleDetails": titleA, "authorsDetails": authorsA})
-        print("pubmed return")
-        return r.text.strip(), r.status_code, r.headers.items()
+
+        print("should get tag here 1")
+        text, details, date, title, authors, id, tag_results, development = tag(fixed_abstractText, articleDetails,
+            dateA, titleA, authorsA)
+        # print("got data: ", text, details, date, title, authors, id)
+        print("")
+        print("got tag_results: ", tag_results)
+        return render_template('index.html',
+                        text=text,
+                        details=details,
+                        date=date,
+                        title=title,
+                        authors=authors,
+                        id=id,
+                        tag_results=tag_results,
+                        development=development)
+
+        # r = requests.post(url_for("tag", _external=True), data={
+        #                             "inputDetails": articleDetails,
+        #     "inputText": fixed_abstractText, "dateDetails": dateA,
+        #     "titleDetails": titleA, "authorsDetails": authorsA})
+        # print("pubmed return")
+        # print(r.text.strip())
+        # return("pubmed")
+        # return r.text.strip(), r.status_code, r.headers.items()'
+        # dataDict={"inputDetails": articleDetails,
+        #     "inputText": fixed_abstractText, "dateDetails": dateA,
+        #     "titleDetails": titleA, "authorsDetails": authorsA}
+        # return redirect(url_for("tag", data=dataDict, code=307))
     except Exception as e:
         print(e)
         traceback.print_exc()
         try:
             #get pubmed info direct from pubmed here
-            fetched_details = fetch_details([id])
+            detailResults = fetch_details([id])
             #todo: refactor this duplicate block
             # print("got fetched_details: ", fetched_details)
             articleDetails = id
@@ -568,17 +591,36 @@ def pubmed():
             #returning details from fetch_details here: 
             print("should get tag here2")
             # try:
-            r = requests.post(url_for("tag", _external=True), data={
-                                    "inputDetails": articleDetails,
-            "inputText": fixed_abstractText, "dateDetails": dateA,
-            "titleDetails": titleA, "authorsDetails": authorsA})
+
+            # r = requests.post(url_for("tag", _external=True), data={
+            #                         "inputDetails": articleDetails,
+            # "inputText": fixed_abstractText, "dateDetails": dateA,
+            # "titleDetails": titleA, "authorsDetails": authorsA})
+            text, details, date, title, authors, id, tag_results, development = tag(fixed_abstractText, articleDetails,
+            dateA, titleA, authorsA)
+            return render_template('index.html',
+                           text=text,
+                           details=details,
+                           date=date,
+                           title=title,
+                           authors=authors,
+                           id=id,
+                           tag_results=tag_results,
+                           development=development)
+            # print("pubmed 2: ", r.text.strip())
+            # return("pubmed 2")
+
+            # dataDict={"inputDetails": articleDetails,
+            # "inputText": fixed_abstractText, "dateDetails": dateA,
+            # "titleDetails": titleA, "authorsDetails": authorsA}
+            # return redirect(url_for("tag", data=dataDict), code=307)
             # print("got result: ", r.text, r.status_code, r.headers.items())
             # except: 
             #     return render_template('index.html',
             #                         error_msg=f"Error tagging {id}",
             #                         development=development)
-            print("pubmed return2")
-            return r.text.strip, r.status_code, r.headers.items()
+            # print("pubmed return2")
+            # return r.text.strip, r.status_code, r.headers.items()
         except Exception as exe:
             #no pubmed found, return error message
             print(exe)
@@ -587,11 +629,203 @@ def pubmed():
                                    error_msg=f"This PubMed ID {id} was not indexed  - try pasting in the abstract text instead")
 
     
-@ app.route('/tag', methods=['POST'])
-def tag():
+# @ app.route('/tag', methods=['POST'])
+def tag(text, details, date, title, authors):
     print("/tag")
     # development = (os.environ.get("FLASK_ENV")=='development')
     development="development"
+    # data = json.load(request.data)
+    # data = request.get_json()
+    # text = data['inputText']
+    # # print("got text", text)
+    # details = data['inputDetails'] #pmid
+    # # print("should have id: ", details)
+    # date = data['dateDetails']
+    # title = data['titleDetails']
+    # authors = data['authorsDetails']
+    # text = request.form['inputText']
+    # # print("got text", text)
+    # details = request.form.get('inputDetails') #pmid
+    # # print("should have id: ", details)
+    # date = request.form.get('dateDetails')
+    # title = request.form.get('titleDetails')
+    # authors = request.form.get('authorsDetails')
+    if details is None:
+        details = ""
+    if date is None:
+        date = ""
+    if title is None:
+        title = ""
+    if authors is None:
+        authors = ""
+
+    # process the text
+    tag_results = []
+    
+    # NOTE: build_terms is for re-building test_terms.tsv
+    # to do this, set build_terms to True and delete the test_terms.tsv, and test_terms.tsv.pickle (generated by OGER)
+    # only necessary if the ontotermentions.csv file has been updated. 
+    # todo: re-factor to build terms when ontotermentions.csv is updated
+
+    #new idea: if test_terms.tsv is not in the /static directory, then build it.
+    build_terms = False
+
+    if not os.path.isfile(os.path.join(app.root_path, 'static/test_terms.tsv.pickle')):
+        build_terms = True
+
+    engine = inflect.engine()
+
+           
+    if build_terms: 
+        print("Building terms, please wait...")
+        # stop words, don't try to match these
+        stopwords = nlp.Defaults.stop_words
+        stopwords.add("ands")
+        stopwords.add("ends")
+        stopwords.add("ci")
+        #test build test_terms.tsv from onto_extractor3:
+        mydict = []
+        for f in onto_extractor3.terms:
+            l = onto_extractor3.get_label(f)
+            if l is not None:
+                term=onto_extractor3.get_term(l['id'])
+                if term:                        
+                    ont = term['id'][0:term['id'].index(":")]
+                    #checking different ontologies:
+                    # if ont == "BCIO":
+                    #     print("BCIO")
+                    # else: 
+                    #     print(ont)
+                    if term['id'] == "BCIO:010055":
+                        continue
+                    else:
+                        # order: 'a', 'ont', 'id', 'alt_name', 'name', 'definition'
+                        sing = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': term['name'], 'name': term['name'], 'definition': term['definition']}
+                        mydict.append(sing)
+                        
+                        #plurals:                    
+                        try:
+                            plural = engine.plural(term['name'].strip())
+                            plur = {'a': '', 'ont': ont, 'id': term['id'], 'alt_name': plural, 'name': term['name'], 'definition': term['definition']}
+                            mydict.append(plur)
+                        except: 
+                            # print("Problem getting plural of ", term['name'].strip())
+                            continue        
+                else:
+                    print("No term for label: ", l)
+        # use mydict id to check for synonyms and plurals of synonyms:    
+        
+        for ontol in onto_extractor3.ontols:
+            for termid in ontol.get_classes():                   
+                SYN = "http://purl.obolibrary.org/obo/IAO_0000118"
+                DEFINITION = "http://purl.obolibrary.org/obo/IAO_0000115"
+                synonyms = ontol.get_annotations(termid, SYN)
+                label = ontol.get_annotation(termid, RDFSLABEL)
+                definition = ontol.get_annotation(termid, DEFINITION)
+                termshortid = ontol.get_id_for_iri(termid)
+                if termshortid: 
+                    # termshortid from last /:
+                    ontol_namespace = termshortid[termshortid.rfind("/")+1:].strip()
+                    #ontol_namespace string until :
+                    ontol_namespace = ontol_namespace[0:ontol_namespace.index(":")]
+                else:
+                    ontol_namespace = "" 
+                
+                for s in synonyms:
+                    # print("adding SYNONYM: ", s)
+                    # print("got ontol_namespace: ", ontol_namespace)
+                    if s.strip().lower() not in stopwords:                            
+                        syn1 = {'a': '', 'ont': ontol_namespace, 'id': termshortid, 'alt_name': s, 'name': label, 'definition': definition}
+                        mydict.append(syn1)
+                        try:
+                            plural2 = engine.plural(s.strip())
+                            plur2 = {'a': '', 'ont': ontol_namespace, 'id': termshortid, 'alt_name': plural2, 'name': label, 'definition': definition}
+                            mydict.append(plur2)
+                        except:
+                            print("Problem getting plural of ",s)
+                            pass
+
+                          
+        filename = 'static/test_terms.tsv'
+        fields = ['a', 'ont', 'id', 'alt_name', 'name', 'definition'] 
+        with open(filename, 'w') as tsvfile: 
+            # creating a csv dict writer object 
+            writer = csv.DictWriter(tsvfile, delimiter='\t', fieldnames=fields) 
+            writer.writerows(mydict) 
+        print("done creating test_terms.tsv")
+    
+    #file_path = os.path.join(current_app.root_path,'static')
+    # file_path = url_for('static', filename = 'text.txt')
+
+    #with open(file_path + '/text.txt', "w") as textfile:
+    #    textfile.write(text)
+    #    textfile.close()
+
+    textfile = io.StringIO(text)
+    # print("textfile: ", textfile)
+
+    # coll_pmid = []    
+    # coll_pmid.append(idName) #idName is the pubmed id
+    # pass
+    # print("coll_pmid = ", coll_pmid)
+    #load_file = file_path + '/text.txt'
+    coll = pl.load_one(textfile, fmt='txt')#, iter_mode='document')
+    pl.process(coll)
+    print("coll: ", coll[0])
+    
+    
+    # note: the entity.names below are just to fit in with OGER's un-related column naming. 
+    for entity in coll[0].iter_entities():
+        print("for entity")
+        span_text = entity.text.strip()
+        print("span_text: ", span_text)
+        ontol_id = entity.cid.strip() 
+        link_prefix_http = ""
+        if 'BCIO' in ontol_id.strip():
+            link_prefix_http = "https://bciovocab.org/"
+        else: 
+            link_prefix_http = "http://addictovocab.org/"
+        ontol_label = entity.pref.strip()
+        ontol_def = entity.type.strip()
+        ontol_namespace = entity.db.strip()
+        tag_results.append({"ontol_id": ontol_id,
+                                "span_text": span_text,
+                                "ontol_label": ontol_label,
+                                "ontol_def": ontol_def,
+                                "ontol_namespace": ontol_namespace,
+                                "ontol_link": link_prefix_http+ontol_id,
+                                "match_index": ontol_id})
+        print("got tag_results in /tag: ", tag_results)
+    print("got tag result in /tag: ", tag_results)
+    print("should render index.html here (/tag)")
+    # return render_template('index.html',
+    #                        text=text,
+    #                        details=details,
+    #                        date=date,
+    #                        title=title,
+    #                        authors=authors,
+    #                        id='',
+    #                        tag_results=tag_results,
+    #                        development=development)
+    id=""
+    return text, details, date, title, authors, id, tag_results, development
+
+
+@ app.route('/tag_url', methods=['POST'])
+def tag_url():
+    print("/tag_url")
+    # development = (os.environ.get("FLASK_ENV")=='development')
+    development="development"
+    # data = json.load(request.data)
+    # data = request.get_json()
+    # text = data['inputText']
+    # # print("got text", text)
+    # details = data['inputDetails'] #pmid
+    # # print("should have id: ", details)
+    # date = data['dateDetails']
+    # title = data['titleDetails']
+    # authors = data['authorsDetails']
+
     text = request.form['inputText']
     # print("got text", text)
     details = request.form.get('inputDetails') #pmid
@@ -711,7 +945,7 @@ def tag():
     #    textfile.close()
 
     textfile = io.StringIO(text)
-
+    
 
     # coll_pmid = []    
     # coll_pmid.append(idName) #idName is the pubmed id
@@ -725,6 +959,7 @@ def tag():
     # note: the entity.names below are just to fit in with OGER's un-related column naming. 
     for entity in coll[0].iter_entities():
         span_text = entity.text.strip()
+        print("span_text tag_url: ", span_text)
         ontol_id = entity.cid.strip() 
         link_prefix_http = ""
         if 'BCIO' in ontol_id.strip():
@@ -751,8 +986,8 @@ def tag():
                            id='',
                            tag_results=tag_results,
                            development=development)
-
-
+    # id=""
+    # return text, details, date, title, authors, id, tag_results, development
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
