@@ -69,10 +69,7 @@ app = Flask(__name__)
 
 
 app.config.from_object('config')
-#idName = "ID"
-# python -m spacy download en_core_web_md
-# or: en_core_web_md or en_core_web_lg
-# nlp = spacy.load('en_core_web_md')
+
 nlp = en_core_web_sm.load()
 
 location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
@@ -83,8 +80,6 @@ ontol1 = pyhornedowl.open_ontology(urlopen(location).read().decode('utf-8'))
 print("Fetching release file from", location2)
 ontol2 = pyhornedowl.open_ontology(urlopen(location2).read().decode('utf-8'))
 
-# pickle_in = open("allAbstracts.pkl","rb")
-# abstract_associations = pickle.load(pickle_in)
 development = (os.environ.get("FLASK_ENV")=='development')
 #if development:
 abstract_ass_db = shelve.open('static/allAbstracts.db', flag='r', writeback=False)
@@ -121,7 +116,7 @@ ontoDict = {
 def get_all_descendents(id_list):   
     descendent_ids = []
 
-    #todo: refactor below:
+    #todo: refactor below?:
 
     for entry in id_list:
         entryIri = ontol1.get_iri_for_id(entry.replace("_", ":"))
@@ -174,7 +169,7 @@ def fetch_details(id_list):
    return results
 
 # parse the title, authors and date published
-# try return separate values for year, day, month, AuthourList and ArticleTitle
+# return separate values for year, day, month, AuthourList and ArticleTitle
 
 
 def get_article_details(result):
@@ -195,7 +190,7 @@ def get_article_details(result):
             else:
                 yearCompleted = ""
                 monthCompleted = ""
-                # todo: we still end up with // here if no data returned..
+                # todo: do we still end up with // here if no data returned? 
                 dayCompleted = ""
 
             if 'ArticleTitle' in detail['MedlineCitation']['Article']:
@@ -363,7 +358,6 @@ def chordout():
             return render_template('chordout2.html', html=html)
     return render_template('index.html',
                                    error_msg=f"No associations found or error in application")
-    # return("No ontology ID List error") #todo: error message in index.html here
 
 @app.route('/visualise_similarities', methods=['POST'])
 def visualise_similarities():  
@@ -464,45 +458,20 @@ def pubmed():
                                 else:
                                     authorDetails += ""
                                     authorsA = authorDetails
-                #returning details from fetch_details here:
-                # print("should get tag here") 
-                # # try:
-                # return render_template('tag.html', data={
-                #                         "inputDetails": articleDetails,
-                # "inputText": fixed_abstractText, "dateDetails": dateA,
-                # "titleDetails": titleA, "authorsDetails": authorsA})
 
-                # r = requests.post(url_for("tag", _external=True), data={
-                #                         "inputDetails": articleDetails,
-                # "inputText": fixed_abstractText, "dateDetails": dateA,
-                # "titleDetails": titleA, "authorsDetails": authorsA})
-                # print("got result: ", r.text, r.status_code, r.header)
-                # return r.text, r.status_code, r.headers.items() #this line is giving issue..
-                # except: 
-                #     return render_template('index.html',
-                #                        error_msg=f"Error tagging {id}",
-                #                        development=development)
             except Exception as exe:
                 #no pubmed ID found, return error message
                 print(exe)
                 traceback.print_exc()
                 return render_template('index.html',
                                        error_msg=f"The PubMed ID {id} was not indexed  - try pasting in the abstract text instead",)
-        # get from all_abstracts db:
-        # todo: below if statements causing errors - is this still needed? 
-        # if all_dates_db[fixed_id] is not None:
-        #     dateA = all_dates_db[fixed_id]
-        # if all_titles_db[fixed_id] is not None: 
-        #     titleA = all_titles_db[fixed_id]
-        # if all_authors_db[fixed_id] is not None: 
-        #     authorsA = all_authors_db[fixed_id]
 
-        print("should get tag here 1")
+        # print("should get tag here 1")
         text, details, date, title, authors, id, tag_results, development = tag(fixed_abstractText, articleDetails,
             dateA, titleA, authorsA)
         # print("got data: ", text, details, date, title, authors, id)
-        print("")
-        print("got tag_results: ", tag_results)
+        # print("")
+        # print("got tag_results: ", tag_results)
         return render_template('index.html',
                         text=text,
                         details=details,
@@ -513,18 +482,6 @@ def pubmed():
                         tag_results=tag_results,
                         development=development)
 
-        # r = requests.post(url_for("tag", _external=True), data={
-        #                             "inputDetails": articleDetails,
-        #     "inputText": fixed_abstractText, "dateDetails": dateA,
-        #     "titleDetails": titleA, "authorsDetails": authorsA})
-        # print("pubmed return")
-        # print(r.text.strip())
-        # return("pubmed")
-        # return r.text.strip(), r.status_code, r.headers.items()'
-        # dataDict={"inputDetails": articleDetails,
-        #     "inputText": fixed_abstractText, "dateDetails": dateA,
-        #     "titleDetails": titleA, "authorsDetails": authorsA}
-        # return redirect(url_for("tag", data=dataDict, code=307))
     except Exception as e:
         print(e)
         traceback.print_exc()
@@ -589,13 +546,7 @@ def pubmed():
                                     authorsA = authorDetails
 
             #returning details from fetch_details here: 
-            print("should get tag here2")
-            # try:
-
-            # r = requests.post(url_for("tag", _external=True), data={
-            #                         "inputDetails": articleDetails,
-            # "inputText": fixed_abstractText, "dateDetails": dateA,
-            # "titleDetails": titleA, "authorsDetails": authorsA})
+            # print("should get tag here2")
             text, details, date, title, authors, id, tag_results, development = tag(fixed_abstractText, articleDetails,
             dateA, titleA, authorsA)
             return render_template('index.html',
@@ -607,20 +558,6 @@ def pubmed():
                            id=id,
                            tag_results=tag_results,
                            development=development)
-            # print("pubmed 2: ", r.text.strip())
-            # return("pubmed 2")
-
-            # dataDict={"inputDetails": articleDetails,
-            # "inputText": fixed_abstractText, "dateDetails": dateA,
-            # "titleDetails": titleA, "authorsDetails": authorsA}
-            # return redirect(url_for("tag", data=dataDict), code=307)
-            # print("got result: ", r.text, r.status_code, r.headers.items())
-            # except: 
-            #     return render_template('index.html',
-            #                         error_msg=f"Error tagging {id}",
-            #                         development=development)
-            # print("pubmed return2")
-            # return r.text.strip, r.status_code, r.headers.items()
         except Exception as exe:
             #no pubmed found, return error message
             print(exe)
@@ -634,22 +571,6 @@ def tag(text, details, date, title, authors):
     print("/tag")
     # development = (os.environ.get("FLASK_ENV")=='development')
     development="development"
-    # data = json.load(request.data)
-    # data = request.get_json()
-    # text = data['inputText']
-    # # print("got text", text)
-    # details = data['inputDetails'] #pmid
-    # # print("should have id: ", details)
-    # date = data['dateDetails']
-    # title = data['titleDetails']
-    # authors = data['authorsDetails']
-    # text = request.form['inputText']
-    # # print("got text", text)
-    # details = request.form.get('inputDetails') #pmid
-    # # print("should have id: ", details)
-    # date = request.form.get('dateDetails')
-    # title = request.form.get('titleDetails')
-    # authors = request.form.get('authorsDetails')
     if details is None:
         details = ""
     if date is None:
@@ -662,12 +583,10 @@ def tag(text, details, date, title, authors):
     # process the text
     tag_results = []
     
-    # NOTE: build_terms is for re-building test_terms.tsv
-    # to do this, set build_terms to True and delete the test_terms.tsv, and test_terms.tsv.pickle (generated by OGER)
+    # NOTE: build_terms is for re-building test_terms.tsv, when the db is re-built
     # only necessary if the ontotermentions.csv file has been updated. 
-    # todo: re-factor to build terms when ontotermentions.csv is updated
 
-    #new idea: if test_terms.tsv is not in the /static directory, then build it.
+    # if test_terms.tsv is not in the /static directory, then build it.
     build_terms = False
 
     if not os.path.isfile(os.path.join(app.root_path, 'static/test_terms.tsv.pickle')):
@@ -753,22 +672,9 @@ def tag(text, details, date, title, authors):
             writer = csv.DictWriter(tsvfile, delimiter='\t', fieldnames=fields) 
             writer.writerows(mydict) 
         print("done creating test_terms.tsv")
-    
-    #file_path = os.path.join(current_app.root_path,'static')
-    # file_path = url_for('static', filename = 'text.txt')
-
-    #with open(file_path + '/text.txt', "w") as textfile:
-    #    textfile.write(text)
-    #    textfile.close()
 
     textfile = io.StringIO(text)
     # print("textfile: ", textfile)
-
-    # coll_pmid = []    
-    # coll_pmid.append(idName) #idName is the pubmed id
-    # pass
-    # print("coll_pmid = ", coll_pmid)
-    #load_file = file_path + '/text.txt'
     coll = pl.load_one(textfile, fmt='txt')#, iter_mode='document')
     pl.process(coll)
     print("coll: ", coll[0])
@@ -776,9 +682,9 @@ def tag(text, details, date, title, authors):
     
     # note: the entity.names below are just to fit in with OGER's un-related column naming. 
     for entity in coll[0].iter_entities():
-        print("for entity")
+        # print("for entity")
         span_text = entity.text.strip()
-        print("span_text: ", span_text)
+        # print("span_text: ", span_text)
         ontol_id = entity.cid.strip() 
         link_prefix_http = ""
         if 'BCIO' in ontol_id.strip():
@@ -795,18 +701,9 @@ def tag(text, details, date, title, authors):
                                 "ontol_namespace": ontol_namespace,
                                 "ontol_link": link_prefix_http+ontol_id,
                                 "match_index": ontol_id})
-        print("got tag_results in /tag: ", tag_results)
-    print("got tag result in /tag: ", tag_results)
-    print("should render index.html here (/tag)")
-    # return render_template('index.html',
-    #                        text=text,
-    #                        details=details,
-    #                        date=date,
-    #                        title=title,
-    #                        authors=authors,
-    #                        id='',
-    #                        tag_results=tag_results,
-    #                        development=development)
+        # print("got tag_results in /tag: ", tag_results)
+    # print("got tag result in /tag: ", tag_results)
+    # print("should render index.html here (/tag)")
     id=""
     return text, details, date, title, authors, id, tag_results, development
 
@@ -816,16 +713,6 @@ def tag_url():
     print("/tag_url")
     # development = (os.environ.get("FLASK_ENV")=='development')
     development="development"
-    # data = json.load(request.data)
-    # data = request.get_json()
-    # text = data['inputText']
-    # # print("got text", text)
-    # details = data['inputDetails'] #pmid
-    # # print("should have id: ", details)
-    # date = data['dateDetails']
-    # title = data['titleDetails']
-    # authors = data['authorsDetails']
-
     text = request.form['inputText']
     # print("got text", text)
     details = request.form.get('inputDetails') #pmid
@@ -845,12 +732,10 @@ def tag_url():
     # process the text
     tag_results = []
     
-    # NOTE: build_terms is for re-building test_terms.tsv
-    # to do this, set build_terms to True and delete the test_terms.tsv, and test_terms.tsv.pickle (generated by OGER)
-    # only necessary if the ontotermentions.csv file has been updated. 
-    # todo: re-factor to build terms when ontotermentions.csv is updated
+    # NOTE: build_terms is for re-building test_terms.tsv, when the db is re-built
+    # only necessary if the ontotermentions.csv file has been updated.
 
-    #new idea: if test_terms.tsv is not in the /static directory, then build it.
+    # If test_terms.tsv is not in the /static directory, then build it.
     build_terms = False
 
     if not os.path.isfile(os.path.join(app.root_path, 'static/test_terms.tsv.pickle')):
@@ -936,22 +821,8 @@ def tag_url():
             writer = csv.DictWriter(tsvfile, delimiter='\t', fieldnames=fields) 
             writer.writerows(mydict) 
         print("done creating test_terms.tsv")
-    
-    #file_path = os.path.join(current_app.root_path,'static')
-    # file_path = url_for('static', filename = 'text.txt')
-
-    #with open(file_path + '/text.txt', "w") as textfile:
-    #    textfile.write(text)
-    #    textfile.close()
 
     textfile = io.StringIO(text)
-    
-
-    # coll_pmid = []    
-    # coll_pmid.append(idName) #idName is the pubmed id
-    # pass
-    # print("coll_pmid = ", coll_pmid)
-    #load_file = file_path + '/text.txt'
     coll = pl.load_one(textfile, fmt='txt')#, iter_mode='document')
     pl.process(coll)
     
@@ -986,8 +857,6 @@ def tag_url():
                            id='',
                            tag_results=tag_results,
                            development=development)
-    # id=""
-    # return text, details, date, title, authors, id, tag_results, development
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
