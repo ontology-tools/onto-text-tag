@@ -13,7 +13,7 @@
 # limitations under the License.
 from logging import error
 import pyhornedowl
-from flask import Flask, request, redirect, url_for, session, Response, stream_with_context, current_app, g
+from flask import Flask, request, redirect, url_for, session, Response, stream_with_context, current_app, g, jsonify
 from flask.templating import render_template
 # from ontotagtext import ExtractorComponent
 from ontotagtext import MultiExtractorComponent
@@ -299,6 +299,22 @@ def strip_tags(html):
 #         worker = Worker(app.config['QUEUES'])
 #         worker.work()
 
+# check status of running job 
+
+@app.route('/status/<job_id>')
+def job_status(job_id):
+    q = Queue()
+    job = q.fetch_job(job_id)
+    if job is None:
+        response = {'status': 'unknown'}
+    else:
+        response = {
+            'status': job.get_status(),
+            'result': job.result,
+        }
+        if job.is_failed:
+            response['message'] = job.exc_info.strip().split('\n')[-1]
+    return jsonify(response)
 
 
 def get_redis_connection():
@@ -335,10 +351,11 @@ def build_ontotermentions_func():
 
 @app.route('/build')
 def build():
-    
-    return render_template("build.html")
+    # todo: build_ontotermentions_now if method==POST
+    job_id = "test ID: 1"
+    return render_template("build.html", job_id=job_id)
 
-# runs build_ontotermentions.py
+# runs build_ontotermentions.py #todo: trigger this from build() (POST request) 
 
 @app.route('/build-ontotermentions-now')
 def build_ontotermentions_now():
@@ -382,9 +399,13 @@ def build_ontotermentions_now():
     #     print(item.id)
     # print(list_of_job_instances)
 
-    print(job.get_id())
+    # todo: keep track of job status: https://beenje.github.io/blog/posts/running-background-tasks-with-flask-and-rq/
+    # just need to add client side jquery
 
-    return ("building? ")
+    print("job ID is: ", job.get_id()) #return this 
+    returnString = "build job started: " + job.get_id()
+    print(returnString)
+    return (returnString) #todo return job.get_id()
 
 
 # Pages for the app
