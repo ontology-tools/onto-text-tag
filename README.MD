@@ -2,7 +2,7 @@
 
 addiction-ontology branch: updateIndex
 
-onto-text-tag branch: shelve_update
+onto-text-tag branch: development
 
 environment: python 3.8
 

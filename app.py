@@ -13,7 +13,7 @@
 # limitations under the License.
 from logging import error
 import pyhornedowl
-from flask import Flask, request, redirect, url_for, session, Response, stream_with_context, current_app
+from flask import Flask, request, redirect, url_for, session, Response, stream_with_context, current_app, g
 from flask.templating import render_template
 # from ontotagtext import ExtractorComponent
 from ontotagtext import MultiExtractorComponent
@@ -60,6 +60,17 @@ conf = Router(termlist_path='static/test_terms.tsv')
 pl = PipelineServer(conf)
 
 import inflect
+
+
+# rq scheduler: 
+from redis import Redis
+# import redis
+from rq import push_connection, pop_connection, Queue, Connection, Worker
+redis = Redis(host="redis", db=0, socket_connect_timeout=10, socket_timeout=10)
+# from rq_scheduler import Scheduler
+# from datetime import datetime
+
+# scheduler = Scheduler(connection=redis.Redis())
 
 development = False
 
@@ -278,33 +289,102 @@ def strip_tags(html):
     returnString = re.sub(r'\\u....', '', returnString) #
     return returnString
 
+# python app.py runworker
+# todo: put this in a separate module
+
+# def runworker():
+#     redis_url = app.config['REDIS_URL']
+#     redis_connection = redis.from_url(redis_url)
+#     with Connection(redis_connection):
+#         worker = Worker(app.config['QUEUES'])
+#         worker.work()
+
+
+
+def get_redis_connection():
+    # redis_connection = app.config['REDIS_URL']
+    redis_connection = getattr(g, '_redis_connection', None)
+    if redis_connection is None:
+        redis_url = current_app.config['REDIS_URL']
+        redis_connection = g._redis_connection = Redis.from_url(redis_url)
+    return redis_connection
+
+def build_ontotermentions_func():
+    print("should be building ontotermentions here using rq scheduler")
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    os.system("touch successRQ.txt")
+    # try:
+    #     # todo: use RQ scheduler instead of below, need better system to indicate success
+    #     # todo: relative path to addiction-ontology
+    #     # todo: use subprocess instead of os.system
+    #     os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    #     os.system("python -W ignore build_ontotermentions.py --path /home/tom/Documents/PROGRAMMING/Python/addiction-ontology")
+    #     # os.system("python -W ignore build_ontotermentions.py --path /home/tom/addiction-ontology") # todo: path hard coded here, change
+    #     os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    #     os.system("touch success.txt")
+    #     os.system("echo `date +'%Y-%m-%d %T'` >> success.txt") #save date and time to file
+    #     return "Build Successful"
+    # except: 
+    #     os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    #     os.system("touch failed.txt")
+    #     os.system("echo `date +'%Y-%m-%d %T'` >> failed.txt") #save date and time to file
+    #     return "Build FAILED"
 # page with button to trigger build
+    pop_connection() # redis finish? 
+    return "success"
 
 @app.route('/build')
 def build():
+    
     return render_template("build.html")
 
 # runs build_ontotermentions.py
 
 @app.route('/build-ontotermentions-now')
 def build_ontotermentions_now():
-    try:
-        # todo: use RQ scheduler instead of below, need better system to indicate success
-        # todo: relative path to addiction-ontology
-        # todo: use subprocess instead of os.system
-        os.chdir(os.path.dirname(os.path.realpath(__file__)))
-        os.system("python -W ignore build_ontotermentions.py --path /home/tom/Documents/PROGRAMMING/Python/addiction-ontology")
-        # os.system("python -W ignore build_ontotermentions.py --path /home/tom/addiction-ontology") # todo: path hard coded here, change
-        os.chdir(os.path.dirname(os.path.realpath(__file__)))
-        os.system("touch success.txt")
-        os.system("echo `date +'%Y-%m-%d %T'` >> success.txt") #save date and time to file
-        return "Build Successful"
-    except: 
-        os.chdir(os.path.dirname(os.path.realpath(__file__)))
-        os.system("touch failed.txt")
-        os.system("echo `date +'%Y-%m-%d %T'` >> failed.txt") #save date and time to file
-        return "Build FAILED"
+    push_connection(get_redis_connection()) # initialise redis?
+    q = Queue(connection=Redis())
+    job = q.enqueue(build_ontotermentions_func())
+
+    # todo: scheduler does nothing..???
+    # scheduler.schedule(
+    #     scheduled_time=datetime.utcnow(), # Time for first execution, in UTC timezone
+    #     func=build_ontotermentions_func,                     # Function to be queued
+    #     # args=[arg1, arg2],             # Arguments passed into function when executed
+    #     # kwargs={'foo': 'bar'},         # Keyword arguments passed into function when executed
+    #     interval=60,                   # Time before the function is called again, in seconds
+    #     repeat=1,                     # Repeat this number of times (None means repeat forever)
+    #     # meta={'foo': 'bar'}            # Arbitrary pickleable data on the job itself
+    # )
     
+    # todo: path as environment variable
+    
+    # try:
+    #     # todo: use RQ scheduler instead of below, need better system to indicate success
+    #     # todo: relative path to addiction-ontology
+    #     # todo: use subprocess instead of os.system
+    #     os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    #     os.system("python -W ignore build_ontotermentions.py --path /home/tom/Documents/PROGRAMMING/Python/addiction-ontology")
+    #     # os.system("python -W ignore build_ontotermentions.py --path /home/tom/addiction-ontology") # todo: path hard coded here, change
+    #     os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    #     os.system("touch success.txt")
+    #     os.system("echo `date +'%Y-%m-%d %T'` >> success.txt") #save date and time to file
+    #     return "Build Successful"
+    # except: 
+    #     os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    #     os.system("touch failed.txt")
+    #     os.system("echo `date +'%Y-%m-%d %T'` >> failed.txt") #save date and time to file
+    #     return "Build FAILED"
+
+
+    # list_of_job_instances = scheduler.get_jobs()
+    # for item in list_of_job_instances:
+    #     print(item.id)
+    # print(list_of_job_instances)
+
+    print(job.get_id())
+
+    return ("building? ")
 
 
 # Pages for the app

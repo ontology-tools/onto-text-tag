@@ -7,6 +7,9 @@ APP_TITLE = "Ontology Text Tagging"
 
 # DATABASE_URI = 'sqlite:////tmp/github-flask-ontospreaded.db'
 
+REDIS_URL = 'redis://redis:6379/0'
+QUEUES = ['default']
+
 if os.environ.get("FLASK_ENV")=='development':
     SECRET_KEY = os.environ.get('FLASK_SECRET_KEY')
 else:
