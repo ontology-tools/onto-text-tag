@@ -22,8 +22,14 @@
 buildit = () => {
     //todo: send "start" command and stay in this view rather
     // check build status eg: https://beenje.github.io/blog/posts/running-background-tasks-with-flask-and-rq/
+    // todo: only run below if not already running build! 
+    
     // window.location = "/build-ontotermentions-now";
-    open('/build-ontotermentions-now')
+    {% if status == 'finished' or status == 'no build found'%}
+    open('/build-ontotermentions-now');
+    {% else %}
+    console.log("Cannot initiate build, busy building");
+    {% endif %}
     // todo: indicate that build started
     // todo: load /build-ontotermentions-now without opening
 }
