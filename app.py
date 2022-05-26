@@ -67,6 +67,9 @@ from redis import Redis
 # import redis
 from rq import push_connection, pop_connection, Queue, Connection, Worker
 redis = Redis(host="redis", db=0, socket_connect_timeout=10, socket_timeout=10)
+import time
+
+from flask_caching import Cache
 # from rq_scheduler import Scheduler
 # from datetime import datetime
 
@@ -78,6 +81,15 @@ pp = pprint.PrettyPrinter(depth=4)
 
 app = Flask(__name__)
 
+# redis store setup:
+
+cache = Cache(app, config={
+    'CACHE_TYPE': 'redis',
+    'CACHE-KEY-PREFIX': 'server1', 
+    'CACHE_REDIS_HOST': 'localhost', 
+    'CACHE_REDIS_PORT': '6379', 
+    'CACHE_REDIS_URL' : 'REDIS://LOCALHOST:6379'
+})
 
 app.config.from_object('config')
 
@@ -289,48 +301,19 @@ def strip_tags(html):
     returnString = re.sub(r'\\u....', '', returnString) #
     return returnString
 
-# python app.py runworker
-# todo: put this in a separate module
-
-# def runworker():
-#     redis_url = app.config['REDIS_URL']
-#     redis_connection = redis.from_url(redis_url)
-#     with Connection(redis_connection):
-#         worker = Worker(app.config['QUEUES'])
-#         worker.work()
-
-# check status of running job 
-
-@app.route('/status/<job_id>')
-def job_status(job_id):
-    q = Queue()
-    job = q.fetch_job(job_id)
-    if job is None:
-        response = {'status': 'unknown'}
-    else:
-        response = {
-            'status': job.get_status(),
-            'result': job.result,
-        }
-        if job.is_failed:
-            response['message'] = job.exc_info.strip().split('\n')[-1]
-    return jsonify(response)
-
-
-def get_redis_connection():
-    # redis_connection = app.config['REDIS_URL']
-    redis_connection = getattr(g, '_redis_connection', None)
-    if redis_connection is None:
-        redis_url = current_app.config['REDIS_URL']
-        redis_connection = g._redis_connection = Redis.from_url(redis_url)
-    return redis_connection
 
 def build_ontotermentions_func():
-    print("should be building ontotermentions here using rq scheduler")
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    os.system("touch successRQ.txt")
+    print("running worker")
+    cache.set('status', 'running')
+    timeStarted = time.localtime(time.time())
+    cache.set('time_started', timeStarted)  
+    timeFinished = "unfinished"
+    cache.set('time_finished', timeFinished)  
+    time.sleep(30) # test simulate long BUILD process
+
+    # THE BUILD:
+
     # try:
-    #     # todo: use RQ scheduler instead of below, need better system to indicate success
     #     # todo: relative path to addiction-ontology
     #     # todo: use subprocess instead of os.system
     #     os.chdir(os.path.dirname(os.path.realpath(__file__)))
@@ -345,67 +328,39 @@ def build_ontotermentions_func():
     #     os.system("touch failed.txt")
     #     os.system("echo `date +'%Y-%m-%d %T'` >> failed.txt") #save date and time to file
     #     return "Build FAILED"
-# page with button to trigger build
-    pop_connection() # redis finish? 
-    return "success"
 
+    cache.set('status', 'finished')
+    timeFinished = time.localtime(time.time())
+    cache.set('time_finished', timeFinished)
+    print("job finished at: ", timeFinished)
+    return "successfully built"
+
+# page with button to trigger build:
 @app.route('/build')
 def build():
-    # todo: build_ontotermentions_now if method==POST
-    job_id = "test ID: 1"
-    return render_template("build.html", job_id=job_id)
+    # # todo: build_ontotermentions_now if method==POST ?
+    time_started = "not started" #test
+    status = "no build found"
+    time_finished = "not finished" #test
+    if cache.get('status') is not None: 
+        status = cache.get('status')
+    if cache.get('time_started') is not None: 
+        time_started = cache.get('time_started')
+    if cache.get('time_finished') is not None: 
+        time_finished = cache.get('time_finished')
 
-# runs build_ontotermentions.py #todo: trigger this from build() (POST request) 
+    return render_template("build.html", time_started=time_started, status=status, time_finished=time_finished)
 
+# runs build_ontotermentions.py: #todo: trigger this from build() (POST request)
 @app.route('/build-ontotermentions-now')
 def build_ontotermentions_now():
-    push_connection(get_redis_connection()) # initialise redis?
-    q = Queue(connection=Redis())
-    job = q.enqueue(build_ontotermentions_func())
-
-    # todo: scheduler does nothing..???
-    # scheduler.schedule(
-    #     scheduled_time=datetime.utcnow(), # Time for first execution, in UTC timezone
-    #     func=build_ontotermentions_func,                     # Function to be queued
-    #     # args=[arg1, arg2],             # Arguments passed into function when executed
-    #     # kwargs={'foo': 'bar'},         # Keyword arguments passed into function when executed
-    #     interval=60,                   # Time before the function is called again, in seconds
-    #     repeat=1,                     # Repeat this number of times (None means repeat forever)
-    #     # meta={'foo': 'bar'}            # Arbitrary pickleable data on the job itself
-    # )
-    
-    # todo: path as environment variable
-    
-    # try:
-    #     # todo: use RQ scheduler instead of below, need better system to indicate success
-    #     # todo: relative path to addiction-ontology
-    #     # todo: use subprocess instead of os.system
-    #     os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    #     os.system("python -W ignore build_ontotermentions.py --path /home/tom/Documents/PROGRAMMING/Python/addiction-ontology")
-    #     # os.system("python -W ignore build_ontotermentions.py --path /home/tom/addiction-ontology") # todo: path hard coded here, change
-    #     os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    #     os.system("touch success.txt")
-    #     os.system("echo `date +'%Y-%m-%d %T'` >> success.txt") #save date and time to file
-    #     return "Build Successful"
-    # except: 
-    #     os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    #     os.system("touch failed.txt")
-    #     os.system("echo `date +'%Y-%m-%d %T'` >> failed.txt") #save date and time to file
-    #     return "Build FAILED"
-
-
-    # list_of_job_instances = scheduler.get_jobs()
-    # for item in list_of_job_instances:
-    #     print(item.id)
-    # print(list_of_job_instances)
-
-    # todo: keep track of job status: https://beenje.github.io/blog/posts/running-background-tasks-with-flask-and-rq/
-    # just need to add client side jquery
-
-    print("job ID is: ", job.get_id()) #return this 
-    returnString = "build job started: " + job.get_id()
+    # trying running directly with status in cache: 
+    cache.set('status', 'started')
+    build_ontotermentions_func()
+    returnString = "returned and finished"
     print(returnString)
-    return (returnString) #todo return job.get_id()
+    return (returnString) 
+    
 
 
 # Pages for the app

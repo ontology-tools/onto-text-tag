@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+
+
+<p>Build Status: {{status}}</p>
+<p>Start Time: {{time_started}}</p>
+<p>Finish Time: {{time_finished}}</p>
+<style>
+    .button{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+</style>
+
+<button class="button" id="trigger" onclick="buildit()">
+    BUILD NOW
+</button>
+
+<script type="text/javascript">
+
+buildit = () => {
+    //todo: send "start" command and stay in this view rather
+    // check build status eg: https://beenje.github.io/blog/posts/running-background-tasks-with-flask-and-rq/
+    // window.location = "/build-ontotermentions-now";
+    open('/build-ontotermentions-now')
+    // todo: indicate that build started
+    // todo: load /build-ontotermentions-now without opening
+}
+</script>
