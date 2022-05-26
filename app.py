@@ -68,6 +68,8 @@ from redis import Redis
 from rq import push_connection, pop_connection, Queue, Connection, Worker
 redis = Redis(host="redis", db=0, socket_connect_timeout=10, socket_timeout=10)
 import time
+import asyncio
+
 
 from flask_caching import Cache
 # from rq_scheduler import Scheduler
@@ -346,22 +348,50 @@ def build():
         status = cache.get('status')
     if cache.get('time_started') is not None: 
         time_started = cache.get('time_started')
+    else: 
+        if cache.get('status') is not None:
+            # status set but no time? error!
+            cache.set('status', None)
     if cache.get('time_finished') is not None: 
         time_finished = cache.get('time_finished')
+
 
     return render_template("build.html", time_started=time_started, status=status, time_finished=time_finished)
 
 # runs build_ontotermentions.py: #todo: trigger this from build() (POST request)
-@app.route('/build-ontotermentions-now')
+@app.route('/build-ontotermentions-now', methods=['POST'])
 def build_ontotermentions_now():
+    print("received post request")
     # trying running directly with status in cache: 
-    cache.set('status', 'started')
-    build_ontotermentions_func()
-    returnString = "returned and finished"
-    print(returnString)
-    return (returnString) 
+    status = cache.get('status')
+    print("current status after post: ", status)
+    if status == 'finished' or status == None:
+        print("status corrent, trying build now")
+        cache.set('status', 'started')
+        #todo: learn how to use asyncio? Not working below
+        # loop = asyncio.get_event_loop()
+        # loop.run_until_complete(build_ontotermentions_func())
+        # loop.close
+        build_ontotermentions_func()
+        returnString = jsonify("returned and finished")
+        print(returnString)
+        return (returnString) 
+    else:
+        print("wrong status")
+        return(jsonify("busy building"))
     
-
+@app.route('/get_status', methods = ["GET"])
+def get_status():
+    status = cache.get('status')
+    time_started = cache.get('time_started')
+    time_finished = cache.get('time_finished')
+    data = {
+        "status" : status,
+        "time_started" : time_started,
+        "time_finished" : time_finished,
+    }
+    print("returning data: ", data)
+    return(jsonify(data))
 
 # Pages for the app
 @app.route('/')

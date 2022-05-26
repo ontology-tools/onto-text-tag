@@ -1,36 +1,79 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html> -->
+{% extends "base.html" %}
 
+{% block head %}
+{{ super() }}
+{% endblock %}
 
-<p>Build Status: {{status}}</p>
-<p>Start Time: {{time_started}}</p>
-<p>Finish Time: {{time_finished}}</p>
+{% block body %}
+{{ super() }}
 <style>
     .button{
-        position: absolute;
+        position: relative;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
     }
 </style>
+<p id="status">Build Status: {{status}}</p>
+<p id="time_started">Start Time: {{time_started}}</p>
+<p id="time_finished">Finish Time: {{time_finished}}</p>
+<p id="message"></p>
+
 
 <button class="button" id="trigger" onclick="buildit()">
     BUILD NOW
 </button>
-
 <script type="text/javascript">
+        buildit = () => {
+        //todo: send "start" command and stay in this view rather
+        // check build status eg: https://beenje.github.io/blog/posts/running-background-tasks-with-flask-and-rq/
+        // todo: only run below if not already running build! 
+        
+        // window.location = "/build-ontotermentions-now";
+        console.log("should send post now");
+        {% if status == 'finished' or status == 'no build found'%} //or status == failed? 
+        fetch('/build-ontotermentions-now', {
+            headers: { "Content-Type": "application/json; charset=utf-8" },
+            method: 'POST',
+            body: JSON.stringify({
+                startmessage: "start",
+            })
+        })
+            .then($('#message').text("Request sent"))
+            .then(response => response.json())
+            .then(data => console.log(JSON.stringify(data)))
+        // open('/build-ontotermentions-now');
+        {% else %}
+        console.log("Cannot initiate build, busy building");
+        {% endif %}
+        // todo: indicate that build started
+        // todo: load /build-ontotermentions-now without opening
+    }
 
-buildit = () => {
-    //todo: send "start" command and stay in this view rather
-    // check build status eg: https://beenje.github.io/blog/posts/running-background-tasks-with-flask-and-rq/
-    // todo: only run below if not already running build! 
-    
-    // window.location = "/build-ontotermentions-now";
-    {% if status == 'finished' or status == 'no build found'%}
-    open('/build-ontotermentions-now');
-    {% else %}
-    console.log("Cannot initiate build, busy building");
-    {% endif %}
-    // todo: indicate that build started
-    // todo: load /build-ontotermentions-now without opening
-}
-</script>
+$(function(){
+    const timer = () => {
+        // fetch status, time_started, time_finished here
+        fetch('/get_status')
+        .then(response => response.json())
+        .then(data => {
+            // console.log(data)
+            parsed = data;
+            // parsed = JSON.parse(data);
+            console.log(parsed);
+            $('#status').text(parsed.status);
+            $('#time_started').text(parsed.time_started);
+            $('#time_finished').text(parsed.time_finished);
+        });
+    };
+
+    setInterval(timer, 2000); //todo: should be every minute? on-demand? 
+});
+
+
+
+    </script>
+{% endblock %}
+{% block footer %}
+{{ super() }}
+{% endblock %}
