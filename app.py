@@ -90,9 +90,7 @@ cache = Cache(app, config={
     'CACHE-KEY-PREFIX': 'server1', 
     'CACHE_REDIS_HOST': 'localhost', 
     'CACHE_REDIS_PORT': '6379', 
-    'CACHE_REDIS_URL' : 'REDIS://LOCALHOST:6379',
-    'CACHE_DEFAULT_TIMEOUT' : 922337203685477580, # keep cache for a very long time (years)
-    'CACHE_THRESHOLD' : 922337203685477580
+    'CACHE_REDIS_URL' : 'REDIS://LOCALHOST:6379'
 })
 
 app.config.from_object('config')
@@ -308,12 +306,12 @@ def strip_tags(html):
 
 def build_ontotermentions_func():
     print("running worker")
-    cache.set('status', 'running')
+    cache.set('status', 'running', timeout=0)
     # timeStarted = time.localtime(time.time())
     timeStarted = time.strftime('%X %x %Z')
-    cache.set('time_started', timeStarted)  
+    cache.set('time_started', timeStarted, timeout=0)  
     timeFinished = "unfinished"
-    cache.set('time_finished', timeFinished)  
+    cache.set('time_finished', timeFinished, timeout=0)  
     time.sleep(30) # test simulate long BUILD process
 
     # THE BUILD:
@@ -334,10 +332,10 @@ def build_ontotermentions_func():
     #     os.system("echo `date +'%Y-%m-%d %T'` >> failed.txt") #save date and time to file
     #     return "Build FAILED"
 
-    cache.set('status', 'finished')
+    cache.set('status', 'finished', timeout=0)
     # timeFinished = time.localtime(time.time())
     timeFinished = time.strftime('%X %x %Z')
-    cache.set('time_finished', timeFinished)
+    cache.set('time_finished', timeFinished, timeout=0)
     print("job finished at: ", timeFinished)
     return "successfully built"
 
@@ -355,7 +353,7 @@ def build():
     else: 
         if cache.get('status') is not None:
             # status set but no time? error!
-            cache.set('status', None)
+            cache.set('status', None, timeout=0)
     if cache.get('time_finished') is not None: 
         time_finished = cache.get('time_finished')
 
@@ -371,7 +369,7 @@ def build_ontotermentions_now():
     print("current status after post: ", status)
     if status == 'finished' or status == None:
         print("status corrent, trying build now")
-        cache.set('status', 'started')
+        cache.set('status', 'started', timeout=0)
         #todo: learn how to use asyncio? Not working below
         # loop = asyncio.get_event_loop()
         # loop.run_until_complete(build_ontotermentions_func())
