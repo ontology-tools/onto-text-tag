@@ -61,9 +61,9 @@ $(function(){
             parsed = data;
             // parsed = JSON.parse(data);
             console.log(parsed);
-            $('#status').text(parsed.status);
-            $('#time_started').text(parsed.time_started);
-            $('#time_finished').text(parsed.time_finished);
+            $('#status').text("Status: " + parsed.status);
+            $('#time_started').text("Time Started: " + parsed.time_started);
+            $('#time_finished').text("Time Finished: " + parsed.time_finished);
         });
     };
 

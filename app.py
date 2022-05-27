@@ -307,7 +307,8 @@ def strip_tags(html):
 def build_ontotermentions_func():
     print("running worker")
     cache.set('status', 'running')
-    timeStarted = time.localtime(time.time())
+    # timeStarted = time.localtime(time.time())
+    timeStarted = time.strftime('%X %x %Z')
     cache.set('time_started', timeStarted)  
     timeFinished = "unfinished"
     cache.set('time_finished', timeFinished)  
@@ -332,7 +333,8 @@ def build_ontotermentions_func():
     #     return "Build FAILED"
 
     cache.set('status', 'finished')
-    timeFinished = time.localtime(time.time())
+    # timeFinished = time.localtime(time.time())
+    timeFinished = time.strftime('%X %x %Z')
     cache.set('time_finished', timeFinished)
     print("job finished at: ", timeFinished)
     return "successfully built"
