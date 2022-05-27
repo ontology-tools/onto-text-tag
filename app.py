@@ -90,7 +90,9 @@ cache = Cache(app, config={
     'CACHE-KEY-PREFIX': 'server1', 
     'CACHE_REDIS_HOST': 'localhost', 
     'CACHE_REDIS_PORT': '6379', 
-    'CACHE_REDIS_URL' : 'REDIS://LOCALHOST:6379'
+    'CACHE_REDIS_URL' : 'REDIS://LOCALHOST:6379',
+    'CACHE_DEFAULT_TIMEOUT' : 922337203685477580, # keep cache for a very long time (years)
+    'CACHE_THRESHOLD' : 922337203685477580
 })
 
 app.config.from_object('config')
