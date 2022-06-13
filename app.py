@@ -386,6 +386,7 @@ def pubmed():
     dateA = ""
     titleA = ""
     authorsA = "" 
+    fixed_abstractText = ""
 
 #This try/except fails on any issue with missing pubmed ID. Deal with each case individually. 
     try:
