@@ -403,6 +403,7 @@ def pubmed():
             #not in pre-downloaded abstracts, get pubmed info direct from pubmed here:
             #todo: refactor this duplicate block
             try:
+                # print("FETCHING DETAILS")
                 detailResults = fetch_details([id])
                 # print("got fetched_details: ", detailResults)
                 articleDetails = id
@@ -468,9 +469,10 @@ def pubmed():
                                        error_msg=f"The PubMed ID {id} was not indexed  - try pasting in the abstract text instead",)
 
         # print("should get tag here 1")
-        text, details, date, title, authors, id, tag_results, development = tag(fixed_abstractText, articleDetails,
+        text, details, date, title, authors, tag_results, development = tag(fixed_abstractText, articleDetails,
             dateA, titleA, authorsA)
         # print("got data: ", text, details, date, title, authors, id)
+        # print("got id", id)
         # print("")
         # print("got tag_results: ", tag_results)
         return render_template('index.html',
@@ -488,6 +490,7 @@ def pubmed():
         traceback.print_exc()
         try:
             #get pubmed info direct from pubmed here
+            # print("FETCHING DETAILS")
             detailResults = fetch_details([id])
             #todo: refactor this duplicate block
             # print("got fetched_details: ", fetched_details)
@@ -548,8 +551,11 @@ def pubmed():
 
             #returning details from fetch_details here: 
             # print("should get tag here2")
-            text, details, date, title, authors, id, tag_results, development = tag(fixed_abstractText, articleDetails,
+
+            text, details, date, title, authors, tag_results, development = tag(fixed_abstractText, articleDetails,
             dateA, titleA, authorsA)
+            # print("got data: ", text, details, date, title, authors, id)
+            # print("got id: ", id)
             return render_template('index.html',
                            text=text,
                            details=details,
@@ -569,7 +575,7 @@ def pubmed():
     
 # @ app.route('/tag', methods=['POST'])
 def tag(text, details, date, title, authors):
-    print("/tag")
+    # print("/tag")
     # development = (os.environ.get("FLASK_ENV")=='development')
     development="development"
     if details is None:
@@ -678,7 +684,7 @@ def tag(text, details, date, title, authors):
     # print("textfile: ", textfile)
     coll = pl.load_one(textfile, fmt='txt')#, iter_mode='document')
     pl.process(coll)
-    print("coll: ", coll[0])
+    # print("coll: ", coll[0])
     
     
     # note: the entity.names below are just to fit in with OGER's un-related column naming. 
@@ -705,8 +711,7 @@ def tag(text, details, date, title, authors):
         # print("got tag_results in /tag: ", tag_results)
     # print("got tag result in /tag: ", tag_results)
     # print("should render index.html here (/tag)")
-    id=""
-    return text, details, date, title, authors, id, tag_results, development
+    return text, details, date, title, authors, tag_results, development
 
 
 @ app.route('/tag_url', methods=['POST'])
