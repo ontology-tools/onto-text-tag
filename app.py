@@ -570,8 +570,8 @@ def pubmed():
             print(exe)
             traceback.print_exc()
             return render_template('index.html',
-                                   error_msg=f"This PubMed ID {id} was not indexed  - try pasting in the abstract text instead")
-
+                                   error_msg=f"This PubMed ID {id} has no abstract available, or there is an error fetching it from PubMed")
+                                   
     
 # @ app.route('/tag', methods=['POST'])
 def tag(text, details, date, title, authors):
