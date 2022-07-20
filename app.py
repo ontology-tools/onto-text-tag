@@ -72,13 +72,67 @@ app.config.from_object('config')
 
 nlp = en_core_web_sm.load()
 
+# todo: get source repositories (location, location2..) from bsso foundry: 
+#get source repositories: 
+query_url = f"https://api.github.com/repos/bssofoundry/bssofoundry.github.io/contents/ontology?ref=main"
+
+headers = {'Accept': f'application/vnd.github.v3+json'}
+r = requests.get(query_url, headers=headers)
+linksData = r.json()
+repo_names = []
+# repositories = []
+source_repositories = {}
+
+# todo: source_repositories only updated on restart? 
+
+# get the .owl url and name information from BSSOFoundry github:
+
+for result in linksData:
+    download_url = result['download_url']
+    if "_outline" in download_url:
+        pass
+    else:
+        md_html = requests.get(download_url, headers=headers).text
+        # print(md_html) #full result for testing
+        for line in md_html.split('\n'):             
+            if "source_url: " in line: 
+                source_url = line.replace("source_url: ", "").strip()
+                # source_urls.append(source_url)
+        for line in md_html.split('\n'):
+            if "id: " in line and "- id: " not in line and "orcid" not in line:
+                repo_name = line.replace("id: ", "").strip().upper()                      
+                repo_names.append(repo_name)
+        # work-around for non-upper AddictO: todo: fix this!
+        if repo_name != "ADDICTO":
+            source_repositories[repo_name] = source_url
+        else: 
+            #todo: url for AddictO not resolving - 
+            source_repositories['ADDICTO'] = "https://raw.githubusercontent.com/addiction-ssa/addiction-ontology/master/addicto.owl" # source_url # todo: make this kluge exception for AddictO go away
+
+print("source_repositories: ", source_repositories)
+
 location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
+# testing .owl - works: 
+location = f"https://raw.githubusercontent.com/addiction-ssa/addiction-ontology/master/addicto.owl"
 location2 = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
 
 print("Fetching release file from", location)
 ontol1 = pyhornedowl.open_ontology(urlopen(location).read().decode('utf-8'))
+
 print("Fetching release file from", location2)
 ontol2 = pyhornedowl.open_ontology(urlopen(location2).read().decode('utf-8'))
+
+#todo: use array for all ontologies (instead of ontol1, 2..)
+ontologies = []
+for r_name in repo_names:
+    print("r_name: ", r_name)
+    # ontologies.append(source_repositories[r_name])
+    ontologies.append(pyhornedowl.open_ontology(urlopen(source_repositories[r_name]).read().decode('utf-8')))
+print("ontologies: ", ontologies)
+
+
+
+
 
 development = (os.environ.get("FLASK_ENV")=='development')
 #if development:
@@ -92,8 +146,10 @@ all_authors_db = shelve.open('static/allAuthorAffils.db', flag='r', writeback=Fa
 print("loaded abstract authors db")
 
 for prefix in PREFIXES:
-    ontol1.add_prefix_mapping(prefix[0], prefix[1])
-    ontol2.add_prefix_mapping(prefix[0], prefix[1])
+    ontologies[0].add_prefix_mapping(prefix[0], prefix[1])
+    ontologies[1].add_prefix_mapping(prefix[0], prefix[1])
+    ontologies[2].add_prefix_mapping(prefix[0], prefix[1])
+    ontologies[3].add_prefix_mapping(prefix[0], prefix[1])
 
 # combined test
 # populated with {"label1": name1, ontofile1}, {"label2": ...}
@@ -102,13 +158,24 @@ ontoDict = {
         {
             "label": "BCIO",
             "name": "BCIO",
-            "ontology": ontol2
+            "ontology": ontologies[1]
         },
         
         {
             "label": "AddictO",
              "name": "AddictO",
-            "ontology": ontol1
+            "ontology": ontologies[0]
+        },
+        {
+            "label": "MF",
+            "name": "MF",
+            "ontology": ontologies[2]
+        },
+        
+        {
+            "label": "MFOEM",
+             "name": "MFOEM",
+            "ontology": ontologies[3]
         },
     ]
 }
@@ -119,25 +186,25 @@ def get_all_descendents(id_list):
     #todo: refactor below?:
 
     for entry in id_list:
-        entryIri = ontol1.get_iri_for_id(entry.replace("_", ":"))
+        entryIri = ontologies[0].get_iri_for_id(entry.replace("_", ":"))
         if entryIri:
-            descs = pyhornedowl.get_descendants(ontol1, entryIri)
+            descs = pyhornedowl.get_descendants(ontologies[0], entryIri)
             if len(descs) > 0:
                 for d in descs:
                     try:
-                        add_id = ontol1.get_id_for_iri(d).replace(":", "_")
+                        add_id = ontologies[0].get_id_for_iri(d).replace(":", "_")
                         descendent_ids.append(add_id.replace("_", ":"))
                     except:
                         print("error when getting descendents of ",d)
                 
     for entry in id_list:
-        entryIri = ontol2.get_iri_for_id(entry.replace("_", ":"))
+        entryIri = ontologies[1].get_iri_for_id(entry.replace("_", ":"))
         if entryIri:
-            descs = pyhornedowl.get_descendants(ontol2, entryIri)
+            descs = pyhornedowl.get_descendants(ontologies[1], entryIri)
             if len(descs) > 0:
                 for d in descs:
                     try:
-                        add_id = ontol1.get_id_for_iri(d).replace(":", "_")
+                        add_id = ontologies[0].get_id_for_iri(d).replace(":", "_")
                         descendent_ids.append(add_id.replace("_", ":"))
                     except:
                         print("error getting descendents of ",d)
@@ -241,7 +308,7 @@ def get_abstract_text(result):
 def get_ids(ontol_list):
     # print("get_ids running here")
     checklist = []
-    for ontol in [ontol1,ontol2]:
+    for ontol in [ontologies[0],ontologies[1],ontologies[2],ontologies[3]]:
         for classIri in ontol.get_classes():
             # print("for classIri running")        
             classId = ontol.get_id_for_iri(classIri)
