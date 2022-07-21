@@ -111,24 +111,13 @@ for result in linksData:
 
 print("source_repositories: ", source_repositories)
 
-location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
-# testing .owl - works: 
-location = f"https://raw.githubusercontent.com/addiction-ssa/addiction-ontology/master/addicto.owl"
-location2 = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
-
-print("Fetching release file from", location)
-ontol1 = pyhornedowl.open_ontology(urlopen(location).read().decode('utf-8'))
-
-print("Fetching release file from", location2)
-ontol2 = pyhornedowl.open_ontology(urlopen(location2).read().decode('utf-8'))
-
-#todo: use array for all ontologies (instead of ontol1, 2..)
+# use array for all ontologies
 ontologies = []
 for r_name in repo_names:
     print("r_name: ", r_name)
     # ontologies.append(source_repositories[r_name])
     ontologies.append(pyhornedowl.open_ontology(urlopen(source_repositories[r_name]).read().decode('utf-8')))
-print("ontologies: ", ontologies)
+print("got ontologies: ", ontologies)
 
 
 
@@ -145,14 +134,14 @@ print("loaded abstract dates db")
 all_authors_db = shelve.open('static/allAuthorAffils.db', flag='r', writeback=False)
 print("loaded abstract authors db")
 
-for prefix in PREFIXES:
-    ontologies[0].add_prefix_mapping(prefix[0], prefix[1])
-    ontologies[1].add_prefix_mapping(prefix[0], prefix[1])
-    ontologies[2].add_prefix_mapping(prefix[0], prefix[1])
-    ontologies[3].add_prefix_mapping(prefix[0], prefix[1])
+for onto in ontologies:
+    for prefix in PREFIXES:
+        onto.add_prefix_mapping(prefix[0], prefix[1])
+        
 
 # combined test
 # populated with {"label1": name1, ontofile1}, {"label2": ...}
+#todo: dynamically add from ontologies array and repo_names?
 ontoDict = {
     "ontologies": [       
         {
@@ -182,32 +171,19 @@ ontoDict = {
     
 def get_all_descendents(id_list):   
     descendent_ids = []
-
-    #todo: refactor below?:
-
-    for entry in id_list:
-        entryIri = ontologies[0].get_iri_for_id(entry.replace("_", ":"))
-        if entryIri:
-            descs = pyhornedowl.get_descendants(ontologies[0], entryIri)
-            if len(descs) > 0:
-                for d in descs:
-                    try:
-                        add_id = ontologies[0].get_id_for_iri(d).replace(":", "_")
-                        descendent_ids.append(add_id.replace("_", ":"))
-                    except:
-                        print("error when getting descendents of ",d)
-                
-    for entry in id_list:
-        entryIri = ontologies[1].get_iri_for_id(entry.replace("_", ":"))
-        if entryIri:
-            descs = pyhornedowl.get_descendants(ontologies[1], entryIri)
-            if len(descs) > 0:
-                for d in descs:
-                    try:
-                        add_id = ontologies[0].get_id_for_iri(d).replace(":", "_")
-                        descendent_ids.append(add_id.replace("_", ":"))
-                    except:
-                        print("error getting descendents of ",d)
+    
+    for onto in ontologies:
+        for entry in id_list:
+            entryIri = onto.get_iri_for_id(entry.replace("_", ":"))
+            if entryIri:
+                descs = pyhornedowl.get_descendants(onto, entryIri)
+                if len(descs) > 0:
+                    for d in descs:
+                        try:
+                            add_id = onto.get_id_for_iri(d).replace(":", "_")
+                            descendent_ids.append(add_id.replace("_", ":"))
+                        except:
+                            print("error when getting descendents of ",d)
                 
     if len(descendent_ids) == 0:
         return id_list
@@ -308,7 +284,7 @@ def get_abstract_text(result):
 def get_ids(ontol_list):
     # print("get_ids running here")
     checklist = []
-    for ontol in [ontologies[0],ontologies[1],ontologies[2],ontologies[3]]:
+    for ontol in ontologies: 
         for classIri in ontol.get_classes():
             # print("for classIri running")        
             classId = ontol.get_id_for_iri(classIri)
@@ -356,7 +332,7 @@ def build():
 @app.route('/build-ontotermentions-now')
 def build_ontotermentions_now():
     try:
-        # todo: use RQ scheduler instead of below, need better system to indicate success
+        # todo: use RQ scheduler instead of below, need better system to indicate success - see RQ_scheduler branch for latest
         # todo: relative path to addiction-ontology
         # todo: use subprocess instead of os.system
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
