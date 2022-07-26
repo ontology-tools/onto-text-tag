@@ -102,7 +102,7 @@ for result in linksData:
             if "id: " in line and "- id: " not in line and "orcid" not in line:
                 repo_name = line.replace("id: ", "").strip().upper()                      
                 repo_names.append(repo_name)
-        # work-around for non-upper AddictO: todo: fix this!
+        # work-around for non-upper AddictO: todo: is this still necessary? 
         if repo_name != "ADDICTO":
             source_repositories[repo_name] = source_url
         else: 
@@ -139,8 +139,6 @@ for onto in ontologies:
         onto.add_prefix_mapping(prefix[0], prefix[1])
         
 
-# combined test
-# populated with {"label1": name1, ontofile1}, {"label2": ...}
 #dynamically add from ontologies array and repo_names. TODO: are these always going to match numbers? 
 ontoDict = {"ontologies": []}
 for r in range(len(ontologies)): 
@@ -149,32 +147,7 @@ for r in range(len(ontologies)):
                         "ontology": ontologies[r]}
     ontoDict["ontologies"].append(ontology_details)
 print("ontoDict = ", ontoDict)
-# ontoDict = {
-#     "ontologies": [       
-#         {
-#             "label": "BCIO",
-#             "name": "BCIO",
-#             "ontology": ontologies[1]
-#         },
-        
-#         {
-#             "label": "AddictO",
-#              "name": "AddictO",
-#             "ontology": ontologies[0]
-#         },
-#         {
-#             "label": "MF",
-#             "name": "MF",
-#             "ontology": ontologies[2]
-#         },
-        
-#         {
-#             "label": "MFOEM",
-#              "name": "MFOEM",
-#             "ontology": ontologies[3]
-#         },
-#     ]
-# }
+
     
 def get_all_descendents(id_list):   
     descendent_ids = []
