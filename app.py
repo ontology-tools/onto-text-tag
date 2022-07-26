@@ -141,33 +141,40 @@ for onto in ontologies:
 
 # combined test
 # populated with {"label1": name1, ontofile1}, {"label2": ...}
-#todo: dynamically add from ontologies array and repo_names?
-ontoDict = {
-    "ontologies": [       
-        {
-            "label": "BCIO",
-            "name": "BCIO",
-            "ontology": ontologies[1]
-        },
+#dynamically add from ontologies array and repo_names. TODO: are these always going to match numbers? 
+ontoDict = {"ontologies": []}
+for r in range(len(ontologies)): 
+    ontology_details = {"label": repo_names[r], 
+                        "name": repo_names[r], 
+                        "ontology": ontologies[r]}
+    ontoDict["ontologies"].append(ontology_details)
+print("ontoDict = ", ontoDict)
+# ontoDict = {
+#     "ontologies": [       
+#         {
+#             "label": "BCIO",
+#             "name": "BCIO",
+#             "ontology": ontologies[1]
+#         },
         
-        {
-            "label": "AddictO",
-             "name": "AddictO",
-            "ontology": ontologies[0]
-        },
-        {
-            "label": "MF",
-            "name": "MF",
-            "ontology": ontologies[2]
-        },
+#         {
+#             "label": "AddictO",
+#              "name": "AddictO",
+#             "ontology": ontologies[0]
+#         },
+#         {
+#             "label": "MF",
+#             "name": "MF",
+#             "ontology": ontologies[2]
+#         },
         
-        {
-            "label": "MFOEM",
-             "name": "MFOEM",
-            "ontology": ontologies[3]
-        },
-    ]
-}
+#         {
+#             "label": "MFOEM",
+#              "name": "MFOEM",
+#             "ontology": ontologies[3]
+#         },
+#     ]
+# }
     
 def get_all_descendents(id_list):   
     descendent_ids = []
