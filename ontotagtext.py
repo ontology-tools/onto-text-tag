@@ -1,7 +1,7 @@
 
 import pyhornedowl
 import spacy
-from spacy import displacy
+from spacy import displacy, Language
 from spacy.tokens import Doc, Span, Token
 from spacy.lang.en import English
 from spacy.matcher import PhraseMatcher
@@ -39,8 +39,9 @@ PREFIXES = [ ["ADDICTO","http://addictovocab.org/ADDICTO_"],
 
 
 
+@Language.factory("multi_extractor_component")
 class MultiExtractorComponent(object):
-    def __init__(self, nlp, ontoDict):
+    def setup(self, nlp, ontoDict):
         # add ontology and label from ontoDict
         self.ontoDict = ontoDict
         self.all_labels = ""
@@ -116,6 +117,9 @@ class MultiExtractorComponent(object):
         Doc.set_extension("has_ontols", getter=self.has_ontols, force=True)
         Doc.set_extension("ontols", default=[], force=True)
         Span.set_extension("has_ontols", getter=self.has_ontols, force=True)
+
+    def __init__(self, nlp, name):
+        pass
 
     def __call__(self, doc):
         matches = self.matcher(doc)

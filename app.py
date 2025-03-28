@@ -72,8 +72,8 @@ app.config.from_object('config')
 
 nlp = en_core_web_sm.load()
 
-location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
-location2 = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
+location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto.owl"
+location2 = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/bcio.owl"
 
 print("Fetching release file from", location)
 ontol1 = pyhornedowl.open_ontology(urlopen(location).read().decode('utf-8'))
@@ -150,11 +150,9 @@ def get_all_descendents(id_list):
         return return_list
         # return descendent_ids #test only descendents
 
-onto_extractor3 = MultiExtractorComponent(
-    nlp,
-    ontoDict=ontoDict
-    )
-nlp.add_pipe(onto_extractor3, after="ner")
+nlp.add_pipe("multi_extractor_component", after="ner")
+onto_extractor3 = nlp.get_pipe("multi_extractor_component")
+onto_extractor3.setup(nlp, ontoDict)
 
 
 # Interaction with PubMed: get detailed results for a list of IDs
